@@ -8,13 +8,19 @@
 }
 
 .brand-symbol {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   flex: none;
-  padding: 6px;
-  border-radius: 10px;
-  background: var(--text);
-  color: var(--lime);
+  padding: 7px;
+  border-radius: 12px;
+  background: var(--lime);
+  color: var(--text);
+}
+
+.theme-toggle,
+.menu-toggle {
+  width: 38px;
+  height: 38px;
 }
 
 .content-card {
