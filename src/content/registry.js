@@ -3,17 +3,17 @@ const labMetadataModules = import.meta.glob("../../content/labs/*/meta.js", { ea
 const labModules = import.meta.glob("../../content/labs/*/Lab.jsx");
 const labGuideModules = import.meta.glob("../../content/labs/*/guide.mdx");
 
-function byOrder(first, second) {
-  return first.order - second.order;
+function byDate(first, second) {
+  return new Date(second.date) - new Date(first.date);
 }
 
 export const articles = Object.values(articleModules)
   .map(({ default: Component, meta }) => ({ ...meta, Component }))
-  .sort(byOrder);
+  .sort(byDate);
 
 export const labs = Object.values(labMetadataModules)
   .map(({ meta }) => meta)
-  .sort(byOrder);
+  .sort(byDate);
 
 export function getArticleBySlug(slug) {
   return articles.find((article) => article.slug === slug);
@@ -33,4 +33,12 @@ export function loadLab(slug) {
 
 export function loadLabGuide(slug) {
   return findModule(labGuideModules, slug, "guide.mdx");
+}
+
+export function formatContentDate(date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(`${date}T00:00:00`));
 }
