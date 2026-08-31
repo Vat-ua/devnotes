@@ -69,6 +69,10 @@
   .lab-grid .content-card:last-child {
     grid-column: span 2;
   }
+
+  .lab-grid .content-card:only-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 1040px) {

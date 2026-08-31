@@ -5,6 +5,9 @@ import LabCard from "../../components/content/LabCard.jsx";
 import { articles, labs } from "../../content/registry.js";
 
 export default function Home() {
+  const latestArticles = articles.slice(0, 4);
+  const latestLabs = labs.slice(0, 3);
+
   return (
     <>
       <section className="hero home-hero">
@@ -102,14 +105,14 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="content-grid article-grid">{articles.slice(0, 4).map((article, index) => <ArticleCard key={article.slug} article={article} featured={index === 0} />)}</div>
+          <div className="content-grid article-grid">{latestArticles.map((article, index) => <ArticleCard key={article.slug} article={article} featured={index === 0} />)}</div>
           <Link className="section-link" to="/articles">Ver todos os articles <ArrowRight aria-hidden="true" size={18} /></Link>
         </div>
       </section>
 
       <section className="labs-preview" id="labs"><div className="container">
         <header className="section-header"><div><span className="section-kicker">Labs</span><h2>Abra, mexa,<br />descubra.</h2></div><p>Pequenas experiências interativas para explorar comportamentos antes de levá-los ao seu próximo projeto.</p></header>
-        <div className="content-grid lab-grid">{labs.slice(0, 3).map((lab, index) => <LabCard key={lab.slug} lab={lab} featured={index === 0} />)}</div>
+        <div className="content-grid lab-grid">{latestLabs.map((lab, index) => <LabCard key={lab.slug} lab={lab} featured={index === 0} />)}</div>
         <Link className="section-link" to="/labs">Explorar todos os labs <ArrowRight aria-hidden="true" size={18} /></Link>
       </div></section>
 

@@ -1,1 +1,0 @@
-export const meta = { slug: "estado-em-camadas", number: "01", type: "React · State", title: "Estado em camadas", excerpt: "Observe como uma interface muda quando dados, filtros e feedback compartilham o mesmo contexto.", accent: "lime", prompt: "Escolha uma camada para destacar no painel.", date: "2026-06-18" };

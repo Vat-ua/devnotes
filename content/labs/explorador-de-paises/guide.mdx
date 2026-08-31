@@ -1,0 +1,12 @@
+## Como o exemplo foi construído
+
+Os países começam em um arquivo de dados local. O componente principal não salva uma segunda lista no estado: ele guarda apenas a busca, o continente e a ordem escolhida.
+
+Com esses três valores, a lista visível é derivada com `filter()` e `toSorted()`. Isso evita dados duplicados e mantém o resultado previsível.
+
+## O que vale reaproveitar
+
+- use uma chave estável em cada card, como o nome ou um `id`;
+- mantenha inputs como componentes controlados;
+- use `<details>` e `<summary>` quando um accordion simples já resolve;
+- trate a lista vazia como um estado legítimo da interface.

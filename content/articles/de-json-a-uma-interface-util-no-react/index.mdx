@@ -1,0 +1,32 @@
+import { Link } from "react-router"
+
+export const meta = {
+  slug: "de-json-a-uma-interface-util-no-react",
+  category: "React na prática",
+  title: "De JSON a uma interface útil no React",
+  excerpt: "Como transformar uma lista local de dados em cards pesquisáveis, filtráveis e fáceis de explorar sem complicar o estado.",
+  readTime: "8 min de leitura",
+  date: "2026-07-02",
+  accent: "lime",
+}
+
+Uma lista de objetos parece simples até que a interface pede busca, filtros, ordenação e detalhes. A boa notícia é que a maior parte desse trabalho não pede estados complexos — pede separar dados de decisões.
+
+## Guarde a intenção, derive o resultado
+
+Em vez de salvar uma nova lista toda vez que o usuário digita, guarde apenas o que ele escolheu: a busca, o filtro ativo e a forma de ordenação. A lista visível nasce desses valores.
+
+```jsx
+const visibleCountries = countries
+  .filter(matchesQuery)
+  .filter(matchesContinent)
+  .toSorted(bySelectedOrder);
+```
+
+Esse formato evita que dados de origem e dados filtrados fiquem fora de sincronia. Também deixa cada regra pequena o bastante para testar e explicar.
+
+## Componentes com responsabilidade clara
+
+O campo de busca não precisa conhecer os cards. O card não precisa saber como a lista foi filtrada. Quando cada componente recebe apenas o que precisa, a interface fica mais fácil de evoluir.
+
+<Link className="inline-content-link" to="/labs/explorador-de-paises">Abra o Lab Explorador de países para testar a implementação e ver os arquivos reais do exemplo →</Link>
