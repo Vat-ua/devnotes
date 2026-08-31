@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { Menu, X } from "lucide-react";
+import BrandMark from "./BrandMark.jsx";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
@@ -23,6 +24,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container header-inner">
         <NavLink className="brand" to="/" onClick={closeMenu}>
+          <BrandMark />
           DevNotes
         </NavLink>
 

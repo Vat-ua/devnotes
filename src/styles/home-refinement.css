@@ -7,6 +7,16 @@
   letter-spacing: -0.055em;
 }
 
+.brand-symbol {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--text);
+  color: var(--lime);
+}
+
 .content-card {
   color: inherit;
   text-decoration: none;
@@ -78,5 +88,32 @@
   .lab-grid .content-card:nth-child(3) {
     grid-column: span 4;
     min-height: 300px;
+  }
+}
+
+@media (min-width: 720px) {
+  .labs-preview .lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .labs-preview .lab-grid .content-card,
+  .labs-preview .lab-grid .content-card.is-featured,
+  .labs-preview .lab-grid .content-card:nth-child(3) {
+    grid-column: auto;
+    min-height: 300px;
+  }
+
+  .labs-preview .lab-grid .content-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1040px) {
+  .labs-preview .lab-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .labs-preview .lab-grid .content-card:last-child {
+    grid-column: auto;
   }
 }
