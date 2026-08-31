@@ -23,8 +23,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container header-inner">
         <NavLink className="brand" to="/" onClick={closeMenu}>
-          <span className="brand-mark">#</span>
-          <span>DevNotes</span>
+          DevNotes
         </NavLink>
 
         <div className="header-actions">

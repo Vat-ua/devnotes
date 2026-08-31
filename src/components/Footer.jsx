@@ -6,8 +6,7 @@ export default function Footer() {
       <div className="container footer-inner">
         <div className="footer-brand">
           <Link className="brand" to="/">
-            <span className="brand-mark">#</span>
-            <span>DevNotes</span>
+            DevNotes
           </Link>
           <p>Ideias, notas e experimentos para construir na web.</p>
         </div>

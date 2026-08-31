@@ -1,6 +1,12 @@
 /* Refinements specific to the landing-page content rhythm. */
 .home-hero .hero-actions { margin-top: 2.3rem; }
 
+.brand {
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
 .content-card {
   color: inherit;
   text-decoration: none;
@@ -37,6 +43,15 @@
   .article-grid .content-card.is-featured {
     grid-column: auto;
     min-height: 300px;
+  }
+
+  .lab-grid .content-card.is-featured {
+    grid-column: auto;
+    min-height: 300px;
+  }
+
+  .lab-grid .content-card:last-child {
+    grid-column: span 2;
   }
 }
 
