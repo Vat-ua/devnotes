@@ -1,0 +1,74 @@
+export const articles = [
+  {
+    slug: "interfaces-que-explicam-o-estado",
+    category: "Interface",
+    title: "Interfaces que explicam o próprio estado",
+    excerpt: "Pequenos sinais visuais reduzem a necessidade de instruções e deixam fluxos complexos mais confiáveis.",
+    readTime: "5 min de leitura",
+    date: "12 jun 2026",
+    accent: "lime",
+    body: [
+      "Uma boa interface não pede que a pessoa memorize o que acabou de acontecer. Ela mostra o estado atual, a próxima ação possível e o resultado de uma mudança com clareza.",
+      "Em produtos pequenos, isso costuma nascer de detalhes: um filtro que mostra quantos itens estão ativos, um botão que muda de rótulo depois de salvar e uma área vazia que sugere um primeiro passo útil.",
+      "O objetivo não é adicionar movimento a cada clique. É reduzir a dúvida. Quando a interface responde no mesmo vocabulário visual que usa para orientar, o produto parece mais rápido e mais humano.",
+    ],
+  },
+  {
+    slug: "a-pequena-arquitetura-de-um-fetch",
+    category: "Full stack",
+    title: "A pequena arquitetura de um fetch confiável",
+    excerpt: "Modelar carregamento, erro e dados logo no início evita que uma tela simples vire uma coleção de exceções.",
+    readTime: "7 min de leitura",
+    date: "28 mai 2026",
+    accent: "violet",
+    body: [
+      "Buscar dados parece simples até o primeiro atraso de rede, a primeira resposta vazia ou a primeira troca rápida de tela. É nesses momentos que a interface precisa ter uma opinião.",
+      "Comece descrevendo quatro estados: inicial, carregando, pronto e erro. Cada um merece uma saída visível, mesmo que curta. Essa decisão organiza o componente antes de qualquer biblioteca entrar na conversa.",
+      "A arquitetura pequena funciona porque deixa as fronteiras explícitas: a função que busca, a transformação dos dados e a interface que os apresenta. Se crescer, ela já terá lugares naturais para crescer.",
+    ],
+  },
+  {
+    slug: "menos-abstracao-mais-intencao",
+    category: "Prática",
+    title: "Menos abstração, mais intenção",
+    excerpt: "Um componente compartilhado vale quando torna uma decisão repetida mais clara — não apenas porque dois arquivos parecem semelhantes.",
+    readTime: "4 min de leitura",
+    date: "06 mai 2026",
+    accent: "orange",
+    body: [
+      "A abstração certa reduz decisões futuras. A abstração prematura só muda a complexidade de lugar. Antes de extrair um componente, vale perguntar qual comportamento realmente se repete.",
+      "Dois botões podem parecer iguais e ainda pertencer a contextos diferentes. Quando as regras de conteúdo, estado e acessibilidade se alinham, aí sim existe uma unidade de interface útil.",
+      "Manter a intenção perto do uso é uma vantagem em projetos pequenos. Extraia quando o nome do componente ajudar alguém a entender o produto, não apenas a reutilizar JSX.",
+    ],
+  },
+];
+
+export const labs = [
+  {
+    slug: "estado-em-camadas",
+    number: "01",
+    type: "React · State",
+    title: "Estado em camadas",
+    excerpt: "Observe como uma interface muda quando dados, filtros e feedback compartilham o mesmo contexto.",
+    accent: "lime",
+    prompt: "Escolha uma camada para destacar no painel.",
+  },
+  {
+    slug: "latencia-percebida",
+    number: "02",
+    type: "UX · Async",
+    title: "Latência percebida",
+    excerpt: "Experimente feedbacks de carregamento e veja por que alguns segundos podem parecer menores.",
+    accent: "violet",
+    prompt: "Simule uma resposta de rede para comparar os estados.",
+  },
+  {
+    slug: "formulario-com-feedback",
+    number: "03",
+    type: "Forms · Acessibilidade",
+    title: "Formulário com feedback",
+    excerpt: "Uma pequena experiência para testar validação, mensagens de erro e estados de sucesso.",
+    accent: "orange",
+    prompt: "Envie um nome curto e acompanhe o feedback da interface.",
+  },
+];
