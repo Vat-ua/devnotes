@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ArrowRight, ArrowUpRight, Code2, FileText, FlaskConical, Search } from "lucide-react";
 import ArticleCard from "../../components/content/ArticleCard.jsx";
 import LabCard from "../../components/content/LabCard.jsx";
-import { articles, labs } from "../../content/content.js";
+import { articles, labs } from "../../content/registry.js";
 
 export default function Home() {
   return (

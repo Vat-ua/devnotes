@@ -1,0 +1,1 @@
+export const meta = { slug: "formulario-com-feedback", number: "03", type: "Forms · Acessibilidade", title: "Formulário com feedback", excerpt: "Uma pequena experiência para testar validação, mensagens de erro e estados de sucesso.", accent: "orange", prompt: "Envie um nome curto e acompanhe o feedback da interface.", order: 3 };

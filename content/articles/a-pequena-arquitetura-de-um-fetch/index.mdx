@@ -1,0 +1,25 @@
+export const meta = {
+  slug: "a-pequena-arquitetura-de-um-fetch",
+  category: "Full stack",
+  title: "A pequena arquitetura de um fetch confiável",
+  excerpt: "Modelar carregamento, erro e dados logo no início evita que uma tela simples vire uma coleção de exceções.",
+  readTime: "7 min de leitura",
+  date: "28 mai 2026",
+  accent: "violet",
+  order: 2,
+}
+
+Buscar dados parece simples até o primeiro atraso de rede, a primeira resposta vazia ou a primeira troca rápida de tela. É nesses momentos que a interface precisa ter uma opinião.
+
+## Quatro estados são suficientes para começar
+
+Comece descrevendo inicial, carregando, pronto e erro. Cada um merece uma saída visível, mesmo que curta. Essa decisão organiza o componente antes de qualquer biblioteca entrar na conversa.
+
+```jsx
+if (status === "loading") return <LoadingState />;
+if (status === "error") return <ErrorState />;
+
+return <ResourceList items={data} />;
+```
+
+A arquitetura pequena funciona porque deixa as fronteiras explícitas: a função que busca, a transformação dos dados e a interface que os apresenta.

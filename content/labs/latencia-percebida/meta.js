@@ -1,0 +1,1 @@
+export const meta = { slug: "latencia-percebida", number: "02", type: "UX · Async", title: "Latência percebida", excerpt: "Experimente feedbacks de carregamento e veja por que alguns segundos podem parecer menores.", accent: "violet", prompt: "Simule uma resposta de rede para comparar os estados.", order: 2 };
