@@ -41,6 +41,20 @@ export const articles = [
       "Manter a intenção perto do uso é uma vantagem em projetos pequenos. Extraia quando o nome do componente ajudar alguém a entender o produto, não apenas a reutilizar JSX.",
     ],
   },
+  {
+    slug: "o-contrato-silencioso-do-loading",
+    category: "Produto",
+    title: "O contrato silencioso do loading",
+    excerpt: "Uma tela em espera continua fazendo parte da experiência — e merece uma resposta clara, não um vazio.",
+    readTime: "6 min de leitura",
+    date: "22 abr 2026",
+    accent: "lime",
+    body: [
+      "Carregar é um estado do produto, não um intervalo entre duas telas prontas. Quando ele é tratado como parte do fluxo, a pessoa entende que sua ação foi recebida.",
+      "O melhor feedback combina contexto e proporção. Um pequeno refresh pode pedir apenas um sinal discreto; uma operação longa deve explicar o que está acontecendo e o que permanece disponível.",
+      "A interface não precisa prometer velocidade que não controla. Precisa apenas continuar presente enquanto o trabalho acontece.",
+    ],
+  },
 ];
 
 export const labs = [

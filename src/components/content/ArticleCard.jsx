@@ -1,14 +1,15 @@
 import { Link } from "react-router";
+import { ArrowUpRight } from "lucide-react";
 
 export default function ArticleCard({ article, featured = false }) {
   return (
-    <article className={`content-card article-card accent-${article.accent} ${featured ? "is-featured" : ""}`}>
+    <Link className={`content-card article-card accent-${article.accent} ${featured ? "is-featured" : ""}`} to={`/articles/${article.slug}`}>
       <div className="card-meta"><span>{article.category}</span><span>{article.readTime}</span></div>
       <div>
-        <h3><Link to={`/articles/${article.slug}`}>{article.title}</Link></h3>
+        <h3>{article.title}</h3>
         <p>{article.excerpt}</p>
       </div>
-      <Link className="card-link" to={`/articles/${article.slug}`}>Ler nota <span aria-hidden="true">↗</span></Link>
-    </article>
+      <span className="card-link">Ler article <ArrowUpRight aria-hidden="true" size={18} /></span>
+    </Link>
   );
 }

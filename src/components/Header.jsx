@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
+import { Menu, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
@@ -37,8 +38,7 @@ export default function Header() {
             aria-controls="main-navigation"
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <span />
-            <span />
+            {menuOpen ? <X aria-hidden="true" size={19} /> : <Menu aria-hidden="true" size={20} />}
           </button>
         </div>
 

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { ArrowRight, ArrowUpRight, Code2, FileText, FlaskConical, Search } from "lucide-react";
 import ArticleCard from "../../components/content/ArticleCard.jsx";
 import LabCard from "../../components/content/LabCard.jsx";
 import { articles, labs } from "../../content/content.js";
@@ -28,17 +29,9 @@ export default function Home() {
             <div className="hero-actions">
               <Link className="btn btn-primary" to="/articles">
                 Explorar notes
-                <span aria-hidden="true">↗</span>
+                <ArrowUpRight aria-hidden="true" size={18} />
               </Link>
 
-              <a className="btn btn-link" href="#labs">
-                Conhecer labs
-                <span aria-hidden="true">↓</span>
-              </a>
-            </div>
-
-            <div className="hero-meta">
-              <span>Interfaces</span><span>React</span><span>Full stack</span><span>Experimentos</span>
             </div>
           </div>
 
@@ -65,25 +58,25 @@ export default function Home() {
                 </div>
 
                 <div className="fake-search">
-                  <span>⌕</span>
+                  <Search aria-hidden="true" size={17} />
                   <span>O que você quer testar hoje?</span>
                 </div>
 
                 <div className="fake-grid">
                   <div className="fake-card">
-                    <span className="fake-icon">01</span><strong>Nota</strong><small>Leitura curta</small>
+                    <span className="fake-icon"><FileText aria-hidden="true" size={15} /></span><strong>Nota</strong><small>Leitura curta</small>
                   </div>
 
                   <div className="fake-card fake-card-accent">
-                    <span className="fake-icon">✦</span><strong>Lab</strong><small>Interativo</small>
+                    <span className="fake-icon"><FlaskConical aria-hidden="true" size={15} /></span><strong>Lab</strong><small>Interativo</small>
                   </div>
 
                   <div className="fake-card">
-                    <span className="fake-icon">&lt;/&gt;</span><strong>Código</strong><small>Na prática</small>
+                    <span className="fake-icon"><Code2 aria-hidden="true" size={15} /></span><strong>Código</strong><small>Na prática</small>
                   </div>
 
                   <div className="fake-card">
-                    <span className="fake-icon">↗</span><strong>Projeto</strong><small>Próximo passo</small>
+                    <span className="fake-icon"><ArrowUpRight aria-hidden="true" size={15} /></span><strong>Projeto</strong><small>Próximo passo</small>
                   </div>
                 </div>
               </div>
@@ -110,14 +103,14 @@ export default function Home() {
           </header>
 
           <div className="content-grid article-grid">{articles.map((article, index) => <ArticleCard key={article.slug} article={article} featured={index === 0} />)}</div>
-          <Link className="section-link" to="/articles">Ver todos os articles <span aria-hidden="true">→</span></Link>
+          <Link className="section-link" to="/articles">Ver todos os articles <ArrowRight aria-hidden="true" size={18} /></Link>
         </div>
       </section>
 
       <section className="labs-preview" id="labs"><div className="container">
         <header className="section-header"><div><span className="section-kicker">Labs</span><h2>Abra, mexa,<br />descubra.</h2></div><p>Pequenas experiências interativas para explorar comportamentos antes de levá-los ao seu próximo projeto.</p></header>
         <div className="content-grid lab-grid">{labs.map((lab, index) => <LabCard key={lab.slug} lab={lab} featured={index === 0} />)}</div>
-        <Link className="section-link" to="/labs">Explorar todos os labs <span aria-hidden="true">→</span></Link>
+        <Link className="section-link" to="/labs">Explorar todos os labs <ArrowRight aria-hidden="true" size={18} /></Link>
       </div></section>
 
       <section className="closing-section">
@@ -132,7 +125,7 @@ export default function Home() {
 
           <Link className="btn btn-dark" to="/labs">
             Abrir um lab
-            <span>→</span>
+            <ArrowRight aria-hidden="true" size={18} />
           </Link>
         </div>
       </section>
