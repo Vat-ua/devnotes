@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, Code2, Copy } from "lucide-react";
 
 export default function CodeExplorer({ files }) {
@@ -6,6 +6,8 @@ export default function CodeExplorer({ files }) {
   const [highlightedCode, setHighlightedCode] = useState("");
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? "light");
   const [copied, setCopied] = useState(false);
+  const explorerId = useId();
+  const tabRefs = useRef([]);
   const file = files.find((item) => item.name === activeFile);
 
   useEffect(() => {
@@ -37,6 +39,34 @@ export default function CodeExplorer({ files }) {
     }
   }
 
+  function selectFile(index, shouldFocus = false) {
+    setActiveFile(files[index].name);
+    setCopied(false);
+
+    if (shouldFocus) {
+      tabRefs.current[index]?.focus();
+    }
+  }
+
+  function handleTabKeyDown(event, index) {
+    const lastIndex = files.length - 1;
+    let nextIndex = index;
+
+    if (event.key === "ArrowRight") nextIndex = index === lastIndex ? 0 : index + 1;
+    if (event.key === "ArrowLeft") nextIndex = index === 0 ? lastIndex : index - 1;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = lastIndex;
+
+    if (nextIndex !== index) {
+      event.preventDefault();
+      selectFile(nextIndex, true);
+    }
+  }
+
+  function tabId(filename) {
+    return `${explorerId}-${filename}`;
+  }
+
   return (
     <details className="code-explorer" open>
       <summary>
@@ -47,38 +77,42 @@ export default function CodeExplorer({ files }) {
       </summary>
       <div className="code-explorer-body">
         <div className="code-file-tabs" role="tablist" aria-label="Arquivos do exemplo">
-          {files.map((item) => (
+          {files.map((item, index) => (
             <button
               className={item.name === activeFile ? "active" : ""}
               type="button"
               role="tab"
+              id={tabId(item.name)}
               aria-selected={item.name === activeFile}
-              onClick={() => {
-                setActiveFile(item.name);
-                setCopied(false);
-              }}
+              aria-controls={`${explorerId}-panel`}
+              tabIndex={item.name === activeFile ? 0 : -1}
+              onClick={() => selectFile(index)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
+              ref={(element) => { tabRefs.current[index] = element; }}
               key={item.name}
             >
               {item.name}
             </button>
           ))}
         </div>
-        <div className="code-file-heading">
-          <span>{file.description}</span>
-          <button
-            className={`code-copy-button${copied ? " is-copied" : ""}`}
-            type="button"
-            onClick={copyCode}
-          >
-            {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
-            <span aria-live="polite">{copied ? "Copiado" : "Copiar"}</span>
-          </button>
+        <div id={`${explorerId}-panel`} role="tabpanel" aria-labelledby={tabId(file.name)}>
+          <div className="code-file-heading">
+            <span>{file.description}</span>
+            <button
+              className={`code-copy-button${copied ? " is-copied" : ""}`}
+              type="button"
+              onClick={copyCode}
+            >
+              {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
+              <span aria-live="polite">{copied ? "Copiado" : "Copiar"}</span>
+            </button>
+          </div>
+          {highlightedCode ? (
+            <div className="highlighted-code" dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+          ) : (
+            <pre><code>{file.source}</code></pre>
+          )}
         </div>
-        {highlightedCode ? (
-          <div className="highlighted-code" dangerouslySetInnerHTML={{ __html: highlightedCode }} />
-        ) : (
-          <pre><code>{file.source}</code></pre>
-        )}
       </div>
     </details>
   );

@@ -1,4 +1,7 @@
 .article-body { max-width: 68ch; font-size: clamp(1.05rem, 1vw + .8rem, 1.15rem); line-height: 1.8; }
+.article-breadcrumb { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 2.5rem; color: var(--muted); font-size: .82rem; font-weight: 700; }
+.article-breadcrumb a { color: var(--text); text-underline-offset: .2em; }
+.article-publish-details { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.25rem; color: var(--muted); font-size: .88rem; font-weight: 700; }
 .article-body > * + * { margin-top: 1.5rem; }
 .article-body h2, .article-body h3 { color: var(--text); }
 .article-body h2 { margin-top: 4rem; font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1; }
@@ -30,6 +33,9 @@
 .lab-notes li + li { margin-top: .6rem; }
 .lab-notes li::marker { color: var(--violet); font-weight: 800; }
 .lab-notes :not(pre) > code { padding: .15em .38em; border-radius: 6px; background: var(--surface-2); color: var(--text); font-family: "DM Mono", monospace; font-size: .84em; }
+.fake-card { position: relative; text-decoration: none; transition: transform .18s, border-color .18s; }
+.fake-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--lime) 65%, #383a34); }
+.fake-card-arrow { position: absolute; right: .9rem; bottom: .9rem; opacity: .72; }
 .lab-loading { min-height: 330px; display: grid; place-items: center; color: var(--muted); }.lab-preview-label { color: var(--text); font-weight: 800; }.lab-preview-label::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: .45rem; border-radius: 50%; background: var(--lime); }
 .country-explorer { padding: 1.25rem 0 .25rem; }
 .country-controls { display: grid; gap: .75rem; }

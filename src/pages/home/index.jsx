@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { ArrowRight, ArrowUpRight, Code2, FileText, FlaskConical, Search } from "lucide-react";
+import { ArrowRight, ArrowUpRight, FileText, FlaskConical } from "lucide-react";
 import ArticleCard from "../../components/content/ArticleCard.jsx";
 import LabCard from "../../components/content/LabCard.jsx";
 import { articles, labs } from "../../content/registry.js";
@@ -15,7 +15,7 @@ export default function Home() {
           <div className="hero-copy">
             <div className="hero-label">
               <span />
-              DevNotes · Full stack
+              DevNotes · desenvolvimento full stack
             </div>
 
             <h1>
@@ -31,7 +31,7 @@ export default function Home() {
 
             <div className="hero-actions">
               <Link className="btn btn-primary" to="/articles">
-                Explorar notes
+                Explorar articles
                 <ArrowUpRight aria-hidden="true" size={18} />
               </Link>
 
@@ -47,40 +47,31 @@ export default function Home() {
                   <span />
                 </div>
 
-                <span className="window-title">devnotes.live</span>
+                <span className="window-title">devnotes</span>
               </div>
 
               <div className="showcase-content">
                 <div className="showcase-heading">
                   <div>
-                    <span className="mini-label">Em construção</span>
-                    <h2>Uma ideia em movimento</h2>
+                    <span className="mini-label">Escolha um formato</span>
+                    <h2>Comece por uma pergunta.</h2>
                   </div>
-
-                  <span className="result-count">live preview</span>
-                </div>
-
-                <div className="fake-search">
-                  <Search aria-hidden="true" size={17} />
-                  <span>O que você quer testar hoje?</span>
                 </div>
 
                 <div className="fake-grid">
-                  <div className="fake-card">
-                    <span className="fake-icon"><FileText aria-hidden="true" size={15} /></span><strong>Nota</strong><small>Leitura curta</small>
-                  </div>
+                  <Link className="fake-card" to="/articles">
+                    <span className="fake-icon"><FileText aria-hidden="true" size={15} /></span>
+                    <strong>Articles</strong>
+                    <small>Notas para pensar e construir</small>
+                    <ArrowUpRight className="fake-card-arrow" aria-hidden="true" size={16} />
+                  </Link>
 
-                  <div className="fake-card fake-card-accent">
-                    <span className="fake-icon"><FlaskConical aria-hidden="true" size={15} /></span><strong>Lab</strong><small>Interativo</small>
-                  </div>
-
-                  <div className="fake-card">
-                    <span className="fake-icon"><Code2 aria-hidden="true" size={15} /></span><strong>Código</strong><small>Na prática</small>
-                  </div>
-
-                  <div className="fake-card">
-                    <span className="fake-icon"><ArrowUpRight aria-hidden="true" size={15} /></span><strong>Projeto</strong><small>Próximo passo</small>
-                  </div>
+                  <Link className="fake-card fake-card-accent" to="/labs">
+                    <span className="fake-icon"><FlaskConical aria-hidden="true" size={15} /></span>
+                    <strong>Labs</strong>
+                    <small>Experimentos para explorar</small>
+                    <ArrowUpRight className="fake-card-arrow" aria-hidden="true" size={16} />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -95,7 +86,6 @@ export default function Home() {
         <div className="container">
           <header className="section-header">
             <div>
-              <span className="section-kicker">Notes recentes</span>
               <h2>Leituras que<br />viram decisões.</h2>
             </div>
 
@@ -111,7 +101,7 @@ export default function Home() {
       </section>
 
       <section className="labs-preview" id="labs"><div className="container">
-        <header className="section-header"><div><span className="section-kicker">Labs</span><h2>Abra, mexa,<br />descubra.</h2></div><p>Pequenas experiências interativas para explorar comportamentos antes de levá-los ao seu próximo projeto.</p></header>
+        <header className="section-header"><div><h2>Abra, mexa,<br />descubra.</h2></div><p>Pequenas experiências interativas para explorar comportamentos antes de levá-los ao seu próximo projeto.</p></header>
         <div className="content-grid lab-grid">{latestLabs.map((lab, index) => <LabCard key={lab.slug} lab={lab} featured={index === 0} />)}</div>
         <Link className="section-link" to="/labs">Explorar todos os labs <ArrowRight aria-hidden="true" size={18} /></Link>
       </div></section>

@@ -2,5 +2,5 @@ import ArticleCard from "../../components/content/ArticleCard.jsx";
 import { articles } from "../../content/registry.js";
 
 export default function Articles() {
-  return <main className="page-shell"><header className="page-intro"><span className="eyebrow">Articles</span><h1>Notas para pensar,<br /><em>fazer e seguir.</em></h1><p>Leituras curtas sobre interfaces, full stack e as decisões que deixam um produto mais claro.</p></header><section className="content-grid article-grid">{articles.map((article) => <ArticleCard key={article.slug} article={article} />)}</section></main>;
+  return <main className="page-shell"><header className="page-intro"><h1>Notas para pensar,<br /><em>fazer e seguir.</em></h1><p>Leituras curtas sobre interfaces, full stack e as decisões que deixam um produto mais claro.</p></header><section className="content-grid article-grid">{articles.map((article) => <ArticleCard key={article.slug} article={article} />)}</section></main>;
 }

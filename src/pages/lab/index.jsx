@@ -58,7 +58,6 @@ function LabContent({ module, lab }) {
       {Component.codeFiles && (
         <section className="lab-code-section">
           <header>
-            <span className="eyebrow">Código do exemplo</span>
             <h2>Veja como foi feito.</h2>
             <p>Estes são os arquivos reais que fazem o preview funcionar.</p>
           </header>
