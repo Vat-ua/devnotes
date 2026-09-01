@@ -9,3 +9,12 @@
 - Todo conteúdo visível e todo UI devem estar em pt-BR, exceto os rótulos de marca aprovados: `DevNotes`, `Articles` e `Labs`.
 - Trabalhe mobile-first, use tokens de design, estados de foco visíveis, semântica HTML e suporte a tema claro/escuro.
 - Home deve parecer uma landing page tecnológica refinada; Articles priorizam leitura; Labs priorizam experimentação. Todos compartilham a mesma linguagem visual.
+
+## Quality bar
+
+- Não considere uma mudança pronta apenas porque ela funciona.
+- Em toda mudança de UI, torne intencionais a hierarquia visual, tipografia, espaçamento, responsividade e acessibilidade.
+- Projete os estados relevantes de interação: hover, foco, carregamento, vazio, erro e sucesso.
+- Use rótulos claros e feedback visível para ações do usuário.
+- Não dependa de estilos herdados ou acidentais para definir uma seção ou componente novo.
+- Mantenha a implementação legível e sustentável; valide temas claro e escuro, layouts mobile e desktop, lint e build de produção antes de concluir.

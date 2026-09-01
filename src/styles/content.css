@@ -19,12 +19,12 @@
 .demo-results div { display: grid; gap: .1rem; padding: .75rem; border-radius: 12px; background: var(--surface-2); }
 .demo-results span { color: var(--muted); font-size: .75rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.lab-notes { display: block; max-width: 68ch; padding: 4.5rem 0 0; }
+.lab-notes { display: block; max-width: 650px; padding: 4.5rem 0 0; }
 .lab-notes .eyebrow { margin-bottom: .9rem; color: var(--violet); }
 .lab-notes h2 { margin: 0; color: var(--text); font-size: clamp(2rem, 4vw, 3rem); line-height: 1; }
 .lab-notes h2 + p { margin-top: 1.4rem; }
 .lab-notes h2:not(:first-of-type) { margin-top: 3.5rem; font-size: clamp(1.45rem, 3vw, 1.9rem); line-height: 1.1; }
-.lab-notes p { margin: 0; color: var(--text); font-size: clamp(1rem, 1vw + .75rem, 1.12rem); line-height: 1.8; }
+.lab-notes p { max-width: none; margin: 0; color: var(--text); font-size: clamp(1rem, 1vw + .75rem, 1.12rem); line-height: 1.8; }
 .lab-notes p + p { margin-top: 1.3rem; }
 .lab-notes ul, .lab-notes ol { margin: 1.4rem 0 0; padding-left: 1.25rem; }
 .lab-notes li + li { margin-top: .6rem; }
