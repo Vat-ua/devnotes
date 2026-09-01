@@ -42,3 +42,10 @@ export function formatContentDate(date) {
     year: "numeric",
   }).format(new Date(`${date}T00:00:00`));
 }
+
+export function formatCardDate(date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(`${date}T00:00:00`));
+}

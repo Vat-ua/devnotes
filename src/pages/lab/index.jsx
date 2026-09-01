@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import CodeExplorer from "../../components/content/CodeExplorer.jsx";
-import { getLabBySlug, loadLab, loadLabGuide } from "../../content/registry.js";
+import { formatContentDate, getLabBySlug, loadLab, loadLabGuide } from "../../content/registry.js";
 
 export default function Lab() {
   const { slug } = useParams();
@@ -20,10 +20,18 @@ export default function Lab() {
 
   return (
     <main className="lab-shell">
-      <Link className="back-link" to="/labs">← Voltar para labs</Link>
+      <nav className="content-breadcrumb" aria-label="Navegação estrutural">
+        <Link to="/labs">Labs</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{lab.type}</span>
+      </nav>
       <header className="lab-heading">
-        <span className="eyebrow">Lab {lab.number} · {lab.type}</span>
         <h1>{lab.title}</h1>
+        <p className="content-publish-details">
+          <time dateTime={lab.date}>{formatContentDate(lab.date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{lab.readTime}</span>
+        </p>
         <p>{lab.excerpt}</p>
       </header>
       <AsyncModule

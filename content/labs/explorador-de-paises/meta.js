@@ -7,4 +7,5 @@ export const meta = {
   accent: "lime",
   prompt: "Busque, filtre e abra os detalhes de cada país.",
   date: "2026-07-02",
+  readTime: "8 min de leitura",
 };

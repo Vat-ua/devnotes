@@ -11,7 +11,7 @@ export default function Article() {
 
   return (
     <main className="reading-shell">
-      <nav className="article-breadcrumb" aria-label="Navegação estrutural">
+      <nav className="content-breadcrumb" aria-label="Navegação estrutural">
         <Link to="/articles">Articles</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{article.category}</span>
@@ -20,7 +20,7 @@ export default function Article() {
       <article className="reading-article">
         <header>
           <h1>{article.title}</h1>
-          <p className="article-publish-details">
+          <p className="content-publish-details">
             <time dateTime={article.date}>{formatContentDate(article.date)}</time>
             <span aria-hidden="true">·</span>
             <span>{article.readTime}</span>
