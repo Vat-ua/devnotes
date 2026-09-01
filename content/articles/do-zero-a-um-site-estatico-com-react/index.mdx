@@ -1,0 +1,207 @@
+import { Link } from "react-router"
+
+export const meta = {
+  slug: "do-zero-a-um-site-estatico-com-react",
+  category: "Fundamentos",
+  title: "Do zero a um site estático com React",
+  excerpt: "Crie um pequeno site com Vite, quatro páginas, rotas, navegação responsiva e conteúdo local — sem CMS, sem framework de CSS e sem uma arquitetura inflada.",
+  readTime: "14 min de leitura",
+  date: "2026-09-01",
+  accent: "lime",
+}
+
+Um site estático não precisa ser um arquivo HTML enorme nem uma aplicação React com camadas demais. Para um projeto pequeno, o objetivo é simples: ter uma estrutura que seja fácil de entender hoje e fácil de ampliar quando uma nova página, artigo ou experimento aparecer.
+
+Neste guia, vamos criar uma base com quatro pontos de navegação: **Home**, **Articles**, **Labs** e **Sobre**. O resultado é estático, mas as rotas continuam sendo páginas reais da aplicação.
+
+## 1. Crie o projeto com Vite
+
+Comece com o template React em JavaScript e instale apenas o roteador. Não há necessidade de biblioteca de componentes ou framework de CSS para esta base.
+
+```bash
+pnpm create vite meu-site --template react
+cd meu-site
+pnpm install
+pnpm add react-router
+pnpm dev
+```
+
+O Vite entrega o servidor local, o build de produção e uma configuração pequena. Antes de mudar qualquer arquivo, abra a URL mostrada no terminal e confirme que o projeto inicial funciona.
+
+## 2. Dê nomes claros às responsabilidades
+
+Crie uma estrutura suficiente para diferenciar páginas, componentes compartilhados e estilos. Não crie uma pasta para cada ideia hipotética.
+
+```text
+src/
+  components/
+    Header.jsx
+    Footer.jsx
+  layouts/
+    AppLayout.jsx
+  pages/
+    home.jsx
+    articles.jsx
+    labs.jsx
+    sobre.jsx
+  styles/
+    global.css
+  App.jsx
+  main.jsx
+```
+
+Uma página representa uma rota. Um componente compartilhado existe porque aparece em mais de um lugar. Um layout junta a moldura que todas as páginas dividem.
+
+## 3. Inicialize o router
+
+No ponto de entrada, envolva a aplicação com `BrowserRouter`. Em um host estático, lembre-se de configurar fallback para `index.html` quando for publicar; durante o desenvolvimento, o Vite já cuida disso.
+
+```jsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
+import App from "./App.jsx";
+import "./styles/global.css";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>,
+);
+```
+
+## 4. Declare as páginas em um só lugar
+
+`App.jsx` deve explicar a navegação sem esconder o mapa do site. O `AppLayout` envolve as páginas e renderiza cada uma na posição de `Outlet`.
+
+```jsx
+import { Route, Routes } from "react-router";
+import AppLayout from "./layouts/AppLayout.jsx";
+import Home from "./pages/home.jsx";
+import Articles from "./pages/articles.jsx";
+import Labs from "./pages/labs.jsx";
+import Sobre from "./pages/sobre.jsx";
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<Home />} />
+        <Route path="articles" element={<Articles />} />
+        <Route path="labs" element={<Labs />} />
+        <Route path="sobre" element={<Sobre />} />
+      </Route>
+    </Routes>
+  );
+}
+```
+
+## 5. Compartilhe a moldura, não o conteúdo
+
+Header e Footer são partes da estrutura do produto; o conteúdo de cada página continua local à sua rota. Esse limite deixa a aplicação previsível.
+
+```jsx
+import { Outlet } from "react-router";
+import Header from "../components/Header.jsx";
+import Footer from "../components/Footer.jsx";
+
+export default function AppLayout() {
+  return (
+    <div className="app-shell">
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
+  );
+}
+```
+
+No Header, use `NavLink` em vez de links soltos: ele permite identificar a rota ativa sem manter outro estado apenas para isso.
+
+```jsx
+import { NavLink } from "react-router";
+
+const navigation = [
+  ["Articles", "/articles"],
+  ["Labs", "/labs"],
+  ["Sobre", "/sobre"],
+];
+
+export default function Header() {
+  return (
+    <header>
+      <NavLink to="/">Meu site</NavLink>
+      <nav aria-label="Principal">
+        {navigation.map(([label, to]) => (
+          <NavLink key={to} to={to}>{label}</NavLink>
+        ))}
+      </nav>
+    </header>
+  );
+}
+```
+
+## 6. Comece o CSS pelo sistema, não pela página
+
+Defina primeiro cores, largura do container, tipografia, foco e espaçamentos globais. Depois cada página pode compor essas regras, sem criar uma paleta nova por seção.
+
+```css
+:root {
+  --bg: #f5f3ed;
+  --surface: #fffefa;
+  --text: #151614;
+  --muted: #6e6d66;
+  --line: rgba(21, 22, 20, 0.15);
+  --container: 1180px;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 3px solid rebeccapurple;
+  outline-offset: 4px;
+}
+```
+
+Para a navegação mobile, prefira começar com uma coluna e abrir um menu com um botão semântico. Só adicione o comportamento de menu quando os links realmente não couberem; responsividade não precisa significar complexidade antecipada.
+
+## 7. Mantenha o conteúdo local enquanto ele é pequeno
+
+Para poucas páginas e artigos, arquivos locais são uma escolha produtiva. Um objeto simples já permite renderizar cards sem misturar cópia, layout e dados.
+
+```js
+export const articles = [
+  {
+    slug: "uma-nota-curta",
+    title: "Uma nota curta",
+    excerpt: "Uma ideia útil, sem uma infraestrutura extra.",
+    date: "2026-09-01",
+  },
+];
+```
+
+Quando o texto crescer, migre cada artigo para seu próprio arquivo MDX. A estrutura de rotas e componentes não precisa mudar para isso.
+
+## 8. Faça o build antes de considerar pronto
+
+O servidor de desenvolvimento é ótimo para trabalhar, mas o build confirma que imports, rotas e assets podem ser entregues como arquivos estáticos.
+
+```bash
+pnpm run build
+pnpm run preview
+```
+
+Abra Home, Articles, Labs e Sobre no preview. Teste também uma rota acessada diretamente e a navegação em uma tela estreita. Esse pequeno ritual encontra problemas que um componente isolado não mostra.
+
+## Uma base pequena, com espaço para crescer
+
+O resultado não é um starter genérico: é o começo de um site real. Novos artigos podem entrar como conteúdo local, Labs podem ganhar componentes próprios e o Header continua sendo compartilhado sem transformar cada decisão em uma abstração.
+
+<Link className="inline-content-link" to="/articles/uma-api-publica-nao-e-o-seu-modelo-de-interface">Continue com uma API pública e a fronteira entre dados remotos e interface →</Link>
