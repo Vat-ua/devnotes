@@ -1,0 +1,58 @@
+export const tools = [
+  {
+    name: "Vite",
+    category: "Frontend",
+    description: "Ferramenta de build rápida para projetos web modernos.",
+    tags: ["Build", "DX"],
+    popularity: 9,
+  },
+  {
+    name: "React Router",
+    category: "Frontend",
+    description: "Rotas e parâmetros de URL para aplicações React.",
+    tags: ["Rotas", "URL"],
+    popularity: 9,
+  },
+  {
+    name: "Vitest",
+    category: "Qualidade",
+    description: "Testes unitários com uma experiência próxima do Vite.",
+    tags: ["Testes", "Unitário"],
+    popularity: 8,
+  },
+  {
+    name: "Playwright",
+    category: "Qualidade",
+    description: "Automação de navegador para fluxos ponta a ponta.",
+    tags: ["E2E", "Browser"],
+    popularity: 8,
+  },
+  {
+    name: "Node.js",
+    category: "Backend",
+    description: "Runtime JavaScript para serviços, scripts e APIs.",
+    tags: ["Runtime", "API"],
+    popularity: 10,
+  },
+  {
+    name: "PostgreSQL",
+    category: "Backend",
+    description: "Banco relacional para dados consistentes e consultas expressivas.",
+    tags: ["Banco", "SQL"],
+    popularity: 9,
+  },
+  {
+    name: "Docker",
+    category: "Infraestrutura",
+    description: "Ambientes reproduzíveis para desenvolver e entregar software.",
+    tags: ["Containers", "Deploy"],
+    popularity: 9,
+  },
+  {
+    name: "GitHub Actions",
+    category: "Infraestrutura",
+    description: "Automação de checks, builds e entregas no repositório.",
+    tags: ["CI", "Automação"],
+    popularity: 8,
+  },
+];

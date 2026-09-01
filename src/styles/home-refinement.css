@@ -99,6 +99,11 @@
     grid-column: span 4;
     min-height: 300px;
   }
+
+  .lab-grid .content-card:first-child:nth-last-child(2),
+  .lab-grid .content-card:first-child:nth-last-child(2) ~ .content-card {
+    grid-column: span 6;
+  }
 }
 
 @media (min-width: 720px) {
@@ -121,6 +126,10 @@
 @media (min-width: 1040px) {
   .labs-preview .lab-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .labs-preview .lab-grid:has(.content-card:nth-child(2)):not(:has(.content-card:nth-child(3))) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .labs-preview .lab-grid .content-card:last-child {
