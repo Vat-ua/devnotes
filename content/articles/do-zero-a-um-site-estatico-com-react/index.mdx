@@ -44,9 +44,10 @@ src/
   layouts/
     AppLayout.jsx
   pages/
-    home.jsx
-    servicos.jsx
-    sobre.jsx
+    Home.jsx
+    Servicos.jsx
+    Sobre.jsx
+    NotFound.jsx
   styles/
     global.css
   App.jsx
@@ -88,9 +89,10 @@ Substitua o conteúdo de `src/App.jsx`:
 // src/App.jsx
 import { Route, Routes } from "react-router";
 import AppLayout from "./layouts/AppLayout.jsx";
-import Home from "./pages/home.jsx";
-import Servicos from "./pages/servicos.jsx";
-import Sobre from "./pages/sobre.jsx";
+import Home from "./pages/Home.jsx";
+import Servicos from "./pages/Servicos.jsx";
+import Sobre from "./pages/Sobre.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
   return (
@@ -99,6 +101,7 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="servicos" element={<Servicos />} />
         <Route path="sobre" element={<Sobre />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
@@ -108,23 +111,40 @@ export default function App() {
 Crie uma primeira versão para cada página importada pelas rotas:
 
 ```jsx
-// src/pages/home.jsx
+// src/pages/Home.jsx
 export default function Home() {
   return <main className="page"><h1>Início</h1></main>;
 }
 ```
 
 ```jsx
-// src/pages/servicos.jsx
+// src/pages/Servicos.jsx
 export default function Servicos() {
   return <main className="page"><h1>Serviços</h1></main>;
 }
 ```
 
 ```jsx
-// src/pages/sobre.jsx
+// src/pages/Sobre.jsx
 export default function Sobre() {
   return <main className="page"><h1>Sobre</h1></main>;
+}
+```
+
+Adicione também uma rota de fallback. Ela cobre endereços que não correspondem a nenhuma página declarada e evita uma tela vazia para quem abre uma URL errada.
+
+```jsx
+// src/pages/NotFound.jsx
+import { Link } from "react-router";
+
+export default function NotFound() {
+  return (
+    <main className="page">
+      <h1>Página não encontrada</h1>
+      <p>Este endereço não faz parte do site.</p>
+      <Link to="/">Voltar ao início</Link>
+    </main>
+  );
 }
 ```
 
@@ -198,7 +218,7 @@ export default function Footer() {
 }
 ```
 
-## 6. Dê acabamento à estrutura compartilhada
+## 6. Defina primeiro os estilos compartilhados
 
 O objetivo aqui não é criar um design system completo. É dar ao exemplo uma base visual utilizável: largura de leitura, cabeçalho, navegação, rodapé, páginas e um estado ativo claro. Cada valor abaixo é usado por uma regra real.
 
@@ -326,10 +346,10 @@ Em telas estreitas, o media query empilha o cabeçalho e distribui os três link
 
 Cada rota é um componente React comum. Nesta etapa, vamos transformar a página de Serviços em uma seção estática com uma estrutura semântica simples.
 
-Substitua o conteúdo de `src/pages/servicos.jsx` por uma seção semântica:
+Substitua o conteúdo de `src/pages/Servicos.jsx` por uma seção semântica:
 
 ```jsx
-// src/pages/servicos.jsx
+// src/pages/Servicos.jsx
 export default function Servicos() {
   return (
     <main className="page">
