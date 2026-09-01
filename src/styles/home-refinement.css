@@ -1,4 +1,17 @@
 /* Refinements specific to the landing-page content rhythm. */
+:root {
+  --orb-blue: #5b8cff;
+  --orb-coral: #ff7764;
+  --orb-cyan: #4fc8e8;
+  --orb-lime: var(--lime);
+  --orb-orange: var(--orange);
+  --orb-pink: #ed8bc4;
+  --orb-sky: #75a8ff;
+  --orb-teal: #43c4a7;
+  --orb-violet: var(--violet);
+  --orb-yellow: #ffd75b;
+}
+
 .home-hero .hero-actions { margin-top: 2.3125rem; }
 
 .brand {
@@ -35,77 +48,10 @@
   box-shadow: 7px 8px 0 color-mix(in srgb, currentColor 82%, transparent);
 }
 
-/* Article accents are compositional marks, not category borders. */
-.article-card {
-  --card-accent: var(--lime);
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-.article-card.accent-violet {
-  --card-accent: var(--violet);
-}
-
-.article-card.accent-orange {
-  --card-accent: var(--orange);
-}
-
-.article-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.article-card::before,
-.article-card::after {
-  position: absolute;
-  content: "";
-  pointer-events: none;
-}
-
-.article-card::before {
-  top: -82px;
-  right: -34px;
-  width: 128px;
-  height: 128px;
-  border-radius: 45% 55% 58% 42%;
-  background: var(--card-accent);
-  opacity: 0.22;
-  transform: rotate(-18deg);
-}
-
-.article-card::after {
-  top: 38px;
-  right: 32px;
-  width: 44px;
-  height: 44px;
-  border: 2px solid var(--card-accent);
-  border-radius: 50%;
-  opacity: 0.56;
-}
-
-.article-card.is-featured::before {
-  opacity: 0.9;
-}
-
-.article-card.is-featured::after {
-  opacity: 0.82;
-}
-
-/* These pairs vary decorative Lab marks without implying a category taxonomy. */
+/* Decorative Lab pairs are independent of type, category, and page accent. */
 .lab-card {
   --lab-orb-primary: var(--lime);
   --lab-orb-secondary: var(--violet);
-}
-
-.lab-card.accent-violet {
-  --lab-orb-primary: var(--violet);
-  --lab-orb-secondary: var(--lime);
-}
-
-.lab-card.accent-orange {
-  --lab-orb-primary: var(--orange);
-  --lab-orb-secondary: var(--lime);
 }
 
 .lab-card .lab-card-orb span:nth-child(1) {
