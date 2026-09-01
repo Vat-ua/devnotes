@@ -1,0 +1,65 @@
+import { Link } from "react-router"
+
+export const meta = {
+  slug: "uma-api-publica-nao-e-o-seu-modelo-de-interface",
+  category: "Dados remotos",
+  title: "Uma API pública não é o seu modelo de interface",
+  excerpt: "A resposta de um serviço externo é um contrato de transporte. Antes de chegar à tela, ela precisa ganhar nomes, formas e estados que façam sentido para o produto.",
+  readTime: "9 min de leitura",
+  date: "2026-09-01",
+  accent: "orange",
+}
+
+Uma API pública é ótima para aprender `fetch`, mas ela também revela uma fronteira importante: o formato que chega pela rede raramente é o formato que a interface realmente precisa.
+
+Uma resposta pode trazer nomes longos, campos opcionais, URLs internas e informações que o card jamais vai exibir. Renderizar tudo diretamente acopla a tela aos detalhes de outro serviço — e torna qualquer mudança mais cara.
+
+## Faça uma tradução na fronteira
+
+No Lab de personagens, a API retorna dados como `species`, `origin.name`, uma lista de episódios e uma URL de imagem. A interface, porém, precisa de um objeto simples e previsível.
+
+```js
+function toCharacter(apiCharacter) {
+  return {
+    id: apiCharacter.id,
+    name: apiCharacter.name,
+    status: apiCharacter.status,
+    species: apiCharacter.species,
+    origin: apiCharacter.origin.name,
+    episodeCount: apiCharacter.episode.length,
+    image: apiCharacter.image,
+  };
+}
+```
+
+Essa função é pequena, mas cria um contrato próprio. O card passa a depender de uma linguagem da aplicação, não da resposta inteira de uma API externa.
+
+## Não deixe uma resposta antiga vencer
+
+Pessoas digitam mais rápido do que a rede responde. Se uma busca por `Rick` termina depois de uma busca por `Morty`, o resultado antigo não pode substituir o novo apenas porque chegou por último.
+
+Use um `AbortController` dentro do efeito. Quando a busca ou o filtro muda, o request anterior é cancelado antes que possa atualizar a interface.
+
+```jsx
+useEffect(() => {
+  const controller = new AbortController();
+
+  fetchCharacters({ query, status, signal: controller.signal })
+    .then(setCharacters)
+    .catch(handleError);
+
+  return () => controller.abort();
+}, [query, status]);
+```
+
+## Resposta vazia não é falha
+
+Algumas APIs usam `404` para comunicar que uma busca não encontrou resultados. Para o produto, isso não é um erro técnico: é um estado vazio que precisa explicar a situação e oferecer um próximo passo.
+
+Separe pelo menos quatro resultados possíveis: carregando, pronto, vazio e erro. A diferença entre vazio e erro é uma das formas mais simples de deixar uma interface honesta.
+
+## A rede continua fora do seu controle
+
+Mesmo uma API estável pode ficar lenta, mudar ou limitar requisições. Por isso, deixe o endpoint concentrado em uma função, mostre uma mensagem recuperável e mantenha o resto da interface independente do formato bruto.
+
+<Link className="inline-content-link" to="/labs/explorador-de-personagens">Abra o Lab Explorador de personagens para testar a API e ver a adaptação dos dados em código →</Link>
