@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { ArrowRight, ArrowUpRight, FileText, FlaskConical } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, FileText, FlaskConical } from "lucide-react";
 import ArticleCard from "../../components/content/ArticleCard.jsx";
 import LabCard from "../../components/content/LabCard.jsx";
 import { articles, labs } from "../../content/registry.js";
@@ -53,25 +53,35 @@ export default function Home() {
               <div className="showcase-content">
                 <div className="showcase-heading">
                   <div>
-                    <span className="mini-label">Escolha um formato</span>
-                    <h2>Comece por uma pergunta.</h2>
+                    <span className="mini-label">DevNotes em movimento</span>
+                    <h2>Ideia. Código. Experimento.</h2>
                   </div>
                 </div>
 
                 <div className="fake-grid">
-                  <Link className="fake-card" to="/articles">
+                  <div className="fake-card">
                     <span className="fake-icon"><FileText aria-hidden="true" size={15} /></span>
                     <strong>Articles</strong>
-                    <small>Notas para pensar e construir</small>
-                    <ArrowUpRight className="fake-card-arrow" aria-hidden="true" size={16} />
-                  </Link>
+                    <small>Contexto para boas decisões</small>
+                  </div>
 
-                  <Link className="fake-card fake-card-accent" to="/labs">
+                  <div className="fake-card fake-card-accent">
                     <span className="fake-icon"><FlaskConical aria-hidden="true" size={15} /></span>
                     <strong>Labs</strong>
-                    <small>Experimentos para explorar</small>
-                    <ArrowUpRight className="fake-card-arrow" aria-hidden="true" size={16} />
-                  </Link>
+                    <small>Ideias para testar na prática</small>
+                  </div>
+
+                  <div className="fake-card">
+                    <span className="fake-icon"><Code2 aria-hidden="true" size={15} /></span>
+                    <strong>Código</strong>
+                    <small>Pequenas decisões, impacto real</small>
+                  </div>
+
+                  <div className="fake-card">
+                    <span className="fake-icon"><ArrowUpRight aria-hidden="true" size={15} /></span>
+                    <strong>Projeto</strong>
+                    <small>Um próximo passo para construir</small>
+                  </div>
                 </div>
               </div>
             </div>
