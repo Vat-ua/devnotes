@@ -220,9 +220,9 @@ body {
 
 Para a navegação mobile, prefira começar com uma coluna e abrir um menu com um botão semântico. Só adicione o comportamento de menu quando os links realmente não couberem; responsividade não precisa significar complexidade antecipada.
 
-## 7. Dê conteúdo às páginas sem criar uma camada de dados
+## 7. Escreva o conteúdo de uma página
 
-Um site com três páginas institucionais não precisa de coleção, CMS ou arquivo de dados. O conteúdo pode viver diretamente em cada página enquanto ainda for simples.
+Cada rota é um componente React comum. Nesta etapa, vamos transformar a página de Serviços em uma seção estática com uma estrutura semântica simples.
 
 Substitua o conteúdo de `src/pages/servicos.jsx` por uma seção semântica:
 
@@ -243,7 +243,7 @@ export default function Servicos() {
 }
 ```
 
-Se o site crescer e passar a ter muitos serviços, cases ou artigos, aí faz sentido introduzir dados locais ou arquivos de conteúdo. A rota e o layout não precisam mudar para isso.
+O mesmo padrão vale para Início e Sobre: cada página pode ter seu próprio conteúdo, mantendo Header, Footer e navegação compartilhados pelo layout.
 
 ## 8. Faça o build antes de considerar pronto
 
