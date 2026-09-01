@@ -58,7 +58,7 @@ function LabContent({ module, lab }) {
     <>
       <section className={`lab-canvas accent-${lab.accent}`}>
         <div className="canvas-top">
-          <span className="lab-preview-label">Preview interativo</span>
+          <span className="lab-preview-label">Demonstração interativa</span>
           <span>{lab.prompt}</span>
         </div>
         <Component />
@@ -67,7 +67,7 @@ function LabContent({ module, lab }) {
         <section className="lab-code-section">
           <header>
             <h2>Veja como foi feito.</h2>
-            <p>Estes são os arquivos reais que fazem o preview funcionar.</p>
+            <p>Estes são os arquivos reais que fazem a demonstração funcionar.</p>
           </header>
           <CodeExplorer files={Component.codeFiles} />
         </section>

@@ -49,11 +49,11 @@ export default function Header() {
           aria-label="Navegação principal"
         >
           <NavLink to="/" end onClick={closeMenu}>
-            Home
+            Início
           </NavLink>
 
           <NavLink to="/articles" onClick={closeMenu}>
-            Articles
+            Artigos
           </NavLink>
 
           <NavLink to="/labs" onClick={closeMenu}>

@@ -31,7 +31,7 @@ export default function Home() {
 
             <div className="hero-actions">
               <Link className="btn btn-primary" to="/articles">
-                Explorar articles
+                Explorar artigos
                 <ArrowUpRight aria-hidden="true" size={18} />
               </Link>
 
@@ -61,7 +61,7 @@ export default function Home() {
                 <div className="fake-grid">
                   <div className="fake-card">
                     <span className="fake-icon"><FileText aria-hidden="true" size={15} /></span>
-                    <strong>Articles</strong>
+                    <strong>Artigos</strong>
                     <small>Contexto para boas decisões</small>
                   </div>
 
@@ -106,7 +106,7 @@ export default function Home() {
           </header>
 
           <div className="content-grid article-grid">{latestArticles.map((article, index) => <ArticleCard key={article.slug} article={article} featured={index === 0} />)}</div>
-          <Link className="section-link" to="/articles">Ver todos os articles <ArrowRight aria-hidden="true" size={18} /></Link>
+          <Link className="section-link" to="/articles">Ver todos os artigos <ArrowRight aria-hidden="true" size={18} /></Link>
         </div>
       </section>
 

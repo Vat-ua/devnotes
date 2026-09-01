@@ -5,14 +5,14 @@ export default function Article() {
   const { slug } = useParams();
   const article = getArticleBySlug(slug);
 
-  if (!article) return <MissingContent label="article" />;
+  if (!article) return <MissingContent label="artigo" />;
 
   const Content = article.Component;
 
   return (
     <main className="reading-shell">
       <nav className="content-breadcrumb" aria-label="Navegação estrutural">
-        <Link to="/articles">Articles</Link>
+        <Link to="/articles">Artigos</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{article.category}</span>
       </nav>
@@ -34,4 +34,4 @@ export default function Article() {
   );
 }
 
-function MissingContent({ label }) { return <main className="page-shell empty-state"><span className="eyebrow">404</span><h1>Este {label} não existe.</h1><Link className="btn btn-primary" to={`/${label}s`}>Voltar</Link></main>; }
+function MissingContent({ label }) { return <main className="page-shell empty-state"><span className="eyebrow">404</span><h1>Este {label} não existe.</h1><Link className="btn btn-primary" to="/articles">Voltar</Link></main>; }

@@ -14,7 +14,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-links" aria-label="Links do rodapé">
-          <Link to="/articles">Articles</Link>
+          <Link to="/articles">Artigos</Link>
           <Link to="/labs">Labs</Link>
           <Link to="/sobre">Sobre</Link>
         </div>

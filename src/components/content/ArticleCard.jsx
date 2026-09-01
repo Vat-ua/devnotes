@@ -13,7 +13,7 @@ export default function ArticleCard({ article, featured = false }) {
         <h3>{article.title}</h3>
         <p>{article.excerpt}</p>
       </div>
-      <span className="card-link">Ler article <ArrowUpRight aria-hidden="true" size={18} /></span>
+      <span className="card-link">Ler artigo <ArrowUpRight aria-hidden="true" size={18} /></span>
     </Link>
   );
 }
