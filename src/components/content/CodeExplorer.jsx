@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Code2, Copy } from "lucide-react";
+import { Check, Code2, Copy } from "lucide-react";
 
 export default function CodeExplorer({ files }) {
   const [activeFile, setActiveFile] = useState(files[0]?.name);
@@ -28,20 +28,57 @@ export default function CodeExplorer({ files }) {
   if (!file) return null;
 
   async function copyCode() {
-    await navigator.clipboard?.writeText(file.source);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1600);
+    try {
+      await navigator.clipboard.writeText(file.source);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
   }
 
   return (
     <details className="code-explorer" open>
-      <summary><span><Code2 aria-hidden="true" size={18} /> Arquivos do exemplo</span><span className="code-explorer-count">{files.length} arquivos</span></summary>
+      <summary>
+        <span>
+          <Code2 aria-hidden="true" size={18} /> Arquivos do exemplo
+        </span>
+        <span className="code-explorer-count">{files.length} arquivos</span>
+      </summary>
       <div className="code-explorer-body">
         <div className="code-file-tabs" role="tablist" aria-label="Arquivos do exemplo">
-          {files.map((item) => <button className={item.name === activeFile ? "active" : ""} type="button" role="tab" aria-selected={item.name === activeFile} onClick={() => setActiveFile(item.name)} key={item.name}>{item.name}</button>)}
+          {files.map((item) => (
+            <button
+              className={item.name === activeFile ? "active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={item.name === activeFile}
+              onClick={() => {
+                setActiveFile(item.name);
+                setCopied(false);
+              }}
+              key={item.name}
+            >
+              {item.name}
+            </button>
+          ))}
         </div>
-        <div className="code-file-heading"><span>{file.description}</span><button type="button" onClick={copyCode}><Copy aria-hidden="true" size={15} /> {copied ? "Copiado" : "Copiar"}</button></div>
-        {highlightedCode ? <div className="highlighted-code" dangerouslySetInnerHTML={{ __html: highlightedCode }} /> : <pre><code>{file.source}</code></pre>}
+        <div className="code-file-heading">
+          <span>{file.description}</span>
+          <button
+            className={`code-copy-button${copied ? " is-copied" : ""}`}
+            type="button"
+            onClick={copyCode}
+          >
+            {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
+            <span aria-live="polite">{copied ? "Copiado" : "Copiar"}</span>
+          </button>
+        </div>
+        {highlightedCode ? (
+          <div className="highlighted-code" dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+        ) : (
+          <pre><code>{file.source}</code></pre>
+        )}
       </div>
     </details>
   );

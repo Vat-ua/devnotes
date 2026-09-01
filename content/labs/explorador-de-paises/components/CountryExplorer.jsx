@@ -3,10 +3,14 @@ import { countries } from "../data.js";
 import CountryCard from "./CountryCard.jsx";
 import FilterBar from "./FilterBar.jsx";
 
-function matchesSearch(country, query) {
+function matchesQuery(country, query) {
   const searchableText = `${country.name} ${country.capital}`.toLowerCase();
 
-  return searchableText.includes(query.toLowerCase());
+  return searchableText.includes(query);
+}
+
+function matchesContinent(country, continent) {
+  return continent === "Todos" || country.continent === continent;
 }
 
 function sortCountries(first, second, sortBy) {
@@ -21,12 +25,14 @@ export default function CountryExplorer() {
   const [query, setQuery] = useState("");
   const [continent, setContinent] = useState("Todos");
   const [sortBy, setSortBy] = useState("name");
+  const normalizedQuery = query.trim().toLowerCase();
+
   const filteredCountries = useMemo(() => {
     return countries
-      .filter((country) => matchesSearch(country, query))
-      .filter((country) => continent === "Todos" || country.continent === continent)
+      .filter((country) => matchesQuery(country, normalizedQuery))
+      .filter((country) => matchesContinent(country, continent))
       .toSorted((first, second) => sortCountries(first, second, sortBy));
-  }, [query, continent, sortBy]);
+  }, [normalizedQuery, continent, sortBy]);
 
   const resultLabel = filteredCountries.length === 1 ? "país encontrado" : "países encontrados";
 
