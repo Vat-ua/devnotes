@@ -35,7 +35,7 @@ export default function CodeExplorer({ files }) {
 
   return (
     <details className="code-explorer" open>
-      <summary><span><Code2 aria-hidden="true" size={18} /> Código do exemplo</span><span className="code-explorer-count">{files.length} arquivos</span></summary>
+      <summary><span><Code2 aria-hidden="true" size={18} /> Arquivos do exemplo</span><span className="code-explorer-count">{files.length} arquivos</span></summary>
       <div className="code-explorer-body">
         <div className="code-file-tabs" role="tablist" aria-label="Arquivos do exemplo">
           {files.map((item) => <button className={item.name === activeFile ? "active" : ""} type="button" role="tab" aria-selected={item.name === activeFile} onClick={() => setActiveFile(item.name)} key={item.name}>{item.name}</button>)}

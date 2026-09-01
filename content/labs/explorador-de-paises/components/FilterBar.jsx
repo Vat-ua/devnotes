@@ -1,5 +1,38 @@
 import { Search } from "lucide-react";
 
 export default function FilterBar({ query, continent, sortBy, onQueryChange, onContinentChange, onSortChange }) {
-  return <div className="country-controls"><label className="country-search"><Search aria-hidden="true" size={17} /><span className="sr-only">Buscar país ou capital</span><input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Buscar país ou capital" /></label><label><span>Continente</span><select value={continent} onChange={(event) => onContinentChange(event.target.value)}><option value="Todos">Todos</option><option value="África">África</option><option value="América do Norte">América do Norte</option><option value="América do Sul">América do Sul</option><option value="Ásia">Ásia</option><option value="Europa">Europa</option><option value="Oceania">Oceania</option></select></label><label><span>Ordenar</span><select value={sortBy} onChange={(event) => onSortChange(event.target.value)}><option value="name">A–Z</option><option value="population">População</option></select></label></div>;
+  return (
+    <div className="country-controls">
+      <label className="country-search">
+        <Search aria-hidden="true" size={17} />
+        <span className="sr-only">Buscar país ou capital</span>
+        <input
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder="Buscar país ou capital"
+        />
+      </label>
+
+      <label>
+        <span>Continente</span>
+        <select value={continent} onChange={(event) => onContinentChange(event.target.value)}>
+          <option value="Todos">Todos</option>
+          <option value="África">África</option>
+          <option value="América do Norte">América do Norte</option>
+          <option value="América do Sul">América do Sul</option>
+          <option value="Ásia">Ásia</option>
+          <option value="Europa">Europa</option>
+          <option value="Oceania">Oceania</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Ordenar</span>
+        <select value={sortBy} onChange={(event) => onSortChange(event.target.value)}>
+          <option value="name">A–Z</option>
+          <option value="population">População</option>
+        </select>
+      </label>
+    </div>
+  );
 }
