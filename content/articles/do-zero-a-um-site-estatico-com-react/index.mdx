@@ -1,5 +1,3 @@
-import { Link } from "react-router"
-
 export const meta = {
   slug: "do-zero-a-um-site-estatico-com-react",
   category: "Fundamentos",
@@ -18,7 +16,10 @@ Neste guia, vamos criar uma base com quatro pontos de navegação: **Home**, **A
 
 Comece com o template React em JavaScript e instale apenas o roteador. Não há necessidade de biblioteca de componentes ou framework de CSS para esta base.
 
+No terminal, na pasta onde você guarda seus projetos, execute:
+
 ```bash
+# terminal
 pnpm create vite meu-site --template react
 cd meu-site
 pnpm install
@@ -32,7 +33,10 @@ O Vite entrega o servidor local, o build de produção e uma configuração pequ
 
 Crie uma estrutura suficiente para diferenciar páginas, componentes compartilhados e estilos. Não crie uma pasta para cada ideia hipotética.
 
+Ao final desta etapa, a pasta `src/` terá esta organização:
+
 ```text
+# src/
 src/
   components/
     Header.jsx
@@ -56,7 +60,10 @@ Uma página representa uma rota. Um componente compartilhado existe porque apare
 
 No ponto de entrada, envolva a aplicação com `BrowserRouter`. Em um host estático, lembre-se de configurar fallback para `index.html` quando for publicar; durante o desenvolvimento, o Vite já cuida disso.
 
+Substitua o conteúdo de `src/main.jsx`:
+
 ```jsx
+// src/main.jsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
@@ -76,7 +83,10 @@ createRoot(document.getElementById("root")).render(
 
 `App.jsx` deve explicar a navegação sem esconder o mapa do site. O `AppLayout` envolve as páginas e renderiza cada uma na posição de `Outlet`.
 
+Substitua o conteúdo de `src/App.jsx`:
+
 ```jsx
+// src/App.jsx
 import { Route, Routes } from "react-router";
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/home.jsx";
@@ -98,11 +108,44 @@ export default function App() {
 }
 ```
 
+Crie uma primeira versão para cada página importada pelas rotas:
+
+```jsx
+// src/pages/home.jsx
+export default function Home() {
+  return <main><h1>Home</h1></main>;
+}
+```
+
+```jsx
+// src/pages/articles.jsx
+export default function Articles() {
+  return <main><h1>Articles</h1></main>;
+}
+```
+
+```jsx
+// src/pages/labs.jsx
+export default function Labs() {
+  return <main><h1>Labs</h1></main>;
+}
+```
+
+```jsx
+// src/pages/sobre.jsx
+export default function Sobre() {
+  return <main><h1>Sobre</h1></main>;
+}
+```
+
 ## 5. Compartilhe a moldura, não o conteúdo
 
 Header e Footer são partes da estrutura do produto; o conteúdo de cada página continua local à sua rota. Esse limite deixa a aplicação previsível.
 
+Crie `src/layouts/AppLayout.jsx`:
+
 ```jsx
+// src/layouts/AppLayout.jsx
 import { Outlet } from "react-router";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
@@ -120,7 +163,10 @@ export default function AppLayout() {
 
 No Header, use `NavLink` em vez de links soltos: ele permite identificar a rota ativa sem manter outro estado apenas para isso.
 
+Crie `src/components/Header.jsx`:
+
 ```jsx
+// src/components/Header.jsx
 import { NavLink } from "react-router";
 
 const navigation = [
@@ -143,11 +189,23 @@ export default function Header() {
 }
 ```
 
+Crie também `src/components/Footer.jsx`, usado pelo layout:
+
+```jsx
+// src/components/Footer.jsx
+export default function Footer() {
+  return <footer>Meu site</footer>;
+}
+```
+
 ## 6. Comece o CSS pelo sistema, não pela página
 
 Defina primeiro cores, largura do container, tipografia, foco e espaçamentos globais. Depois cada página pode compor essas regras, sem criar uma paleta nova por seção.
 
+Crie `src/styles/global.css`:
+
 ```css
+/* src/styles/global.css */
 :root {
   --bg: #f5f3ed;
   --surface: #fffefa;
@@ -176,7 +234,10 @@ Para a navegação mobile, prefira começar com uma coluna e abrir um menu com u
 
 Para poucas páginas e artigos, arquivos locais são uma escolha produtiva. Um objeto simples já permite renderizar cards sem misturar cópia, layout e dados.
 
+Crie `src/content/articles.js`:
+
 ```js
+// src/content/articles.js
 export const articles = [
   {
     slug: "uma-nota-curta",
@@ -193,15 +254,12 @@ Quando o texto crescer, migre cada artigo para seu próprio arquivo MDX. A estru
 
 O servidor de desenvolvimento é ótimo para trabalhar, mas o build confirma que imports, rotas e assets podem ser entregues como arquivos estáticos.
 
+No terminal, na raiz do projeto, execute:
+
 ```bash
+# terminal
 pnpm run build
 pnpm run preview
 ```
 
 Abra Home, Articles, Labs e Sobre no preview. Teste também uma rota acessada diretamente e a navegação em uma tela estreita. Esse pequeno ritual encontra problemas que um componente isolado não mostra.
-
-## Uma base pequena, com espaço para crescer
-
-O resultado não é um starter genérico: é o começo de um site real. Novos artigos podem entrar como conteúdo local, Labs podem ganhar componentes próprios e o Header continua sendo compartilhado sem transformar cada decisão em uma abstração.
-
-<Link className="inline-content-link" to="/articles/uma-api-publica-nao-e-o-seu-modelo-de-interface">Continue com uma API pública e a fronteira entre dados remotos e interface →</Link>
