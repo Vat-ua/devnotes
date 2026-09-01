@@ -1,8 +1,8 @@
 /* Refinements specific to the landing-page content rhythm. */
-.home-hero .hero-actions { margin-top: 2.3rem; }
+.home-hero .hero-actions { margin-top: 2.3125rem; }
 
 .brand {
-  font-size: 1.08rem;
+  font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.055em;
 }
@@ -39,7 +39,7 @@
 .section-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4375rem;
 }
 
 .content-card .card-link svg,
