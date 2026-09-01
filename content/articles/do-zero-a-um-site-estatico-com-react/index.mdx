@@ -2,15 +2,15 @@ export const meta = {
   slug: "do-zero-a-um-site-estatico-com-react",
   category: "Fundamentos",
   title: "Do zero a um site estático com React",
-  excerpt: "Crie um pequeno site com Vite, quatro páginas, rotas, navegação responsiva e conteúdo local — sem CMS, sem framework de CSS e sem uma arquitetura inflada.",
+  excerpt: "Crie um pequeno site com Vite, três páginas, rotas e navegação responsiva — sem CMS, sem framework de CSS e sem uma arquitetura inflada.",
   readTime: "14 min de leitura",
   date: "2026-09-01",
   accent: "lime",
 }
 
-Um site estático não precisa ser um arquivo HTML enorme nem uma aplicação React com camadas demais. Para um projeto pequeno, o objetivo é simples: ter uma estrutura que seja fácil de entender hoje e fácil de ampliar quando uma nova página, artigo ou experimento aparecer.
+Um site estático não precisa ser um arquivo HTML enorme nem uma aplicação React com camadas demais. Para um projeto pequeno, o objetivo é simples: ter uma estrutura que seja fácil de entender hoje e fácil de ampliar quando uma nova página aparecer.
 
-Neste guia, vamos criar uma base com quatro pontos de navegação: **Home**, **Articles**, **Labs** e **Sobre**. O resultado é estático, mas as rotas continuam sendo páginas reais da aplicação.
+Neste guia, vamos criar uma base com três páginas: **Início**, **Serviços** e **Sobre**. O resultado é estático, mas as rotas continuam sendo páginas reais da aplicação.
 
 ## 1. Crie o projeto com Vite
 
@@ -45,8 +45,7 @@ src/
     AppLayout.jsx
   pages/
     home.jsx
-    articles.jsx
-    labs.jsx
+    servicos.jsx
     sobre.jsx
   styles/
     global.css
@@ -90,8 +89,7 @@ Substitua o conteúdo de `src/App.jsx`:
 import { Route, Routes } from "react-router";
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/home.jsx";
-import Articles from "./pages/articles.jsx";
-import Labs from "./pages/labs.jsx";
+import Servicos from "./pages/servicos.jsx";
 import Sobre from "./pages/sobre.jsx";
 
 export default function App() {
@@ -99,8 +97,7 @@ export default function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<Home />} />
-        <Route path="articles" element={<Articles />} />
-        <Route path="labs" element={<Labs />} />
+        <Route path="servicos" element={<Servicos />} />
         <Route path="sobre" element={<Sobre />} />
       </Route>
     </Routes>
@@ -118,16 +115,9 @@ export default function Home() {
 ```
 
 ```jsx
-// src/pages/articles.jsx
-export default function Articles() {
-  return <main><h1>Articles</h1></main>;
-}
-```
-
-```jsx
-// src/pages/labs.jsx
-export default function Labs() {
-  return <main><h1>Labs</h1></main>;
+// src/pages/servicos.jsx
+export default function Servicos() {
+  return <main><h1>Serviços</h1></main>;
 }
 ```
 
@@ -170,8 +160,8 @@ Crie `src/components/Header.jsx`:
 import { NavLink } from "react-router";
 
 const navigation = [
-  ["Articles", "/articles"],
-  ["Labs", "/labs"],
+  ["Início", "/"],
+  ["Serviços", "/servicos"],
   ["Sobre", "/sobre"],
 ];
 
@@ -230,25 +220,30 @@ body {
 
 Para a navegação mobile, prefira começar com uma coluna e abrir um menu com um botão semântico. Só adicione o comportamento de menu quando os links realmente não couberem; responsividade não precisa significar complexidade antecipada.
 
-## 7. Mantenha o conteúdo local enquanto ele é pequeno
+## 7. Dê conteúdo às páginas sem criar uma camada de dados
 
-Para poucas páginas e artigos, arquivos locais são uma escolha produtiva. Um objeto simples já permite renderizar cards sem misturar cópia, layout e dados.
+Um site com três páginas institucionais não precisa de coleção, CMS ou arquivo de dados. O conteúdo pode viver diretamente em cada página enquanto ainda for simples.
 
-Crie `src/content/articles.js`:
+Substitua o conteúdo de `src/pages/servicos.jsx` por uma seção semântica:
 
-```js
-// src/content/articles.js
-export const articles = [
-  {
-    slug: "uma-nota-curta",
-    title: "Uma nota curta",
-    excerpt: "Uma ideia útil, sem uma infraestrutura extra.",
-    date: "2026-09-01",
-  },
-];
+```jsx
+// src/pages/servicos.jsx
+export default function Servicos() {
+  return (
+    <main>
+      <h1>Serviços</h1>
+      <section>
+        <h2>Estratégia, design e desenvolvimento</h2>
+        <p>
+          Ajudamos equipes a transformar uma ideia em uma experiência digital clara.
+        </p>
+      </section>
+    </main>
+  );
+}
 ```
 
-Quando o texto crescer, migre cada artigo para seu próprio arquivo MDX. A estrutura de rotas e componentes não precisa mudar para isso.
+Se o site crescer e passar a ter muitos serviços, cases ou artigos, aí faz sentido introduzir dados locais ou arquivos de conteúdo. A rota e o layout não precisam mudar para isso.
 
 ## 8. Faça o build antes de considerar pronto
 
@@ -262,4 +257,4 @@ pnpm run build
 pnpm run preview
 ```
 
-Abra Home, Articles, Labs e Sobre no preview. Teste também uma rota acessada diretamente e a navegação em uma tela estreita. Esse pequeno ritual encontra problemas que um componente isolado não mostra.
+Abra Início, Serviços e Sobre no preview. Teste também uma rota acessada diretamente e a navegação em uma tela estreita. Esse pequeno ritual encontra problemas que um componente isolado não mostra.
