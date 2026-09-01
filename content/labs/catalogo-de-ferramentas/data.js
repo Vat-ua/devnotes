@@ -28,6 +28,13 @@ export const tools = [
     popularity: 8,
   },
   {
+    name: "Zod",
+    category: "Qualidade",
+    description: "Schemas para validar dados nas fronteiras da aplicação.",
+    tags: ["Schema", "API"],
+    popularity: 8,
+  },
+  {
     name: "Node.js",
     category: "Backend",
     description: "Runtime JavaScript para serviços, scripts e APIs.",
