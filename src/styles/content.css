@@ -100,4 +100,4 @@
 @media (min-width: 960px) { .tool-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 960px) { .character-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 720px) { .lab-notes { display: block; } }
-.article-code-compact pre { max-height: 440px; overflow-y: auto; scrollbar-gutter: stable; }
+.article-body pre { max-height: 440px; overflow-y: auto; scrollbar-gutter: stable; }
