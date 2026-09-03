@@ -15,7 +15,7 @@ export default function Articles() {
           claro.
         </p>
       </header>
-      <ul className="content-grid archive-grid article-grid">
+      <ul className="content-grid archive-grid">
         {articles.map((article, index) => (
           <li key={article.slug}>
             <ArticleCard article={article} featured={index === 0} headingLevel={2} />

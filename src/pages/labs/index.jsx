@@ -14,7 +14,7 @@ export default function Labs() {
           Experimentos pequenos para observar comportamento, testar decisões e aprender fazendo.
         </p>
       </header>
-      <ul className="content-grid archive-grid lab-grid">
+      <ul className="content-grid archive-grid">
         {labs.map((lab, index) => (
           <li key={lab.slug}>
             <LabCard lab={lab} featured={index === 0} headingLevel={2} />

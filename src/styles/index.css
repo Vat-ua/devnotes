@@ -1196,18 +1196,6 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .archive-grid.article-grid .content-card,
-    .archive-grid.lab-grid .content-card,
-    .archive-grid.article-grid .content-card.is-featured,
-    .archive-grid.lab-grid .content-card.is-featured {
-      grid-column: auto;
-      min-height: 300px;
-    }
-
-    .archive-grid.lab-grid .content-card:last-child {
-      grid-column: auto;
-    }
-
     .article-grid .content-card.is-featured {
       grid-column: auto;
       min-height: 300px;
@@ -1230,16 +1218,6 @@
   @media (min-width: 1040px) {
     .archive-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .archive-grid.article-grid .content-card,
-    .archive-grid.lab-grid .content-card,
-    .archive-grid.article-grid .content-card.is-featured,
-    .archive-grid.lab-grid .content-card.is-featured,
-    .archive-grid.article-grid .content-card:nth-child(3),
-    .archive-grid.lab-grid .content-card:nth-child(3) {
-      grid-column: auto;
-      min-height: 300px;
     }
 
     .article-grid .content-card {
