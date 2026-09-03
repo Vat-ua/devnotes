@@ -19,7 +19,9 @@ export const loadLab = (slug) => findModule(labModules, slug, 'Lab.jsx');
 export const loadLabGuide = (slug) => findModule(labGuideModules, slug, 'guide.mdx');
 
 function byDate(first, second) {
-  return new Date(second.date) - new Date(first.date);
+  return (
+    new Date(second.date) - new Date(first.date) || first.slug.localeCompare(second.slug, 'pt-BR')
+  );
 }
 function findModule(modules, slug, filename) {
   const module = Object.entries(modules).find(([path]) =>
@@ -29,15 +31,31 @@ function findModule(modules, slug, filename) {
 }
 
 export function formatContentDate(date) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${date}T00:00:00`));
+  const { day, month, year } = getDateParts(date);
+  return `${day} de ${month} de ${year}`;
 }
 
 export function formatCardDate(date) {
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(
-    new Date(`${date}T00:00:00`),
-  );
+  const { day, month } = getDateParts(date);
+  return `${day} de ${month}`;
+}
+
+function getDateParts(date) {
+  const [year, monthNumber, day] = date.split('-');
+  const month = [
+    'jan.',
+    'fev.',
+    'mar.',
+    'abr.',
+    'mai.',
+    'jun.',
+    'jul.',
+    'ago.',
+    'set.',
+    'out.',
+    'nov.',
+    'dez.',
+  ][Number(monthNumber) - 1];
+
+  return { day, month, year };
 }
