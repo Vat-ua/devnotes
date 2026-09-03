@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "build": "pnpm validate:content && vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\"",
