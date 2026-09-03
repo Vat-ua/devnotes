@@ -1,3 +1,5 @@
+import { preloadContentModule } from './moduleCache.js';
+
 const articleMetadataModules = import.meta.glob('../../content/articles/*/meta.js', {
   eager: true,
 });
@@ -45,6 +47,19 @@ export function loadArticle(slug) {
 
 export function loadLabGuide(slug) {
   return findModule(labGuideModules, slug, 'guide.mdx');
+}
+
+export function preloadRouteContent(pathname) {
+  const [contentType, slug] = pathname.replace(/^\/+|\/+$/g, '').split('/');
+
+  if (!slug || (contentType !== 'articles' && contentType !== 'labs')) {
+    return Promise.resolve();
+  }
+
+  const loaders =
+    contentType === 'articles' ? [loadArticle(slug)] : [loadLab(slug), loadLabGuide(slug)];
+
+  return Promise.all(loaders.filter(Boolean).map(preloadContentModule));
 }
 
 export function formatContentDate(date) {

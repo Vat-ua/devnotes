@@ -13,21 +13,16 @@ const pages = [
 ];
 const renderedPages = pages.map(({ route, file }) => ({ route, file, ...render(route) }));
 
-for (const { html, meta, file, route } of renderedPages) {
-  const renderMode = isAsyncContentRoute(route) ? 'client' : 'hydrate';
+for (const { html, meta, file } of renderedPages) {
   const output = template
     .replace(/<!-- page-meta:start -->[\s\S]*?<!-- page-meta:end -->/, pageMeta(meta))
     .replace(
       /<div id="root"(?:\s[^>]*)?>[\s\S]*?<\/body>/,
-      `<div id="root" data-render-mode="${renderMode}">${html}</div>\n</body>`,
+      `<div id="root">${html}</div>\n</body>`,
     );
   const outputFile = join(distDir, file);
   await mkdir(dirname(outputFile), { recursive: true });
   await writeFile(outputFile, output);
-}
-
-function isAsyncContentRoute(route) {
-  return /^\/(articles|labs)\/[^/]+$/.test(route);
 }
 
 const sitemap = renderedPages

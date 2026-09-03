@@ -35,6 +35,7 @@ export default function Article() {
         </div>
         <div className="article-body">
           <AsyncModule
+            key={`article-${slug}`}
             loader={articleLoader}
             fallback={<p className="content-loading">Carregando artigo…</p>}
             errorFallback={
