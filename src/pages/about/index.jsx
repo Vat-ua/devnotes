@@ -18,7 +18,7 @@ const principles = [
 
 export default function About() {
   return (
-    <main className="about-page">
+    <div className="about-page">
       <section className="about-hero container">
         <h1>
           Sobre o <em>DevNotes.</em>
@@ -59,6 +59,6 @@ export default function About() {
           </article>
         ))}
       </section>
-    </main>
+    </div>
   );
 }

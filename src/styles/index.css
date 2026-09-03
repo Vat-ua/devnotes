@@ -740,6 +740,10 @@
     background: var(--surface-2)
   }
 
+  .labs-preview .section-header p {
+    color: color-mix(in srgb, var(--muted) 70%, var(--text));
+  }
+
   .section-header {
     display: grid;
     gap: 1.5rem;

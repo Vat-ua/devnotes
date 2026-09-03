@@ -12,17 +12,17 @@ export default function Lab() {
 
   if (!lab || !labLoader) {
     return (
-      <main className="page-shell empty-state">
+      <div className="page-shell empty-state">
         <h1>Este lab não existe.</h1>
         <Link className="btn btn-primary" to="/labs">
           Ver labs
         </Link>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="lab-shell">
+    <div className="lab-shell">
       <nav className="content-breadcrumb" aria-label="Navegação estrutural">
         <Link to="/labs">Labs</Link>
         <span aria-hidden="true">/</span>
@@ -65,7 +65,7 @@ export default function Lab() {
           </AsyncModule>
         </section>
       )}
-    </main>
+    </div>
   );
 }
 

@@ -11,7 +11,7 @@ export default function Article() {
   if (!article || !articleLoader) return <MissingContent label="artigo" />;
 
   return (
-    <main className="reading-shell">
+    <div className="reading-shell">
       <nav className="content-breadcrumb" aria-label="Navegação estrutural">
         <Link to="/articles">Artigos</Link>
         <span aria-hidden="true">/</span>
@@ -50,18 +50,18 @@ export default function Article() {
           </AsyncModule>
         </div>
       </article>
-    </main>
+    </div>
   );
 }
 
 function MissingContent({ label }) {
   return (
-    <main className="page-shell empty-state">
+    <div className="page-shell empty-state">
       <span className="eyebrow">404</span>
       <h1>Este {label} não existe.</h1>
       <Link className="btn btn-primary" to="/articles">
         Voltar
       </Link>
-    </main>
+    </div>
   );
 }

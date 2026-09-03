@@ -1,21 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
-export default function ThemeToggle() {
-  const [theme, setTheme] = useState(() => {
-    return typeof document === 'undefined'
-      ? 'light'
-      : (document.documentElement.dataset.theme ?? 'light');
+function getThemeSnapshot() {
+  return document.documentElement.dataset.theme ?? 'light';
+}
+
+function getServerThemeSnapshot() {
+  return 'light';
+}
+
+function subscribeToTheme(onStoreChange) {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
   });
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    localStorage.setItem('devnotes-theme', theme);
-  }, [theme]);
+  return () => observer.disconnect();
+}
+
+export default function ThemeToggle() {
+  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, getServerThemeSnapshot);
 
   function toggleTheme() {
-    setTheme((currentTheme) => (currentTheme === 'light' ? 'dark' : 'light'));
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.colorScheme = nextTheme;
+    localStorage.setItem('devnotes-theme', nextTheme);
   }
 
   return (

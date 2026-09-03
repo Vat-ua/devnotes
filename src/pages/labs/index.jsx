@@ -3,7 +3,7 @@ import { labs } from '@content/registry';
 
 export default function Labs() {
   return (
-    <main className="page-shell">
+    <div className="page-shell">
       <header className="page-intro">
         <h1>
           Ideias que pedem
@@ -15,10 +15,11 @@ export default function Labs() {
         </p>
       </header>
       <section className="content-grid archive-grid lab-grid">
+        <h2 className="sr-only">Labs disponíveis</h2>
         {labs.map((lab, index) => (
           <LabCard key={lab.slug} lab={lab} featured={index === 0} />
         ))}
       </section>
-    </main>
+    </div>
   );
 }
