@@ -83,7 +83,6 @@ export default function ToolCatalog() {
 
   return (
     <div className="tool-catalog">
-      <h2 className="sr-only">Ferramentas disponíveis</h2>
       <FilterBar
         query={query}
         category={category}

@@ -297,8 +297,12 @@
   }
 
   .lab-preview-label {
+    margin: 0;
     color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: inherit;
     font-weight: 800;
+    letter-spacing: normal;
   }
 
   .lab-preview-label::before {
@@ -801,6 +805,7 @@
     text-transform: uppercase
   }
 
+  .content-card h2,
   .content-card h3 {
     max-width: 530px;
     margin: 1.8125rem 0 0;
@@ -808,6 +813,7 @@
     line-height: .94
   }
 
+  .content-card h2 a,
   .content-card h3 a {
     text-decoration: none
   }

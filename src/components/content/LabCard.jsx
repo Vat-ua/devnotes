@@ -3,8 +3,9 @@ import { ArrowUpRight } from 'lucide-react';
 import { formatCardDate } from '@content/registry';
 import { getLabVisualPair } from '../../utils/labVisuals.js';
 
-export default function LabCard({ lab, featured = false }) {
+export default function LabCard({ lab, featured = false, headingLevel = 3 }) {
   const [primaryColor, secondaryColor] = getLabVisualPair(lab.slug);
+  const Title = headingLevel === 2 ? 'h2' : 'h3';
 
   return (
     <Link
@@ -25,7 +26,7 @@ export default function LabCard({ lab, featured = false }) {
         <span />
       </div>
       <div>
-        <h3>{lab.title}</h3>
+        <Title>{lab.title}</Title>
         <p>{lab.excerpt}</p>
       </div>
       <span className="card-link">

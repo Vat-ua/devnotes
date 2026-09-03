@@ -15,9 +15,8 @@ export default function Labs() {
         </p>
       </header>
       <section className="content-grid archive-grid lab-grid">
-        <h2 className="sr-only">Labs disponíveis</h2>
         {labs.map((lab, index) => (
-          <LabCard key={lab.slug} lab={lab} featured={index === 0} />
+          <LabCard key={lab.slug} lab={lab} featured={index === 0} headingLevel={2} />
         ))}
       </section>
     </div>

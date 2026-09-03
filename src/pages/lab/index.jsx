@@ -75,7 +75,7 @@ function LabContent({ module, lab }) {
     <>
       <section className={`lab-canvas accent-${lab.accent}`}>
         <div className="canvas-top">
-          <span className="lab-preview-label">Demonstração interativa</span>
+          <h2 className="lab-preview-label">Demonstração interativa</h2>
           <span>{lab.prompt}</span>
         </div>
         <Component />

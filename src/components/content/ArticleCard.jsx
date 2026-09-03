@@ -2,7 +2,9 @@ import { Link } from 'react-router';
 import { ArrowUpRight } from 'lucide-react';
 import { formatCardDate } from '@content/registry';
 
-export default function ArticleCard({ article, featured = false }) {
+export default function ArticleCard({ article, featured = false, headingLevel = 3 }) {
+  const Title = headingLevel === 2 ? 'h2' : 'h3';
+
   return (
     <Link
       className={`content-card article-card accent-${article.accent} ${featured ? 'is-featured' : ''}`}
@@ -13,7 +15,7 @@ export default function ArticleCard({ article, featured = false }) {
         <time dateTime={article.date}>{formatCardDate(article.date)}</time>
       </div>
       <div>
-        <h3>{article.title}</h3>
+        <Title>{article.title}</Title>
         <p>{article.excerpt}</p>
       </div>
       <span className="card-link">

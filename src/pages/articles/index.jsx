@@ -16,9 +16,13 @@ export default function Articles() {
         </p>
       </header>
       <section className="content-grid archive-grid article-grid">
-        <h2 className="sr-only">Artigos publicados</h2>
         {articles.map((article, index) => (
-          <ArticleCard key={article.slug} article={article} featured={index === 0} />
+          <ArticleCard
+            key={article.slug}
+            article={article}
+            featured={index === 0}
+            headingLevel={2}
+          />
         ))}
       </section>
     </div>
