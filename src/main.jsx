@@ -14,5 +14,5 @@ const app = (
   </StrictMode>
 );
 
-if (root.hasChildNodes()) hydrateRoot(root, app);
+if (root.hasChildNodes() && root.dataset.renderMode !== 'client') hydrateRoot(root, app);
 else createRoot(root).render(app);
