@@ -1,60 +1,62 @@
-import { Link } from "react-router"
+import { Link } from 'react-router';
 
-export const meta = {
-  slug: "quando-um-filtro-merece-entrar-na-url",
-  category: "React Router",
-  title: "Quando um filtro merece entrar na URL",
-  excerpt: "Busca, filtros e ordenação deixam de ser detalhes locais quando o resultado precisa sobreviver a um refresh, um link ou ao botão de voltar.",
-  readTime: "7 min de leitura",
-  date: "2026-08-31",
-  accent: "violet",
-}
+Um filtro merece entrar na URL quando descreve a página que alguém está vendo. Se recarregar, copiar o link ou usar Voltar deve restaurar o mesmo catálogo, a busca, a categoria e a ordenação são parte do endereço — não apenas do componente.
 
-Nem todo estado precisa viver no mesmo lugar. Um accordion aberto pode desaparecer quando a página recarrega sem causar nenhum problema. Já uma busca que define o que alguém está vendo costuma merecer uma vida um pouco mais longa.
-
-Essa é uma boa pergunta para fazer antes de adicionar mais um `useState`: **esta decisão precisa ser compartilhável, restaurável ou navegável?** Se a resposta for sim, ela provavelmente pertence à URL.
-
-## Três lugares para o estado
-
-Pensar no destino de cada valor evita tanto URLs barulhentas quanto componentes que escondem decisões importantes.
-
-| Tipo de estado | Exemplos | Onde costuma viver |
-| --- | --- | --- |
-| Local | tooltip aberto, valor de um campo ainda não enviado | componente |
-| URL | busca, filtro, ordenação, página atual | query string |
-| Servidor | dados remotos, loading, erro, cache | camada de dados |
-
-Não é uma classificação rígida. Ela é apenas uma forma de tornar explícito o que precisa sobreviver além daquele clique.
-
-## A URL é uma interface pública
-
-Quando uma pessoa filtra um catálogo por `Frontend` e ordena por nome, a URL pode registrar essa decisão:
-
-```text
-/labs/catalogo-de-ferramentas?category=Frontend&sort=name
-```
-
-Esse endereço pode ser recarregado, salvo ou enviado para outra pessoa. O botão de voltar também passa a respeitar a navegação que realmente aconteceu. Em vez de reinventar esse comportamento, o navegador participa do produto.
-
-## Derive a interface a partir dos parâmetros
-
-Os parâmetros não precisam virar uma cópia inteira dos dados no estado. Eles são a intenção; a lista visível continua sendo derivada.
+No Lab Catálogo de ferramentas, esses valores vêm de `useSearchParams()`:
 
 ```jsx
-const query = searchParams.get("q") ?? "";
-const category = searchParams.get("category") ?? "Todos";
-
-const visibleTools = tools
-  .filter((tool) => matchesQuery(tool, query))
-  .filter((tool) => matchesCategory(tool, category));
+const [searchParams, setSearchParams] = useSearchParams();
+const query = searchParams.get('q') ?? '';
+const category = searchParams.get('category') ?? 'Todos';
+const sortBy = searchParams.get('sort') ?? 'name';
 ```
 
-Ao atualizar um filtro, preserve os parâmetros que não mudaram e remova valores que representam o padrão. Assim, a URL fica curta e continua descrevendo apenas decisões reais.
+Com isso, `/labs/catalogo-de-ferramentas?category=Frontend&sort=popularity` já é uma descrição completa daquela visualização.
 
-## Nem tudo deve virar query string
+## Atualize um parâmetro sem apagar os outros
 
-O campo de texto enquanto alguém ainda está digitando pode ser local — especialmente se a busca só for aplicada ao enviar o formulário. Estados efêmeros, como foco, hover e uma mensagem de cópia, também não precisam aparecer no endereço.
+Ao trocar a categoria, a busca e a ordenação atuais precisam continuar na URL. Comece a alteração a partir dos parâmetros existentes, não de uma query string nova.
 
-Uma boa regra prática: use a URL quando restaurar aquele valor melhora a experiência de uma pessoa que chega depois, volta para trás ou recebe um link.
+```js
+function updateParam(name, value) {
+  setSearchParams(
+    (currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+      const isDefault =
+        (name === 'category' && value === 'Todos') || (name === 'sort' && value === 'name');
 
-<Link className="inline-content-link" to="/labs/catalogo-de-ferramentas">Abra o Lab Catálogo de ferramentas para testar filtros sincronizados com a URL →</Link>
+      if (!value || isDefault) {
+        nextParams.delete(name);
+      } else {
+        nextParams.set(name, value);
+      }
+
+      return nextParams;
+    },
+    { replace: true },
+  );
+}
+```
+
+No Lab, os valores padrão também são removidos: `category=Todos` e `sort=name` não acrescentam informação. O `{ replace: true }` evita criar uma entrada no histórico a cada letra digitada; use a navegação normal quando cada mudança precisar virar uma etapa do histórico.
+
+## Leia a URL; derive a lista
+
+A URL guarda a intenção, não uma cópia dos resultados. A lista visível continua sendo calculada a partir dos parâmetros e dos dados de origem:
+
+```jsx
+const visibleTools = tools
+  .filter((tool) => matchesQuery(tool, query.trim().toLowerCase()))
+  .filter((tool) => matchesCategory(tool, category))
+  .toSorted((first, second) => sortTools(first, second, sortBy));
+```
+
+Isso evita ter uma lista em `useState` que precisa ser sincronizada com filtros, ordenação e URL.
+
+## Quando deixá-la de fora
+
+Não coloque na query string um tooltip aberto, o foco do teclado, uma mensagem temporária de cópia ou o texto de um formulário que ainda não foi aplicado. Esses estados não descrevem uma página que vale a pena compartilhar ou restaurar.
+
+Use a URL para a visão do conteúdo; mantenha local o que só existe durante a interação atual.
+
+Abra o Lab <Link className="inline-content-link" to="/labs/catalogo-de-ferramentas">Catálogo de ferramentas</Link> e experimente recarregar, copiar a URL e usar o botão Voltar.

@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 
 export default function FilterBar({ query, status, onQueryChange, onStatusChange }) {
   return (

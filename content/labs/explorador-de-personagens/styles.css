@@ -1,4 +1,5 @@
 /* Estilos do Lab: Explorador de personagens */
+@layer labs {
 .character-explorer  {
   padding: 1.25rem 0 .25rem;
 }
@@ -160,4 +161,5 @@
   .character-grid  {
     grid-template-columns: repeat(3, 1fr);
   }
+}
 }

@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
-import { AlertCircle, LoaderCircle } from "lucide-react";
-import { fetchCharacters } from "../api.js";
-import CharacterCard from "./CharacterCard.jsx";
-import FilterBar from "./FilterBar.jsx";
+import { useEffect, useState } from 'react';
+import { AlertCircle, LoaderCircle } from 'lucide-react';
+import { fetchCharacters } from '../api.js';
+import CharacterCard from './CharacterCard.jsx';
+import FilterBar from './FilterBar.jsx';
 
 export default function CharacterExplorer() {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("Todos");
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('Todos');
   const [characters, setCharacters] = useState([]);
   const [nextPage, setNextPage] = useState(null);
-  const [state, setState] = useState("loading");
+  const [state, setState] = useState('loading');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [requestKey, setRequestKey] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
     const delay = window.setTimeout(() => {
-      setState("loading");
+      setState('loading');
 
       fetchCharacters({ query: query.trim(), status, signal: controller.signal })
         .then(({ characters: nextCharacters, nextPage: next }) => {
           setCharacters(nextCharacters);
           setNextPage(next);
-          setState(nextCharacters.length === 0 ? "empty" : "ready");
+          setState(nextCharacters.length === 0 ? 'empty' : 'ready');
         })
         .catch((error) => {
-          if (error.name !== "AbortError") setState("error");
+          if (error.name !== 'AbortError') setState('error');
         });
     }, 350);
 
@@ -50,7 +50,7 @@ export default function CharacterExplorer() {
       setCharacters((currentCharacters) => [...currentCharacters, ...moreCharacters]);
       setNextPage(next);
     } catch {
-      setState("error");
+      setState('error');
     } finally {
       setIsLoadingMore(false);
     }
@@ -65,15 +65,19 @@ export default function CharacterExplorer() {
         onStatusChange={setStatus}
       />
 
-      {state === "loading" && (
-        <p className="character-feedback"><LoaderCircle aria-hidden="true" size={18} /> Buscando personagens…</p>
+      {state === 'loading' && (
+        <p className="character-feedback">
+          <LoaderCircle aria-hidden="true" size={18} /> Buscando personagens…
+        </p>
       )}
 
-      {state === "empty" && (
-        <p className="character-feedback">Nenhum personagem corresponde a essa busca. Tente outro nome ou status.</p>
+      {state === 'empty' && (
+        <p className="character-feedback">
+          Nenhum personagem corresponde a essa busca. Tente outro nome ou status.
+        </p>
       )}
 
-      {state === "error" && (
+      {state === 'error' && (
         <p className="character-feedback is-error">
           <AlertCircle aria-hidden="true" size={18} /> Não foi possível falar com a API.
           <button type="button" onClick={() => setRequestKey((currentKey) => currentKey + 1)}>
@@ -82,7 +86,7 @@ export default function CharacterExplorer() {
         </p>
       )}
 
-      {state === "ready" && (
+      {state === 'ready' && (
         <>
           <p className="character-result-count">{characters.length} personagens carregados</p>
           <div className="character-grid">
@@ -91,8 +95,13 @@ export default function CharacterExplorer() {
             ))}
           </div>
           {nextPage && (
-            <button className="character-more" type="button" onClick={loadMore} disabled={isLoadingMore}>
-              {isLoadingMore ? "Carregando…" : "Carregar mais"}
+            <button
+              className="character-more"
+              type="button"
+              onClick={loadMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore ? 'Carregando…' : 'Carregar mais'}
             </button>
           )}
         </>

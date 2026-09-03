@@ -1,6 +1,6 @@
-import CountryExplorer from "./components/CountryExplorer.jsx";
-import { codeFiles } from "./code-files.js";
-import "./styles.css";
+import CountryExplorer from './components/CountryExplorer.jsx';
+import { codeFiles } from './code-files.js';
+import './styles.css';
 
 function Lab() {
   return <CountryExplorer />;

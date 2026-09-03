@@ -1,12 +1,12 @@
 ## A fronteira da API
 
-`fetchCharacters()` concentra a URL, os parâmetros, os erros HTTP e a adaptação da resposta. O restante da interface não precisa conhecer o formato bruto da API nem montar URLs manualmente.
+`fetchCharacters()` concentra a URL, os parâmetros, o tratamento de erros HTTP e a adaptação da resposta. O restante da interface não precisa conhecer o formato bruto da API nem montar URLs manualmente.
 
-A função `toCharacter()` escolhe os campos que o produto realmente usa. Essa tradução cria um modelo pequeno, estável e fácil de renderizar nos cards.
+A função `toCharacter()` seleciona apenas os campos que a interface realmente usa. Essa tradução cria um modelo pequeno, estável e fácil de renderizar nos cards.
 
 ## O que vale reaproveitar
 
-- cancele requests que deixam de representar a busca atual com `AbortController`;
-- trate `404` de uma busca como lista vazia quando essa for a convenção da API;
-- mantenha loading, vazio e erro como estados distintos da interface;
-- preserve a próxima página retornada pela API, em vez de adivinhar quando a lista terminou.
+- Cancele requisições que deixam de representar a busca atual com `AbortController`.
+- Trate um `404` como lista vazia quando essa for a convenção da API para buscas sem resultados.
+- Mantenha carregamento, vazio e erro como estados distintos da interface.
+- Use a próxima página informada pela API, em vez de tentar deduzir quando a lista terminou.

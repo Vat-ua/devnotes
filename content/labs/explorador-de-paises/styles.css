@@ -1,4 +1,5 @@
 /* Estilos do Lab: Explorador de países */
+@layer labs {
 .country-explorer  {
   padding: 1.25rem 0 .25rem;
 }
@@ -128,4 +129,5 @@
   .country-grid  {
     grid-template-columns: repeat(3, 1fr);
   }
+}
 }

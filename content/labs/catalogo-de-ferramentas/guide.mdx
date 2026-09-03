@@ -1,12 +1,12 @@
 ## O que fica na URL
 
-Busca, categoria e ordenação descrevem o catálogo que alguém está vendo. Por isso, o Lab lê esses valores com `useSearchParams()` em vez de mantê-los apenas em `useState()`.
+Busca, categoria e ordenação descrevem o estado do catálogo que alguém está vendo. Por isso, o Lab lê esses valores com `useSearchParams()` em vez de mantê-los apenas em `useState()`.
 
-Ao mudar um controle, `updateParam()` preserva os outros parâmetros e remove valores padrão. Assim, uma URL curta continua sendo suficiente para restaurar a mesma interface.
+Ao alterar um controle, `updateParam()` preserva os outros parâmetros e remove valores padrão. Assim, uma URL curta continua sendo suficiente para restaurar o mesmo estado da interface.
 
 ## O que vale reaproveitar
 
-- derive a lista visível a partir dos parâmetros, sem salvar uma cópia filtrada no estado;
-- remova parâmetros vazios e padrões para não criar URLs desnecessariamente verbosas;
-- use `replace: true` em ajustes contínuos, como digitar em uma busca, para não poluir o histórico;
-- deixe estados efêmeros — foco, hover e feedback visual — fora da URL.
+- Derive a lista visível diretamente dos parâmetros, sem salvar uma cópia filtrada no estado.
+- Remova parâmetros vazios e valores padrão para evitar URLs desnecessariamente verbosas.
+- Use `replace: true` em ajustes contínuos, como ao digitar em uma busca, para não poluir o histórico.
+- Mantenha estados efêmeros — foco, hover e feedback visual — fora da URL.

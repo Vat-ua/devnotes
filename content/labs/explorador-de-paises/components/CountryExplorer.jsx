@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { countries } from "../data.js";
-import CountryCard from "./CountryCard.jsx";
-import FilterBar from "./FilterBar.jsx";
+import { useMemo, useState } from 'react';
+import { countries } from '../data.js';
+import CountryCard from './CountryCard.jsx';
+import FilterBar from './FilterBar.jsx';
 
 function matchesQuery(country, query) {
   const searchableText = `${country.name} ${country.capital}`.toLowerCase();
@@ -10,21 +10,21 @@ function matchesQuery(country, query) {
 }
 
 function matchesContinent(country, continent) {
-  return continent === "Todos" || country.continent === continent;
+  return continent === 'Todos' || country.continent === continent;
 }
 
 function sortCountries(first, second, sortBy) {
-  if (sortBy === "population") {
+  if (sortBy === 'population') {
     return second.population - first.population;
   }
 
-  return first.name.localeCompare(second.name, "pt-BR");
+  return first.name.localeCompare(second.name, 'pt-BR');
 }
 
 export default function CountryExplorer() {
-  const [query, setQuery] = useState("");
-  const [continent, setContinent] = useState("Todos");
-  const [sortBy, setSortBy] = useState("name");
+  const [query, setQuery] = useState('');
+  const [continent, setContinent] = useState('Todos');
+  const [sortBy, setSortBy] = useState('name');
   const normalizedQuery = query.trim().toLowerCase();
 
   const filteredCountries = useMemo(() => {
@@ -34,7 +34,7 @@ export default function CountryExplorer() {
       .toSorted((first, second) => sortCountries(first, second, sortBy));
   }, [normalizedQuery, continent, sortBy]);
 
-  const resultLabel = filteredCountries.length === 1 ? "país encontrado" : "países encontrados";
+  const resultLabel = filteredCountries.length === 1 ? 'país encontrado' : 'países encontrados';
 
   return (
     <div className="country-explorer">

@@ -1,6 +1,13 @@
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 
-export default function FilterBar({ query, continent, sortBy, onQueryChange, onContinentChange, onSortChange }) {
+export default function FilterBar({
+  query,
+  continent,
+  sortBy,
+  onQueryChange,
+  onContinentChange,
+  onSortChange,
+}) {
   return (
     <div className="country-controls">
       <label className="country-search">

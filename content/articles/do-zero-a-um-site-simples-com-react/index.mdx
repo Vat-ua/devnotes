@@ -1,0 +1,509 @@
+Vamos criar um site de três páginas — **Início**, **Serviços** e **Sobre** —, com navegação entre elas e Header + Footer compartilhados.
+Ao clicar nos links na navegação, a URL muda e o React mostra a página correspondente sem recarregar todo o documento. É essa navegação que transforma nosso exemplo em uma pequena SPA (_Single Page Application_).
+
+O código completo deste exemplo está disponível no [GitHub](https://github.com/Vat-ua/simple-react-site).
+
+> Antes de começar, confirme que Node.js e `pnpm` estão instalados. A versão atual do Vite requer Node.js 20.19+ ou 22.12+. Para verificar as versões, execute:
+>
+> ```bash {copy=false}
+> node --version
+> pnpm --version
+> ```
+>
+> Este guia usa `pnpm`. Se você usa `npm`, substitua `pnpm` por `npm` nos comandos.
+
+## 1. Crie o projeto com Vite
+
+Abra o terminal na pasta onde você costuma guardar seus projetos e execute:
+
+```bash {copy=false}
+# terminal
+pnpm create vite simple-react-site --template react --no-interactive
+cd simple-react-site
+pnpm install
+pnpm dev
+```
+
+O primeiro comando cria um novo projeto React dentro da pasta `simple-react-site`. A opção `--no-interactive` cria o projeto sem perguntas no terminal e usa as opções padrão atuais do Vite.
+Depois, `cd simple-react-site` entra na pasta do projeto, `pnpm install` instala as dependências e `pnpm dev` inicia o servidor de desenvolvimento.
+
+O terminal mostrará um endereço parecido com:
+
+```bash {copy=false}
+# terminal
+http://localhost:5173/
+```
+
+Abra esse endereço no navegador e confirme que a página padrão do Vite está funcionando.
+
+> Para parar o servidor, pressione `Ctrl + C`. Sempre que quiser iniciá-lo novamente, entre na pasta do projeto e execute `pnpm dev`.
+
+Antes de começar a modificar os componentes, abra `index.html` e ajuste pelo menos o idioma e o título da página:
+
+```html {copy=false}
+<!-- index.html -->
+<html lang="pt-BR">
+  <!-- ... -->
+  <title>Meu site</title>
+</html>
+```
+
+## 2. Organize a pasta src
+
+O projeto criado pelo Vite já vem com alguns arquivos de exemplo. Para este site, vamos usar uma estrutura pequena e fácil de entender.
+
+```text {copy=false}
+# simple-react-site/
+src/
+  components/
+    Header.jsx
+    Footer.jsx
+  layouts/
+    AppLayout.jsx
+  pages/
+    Home.jsx
+    Servicos.jsx
+    Sobre.jsx
+    NotFound.jsx
+  styles/
+    global.css
+  App.jsx
+  main.jsx
+```
+
+A ideia é simples:
+
+- `pages/` guarda as páginas;
+- `components/` guarda partes que podem ser usadas em vários lugares;
+- `layouts/` define a estrutura compartilhada entre as páginas;
+- `styles/` guarda os estilos globais.
+
+Não existe uma única estrutura obrigatória para projetos React.
+Essa é apenas uma organização simples que funciona bem para um site pequeno.
+Você pode apagar os arquivos de exemplo que não serão usados,
+como `src/App.css`, `src/index.css` e a pasta `src/assets/`.
+
+## 3. Adicione as rotas
+
+React não cria rotas por conta própria.
+Para relacionar URLs como `/servicos` e `/sobre` aos componentes que representam nossas páginas, vamos usar o **React Router**.
+
+Instale o pacote:
+
+```bash {copy=false}
+# terminal
+pnpm add react-router
+```
+
+Depois abra e ajuste `src/main.jsx`. Esse arquivo é o ponto de entrada da aplicação. É nele que o React é conectado ao elemento `#root` existente em `index.html`.
+
+```jsx
+// src/main.jsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
+import App from './App.jsx';
+import './styles/global.css';
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>,
+);
+```
+
+O `BrowserRouter` permite que os componentes da aplicação conheçam a URL atual e façam a navegação entre as páginas.
+Agora podemos definir quais páginas pertencem a cada endereço.
+
+## 4. Crie as páginas
+
+Vamos começar com páginas bem pequenas.
+
+```jsx
+// src/pages/Home.jsx
+export default function Home() {
+  return (
+    <main className="page">
+      <h1>Início</h1>
+    </main>
+  );
+}
+```
+
+```jsx
+// src/pages/Servicos.jsx
+export default function Servicos() {
+  return (
+    <main className="page">
+      <h1>Serviços</h1>
+    </main>
+  );
+}
+```
+
+```jsx
+// src/pages/Sobre.jsx
+export default function Sobre() {
+  return (
+    <main className="page">
+      <h1>Sobre</h1>
+    </main>
+  );
+}
+```
+
+Por enquanto cada página mostra apenas um título. O importante neste momento é fazer a navegação funcionar. O conteúdo pode ser desenvolvido depois.
+Também vamos criar uma página para URLs que não existem.
+
+```jsx
+// src/pages/NotFound.jsx
+import { Link } from 'react-router';
+
+export default function NotFound() {
+  return (
+    <main className="page">
+      <h1>Página não encontrada</h1>
+      <p>Este endereço não faz parte do site.</p>
+      <Link to="/">Voltar ao início</Link>
+    </main>
+  );
+}
+```
+
+Agora já temos os componentes. Falta dizer ao React Router quando mostrar cada um.
+
+## 5. Relacione URLs e páginas
+
+Abra `src/App.jsx` e substitua seu conteúdo por:
+
+```jsx
+// src/App.jsx
+import { Route, Routes } from 'react-router';
+import AppLayout from './layouts/AppLayout.jsx';
+import Home from './pages/Home.jsx';
+import Servicos from './pages/Servicos.jsx';
+import Sobre from './pages/Sobre.jsx';
+import NotFound from './pages/NotFound.jsx';
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<Home />} />
+        <Route path="servicos" element={<Servicos />} />
+        <Route path="sobre" element={<Sobre />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  );
+}
+```
+
+`index` representa a rota inicial, ou seja, `/`. Já `path="*"` funciona como fallback para qualquer endereço que não corresponda às rotas definidas.
+
+Aqui está o mapa básico do nosso site:
+
+```text {copy=false}
+/                  → Home (Início)
+/servicos          → Serviços
+/sobre             → Sobre
+qualquer outra URL → NotFound
+```
+
+Você deve ter reparado que todas essas rotas estão dentro de `<Route element={<AppLayout />}>`.
+Vamos criar esse `AppLayout` agora.
+
+## 6. Crie o layout compartilhado
+
+Queremos que todas as páginas tenham o mesmo Header e Footer.
+Poderíamos colocar esses componentes manualmente dentro de `Home`, `Servicos` e `Sobre`, mas teríamos código repetido.
+Em vez disso, vamos criar um layout.
+
+```jsx
+// src/layouts/AppLayout.jsx
+import { Outlet } from 'react-router';
+import Header from '../components/Header.jsx';
+import Footer from '../components/Footer.jsx';
+
+export default function AppLayout() {
+  return (
+    <div className="app-shell">
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
+  );
+}
+```
+
+O `Outlet` é o lugar onde o React Router coloca a página atual.
+Se estivermos em `/servicos`, por exemplo, o resultado será equivalente a:
+
+```jsx {copy=false}
+<div className="app-shell">
+  <Header />
+  <Servicos />
+  <Footer />
+</div>
+```
+
+Assim, Header e Footer permanecem no layout e apenas o conteúdo central muda durante a navegação.
+
+## 7. Crie o Header, a navegação e o Footer
+
+Vamos usar `NavLink` no lugar de `<a>` para navegar entre as páginas do site.
+Quando o link corresponde à página atual, o `NavLink` adiciona automaticamente a classe `active`.
+
+```jsx
+// src/components/Header.jsx
+import { NavLink } from 'react-router';
+
+export default function Header() {
+  return (
+    <header className="site-header">
+      <div className="container header-inner">
+        <NavLink className="site-brand" to="/">
+          <span className="brand-mark" aria-hidden="true">
+            M
+          </span>
+          Meu site
+        </NavLink>
+        <nav className="site-nav" aria-label="Principal">
+          <NavLink to="/">Início</NavLink>
+          <NavLink to="/servicos">Serviços</NavLink>
+          <NavLink to="/sobre">Sobre</NavLink>
+        </nav>
+      </div>
+    </header>
+  );
+}
+```
+
+Agora crie `src/components/Footer.jsx`:
+
+```jsx
+// src/components/Footer.jsx
+export default function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="container">© Meu site, 2026</div>
+    </footer>
+  );
+}
+```
+
+## 8. Adicione os estilos básicos
+
+Agora vamos dar ao exemplo uma base visual simples: largura máxima para o conteúdo, Header, navegação, Footer e um estado ativo claro.
+
+Crie `src/styles/global.css`:
+
+```css
+/* src/styles/global.css */
+:root {
+  --bg: #f5f3ed;
+  --surface: #fffefa;
+  --text: #151614;
+  --muted: #6e6d66;
+  --line: rgba(21, 22, 20, 0.15);
+  --accent: #bdff3f;
+  --container: 1080px;
+  --radius: 0.5rem;
+  font-family: system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > main {
+  flex: 1;
+}
+
+.container,
+.page {
+  width: min(100% - 2.5rem, var(--container));
+  margin-inline: auto;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.header-inner,
+.site-nav,
+.site-footer {
+  display: flex;
+  align-items: center;
+}
+
+.header-inner {
+  min-height: 72px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+
+@media (min-width: 560px) {
+  .header-inner {
+    flex-direction: row;
+  }
+}
+
+.site-brand {
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.5rem;
+  border-radius: var(--radius);
+  background: var(--accent);
+  font-size: 1rem;
+}
+
+.site-nav {
+  gap: 0.25rem;
+}
+
+.site-nav a {
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  color: var(--muted);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.site-nav a:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.site-nav a.active {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  padding-block: 4rem;
+}
+
+.page h1 {
+  margin-top: 0;
+  font-size: clamp(1.75rem, 1rem + 3vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.page h2 {
+  font-size: clamp(1.25rem, 0.9rem + 1.2vw, 1.5rem);
+  line-height: 1.3;
+  margin-block: 2rem 0.75rem;
+}
+
+.page p {
+  max-width: 65ch;
+}
+
+.page a {
+  color: var(--muted);
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line);
+  text-decoration-thickness: 2px;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
+}
+
+.page a:hover {
+  color: var(--text);
+  text-decoration-color: var(--text);
+}
+
+.site-footer {
+  min-height: 80px;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a {
+    transition: none;
+  }
+}
+```
+
+## 9. Adicione conteúdo às páginas
+
+Com a estrutura pronta, cada página pode crescer de forma independente.
+Por exemplo, podemos substituir o conteúdo de `src/pages/Servicos.jsx`:
+
+```jsx
+// src/pages/Servicos.jsx
+export default function Servicos() {
+  return (
+    <main className="page">
+      <h1>Serviços</h1>
+      <section>
+        <h2>Estratégia, design e desenvolvimento</h2>
+        <p>Ajudamos equipes a transformar uma ideia em uma experiência digital clara.</p>
+      </section>
+    </main>
+  );
+}
+```
+
+Você pode fazer o mesmo com `Home.jsx` e `Sobre.jsx`, adicionando seções, textos, imagens ou outros componentes.
+
+## 10. Teste o build
+
+Antes de criar o build, execute `pnpm lint`. Esse comando analisa o código e ajuda a encontrar possíveis erros ou problemas comuns sem precisar abrir a aplicação no navegador.
+Se o lint não indicar problemas, `pnpm build` cria a versão de produção do site na pasta `dist/`. Depois, `pnpm preview` permite testar esse build localmente.
+
+```bash {copy=false}
+# terminal
+pnpm lint
+pnpm build
+pnpm preview
+```
+
+Abra Início, Serviços e Sobre, teste também uma URL inexistente e a navegação em uma tela pequena. Se tudo estiver funcionando, temos uma SPA simples com React, três páginas, rotas e um layout compartilhado.
+
+A publicação fica para o próximo passo. Dependendo de onde a SPA for hospedada, pode ser necessário configurar o servidor para que URLs diretas como `/servicos` e `/sobre` carreguem corretamente o `index.html`.

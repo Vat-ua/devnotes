@@ -1,4 +1,5 @@
 /* Estilos do Lab: Catálogo de ferramentas */
+@layer labs {
 .tool-catalog  {
   padding: 1.25rem 0 .25rem;
 }
@@ -71,7 +72,7 @@
   background: var(--bg);
 }
 .tool-category  {
-  color: var(--violet);
+  color: color-mix(in srgb, var(--violet) 65%, var(--text));
   font-size: .6875rem;
   font-weight: 800;
   letter-spacing: .07em;
@@ -99,7 +100,7 @@
   padding: .25rem .4375rem;
   border-radius: 999px;
   background: var(--surface-2);
-  color: var(--muted);
+  color: color-mix(in srgb, var(--text) 82%, var(--muted));
   font-family: "DM Mono", monospace;
   font-size: .6875rem;
 }
@@ -123,4 +124,5 @@
   .tool-grid  {
     grid-template-columns: repeat(3, 1fr);
   }
+}
 }

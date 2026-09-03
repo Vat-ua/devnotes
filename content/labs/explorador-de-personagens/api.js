@@ -1,4 +1,4 @@
-const API_URL = "https://rickandmortyapi.com/api/character";
+const API_URL = 'https://rickandmortyapi.com/api/character';
 
 function toCharacter(apiCharacter) {
   return {
@@ -15,8 +15,8 @@ function toCharacter(apiCharacter) {
 export async function fetchCharacters({ query, status, page = 1, signal }) {
   const params = new URLSearchParams({ page: String(page) });
 
-  if (query) params.set("name", query);
-  if (status !== "Todos") params.set("status", status);
+  if (query) params.set('name', query);
+  if (status !== 'Todos') params.set('status', status);
 
   const response = await fetch(`${API_URL}?${params}`, { signal });
 
@@ -25,11 +25,11 @@ export async function fetchCharacters({ query, status, page = 1, signal }) {
   }
 
   if (!response.ok) {
-    throw new Error("Não foi possível carregar os personagens agora.");
+    throw new Error('Não foi possível carregar os personagens agora.');
   }
 
   const data = await response.json();
-  const nextPage = data.info.next ? new URL(data.info.next).searchParams.get("page") : null;
+  const nextPage = data.info.next ? new URL(data.info.next).searchParams.get('page') : null;
 
   return {
     characters: data.results.map(toCharacter),

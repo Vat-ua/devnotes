@@ -1,6 +1,6 @@
-import ToolCatalog from "./components/ToolCatalog.jsx";
-import { codeFiles } from "./code-files.js";
-import "./styles.css";
+import ToolCatalog from './components/ToolCatalog.jsx';
+import { codeFiles } from './code-files.js';
+import './styles.css';
 
 function Lab() {
   return <ToolCatalog />;

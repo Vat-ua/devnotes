@@ -1,32 +1,50 @@
-import { useMemo } from "react";
-import { useSearchParams } from "react-router";
-import { tools } from "../data.js";
-import FilterBar from "./FilterBar.jsx";
-import ToolCard from "./ToolCard.jsx";
+import { useMemo, useSyncExternalStore } from 'react';
+import { useSearchParams } from 'react-router';
+import { tools } from '../data.js';
+import FilterBar from './FilterBar.jsx';
+import ToolCard from './ToolCard.jsx';
 
 function matchesQuery(tool, query) {
-  const searchableText = `${tool.name} ${tool.description} ${tool.tags.join(" ")}`.toLowerCase();
+  const searchableText = `${tool.name} ${tool.description} ${tool.tags.join(' ')}`.toLowerCase();
 
   return searchableText.includes(query);
 }
 
 function matchesCategory(tool, category) {
-  return category === "Todos" || tool.category === category;
+  return category === 'Todos' || tool.category === category;
 }
 
 function sortTools(first, second, sortBy) {
-  if (sortBy === "popularity") {
+  if (sortBy === 'popularity') {
     return second.popularity - first.popularity;
   }
 
-  return first.name.localeCompare(second.name, "pt-BR");
+  return first.name.localeCompare(second.name, 'pt-BR');
+}
+
+function subscribeToHydration() {
+  return () => {};
+}
+
+function getClientSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
 }
 
 export default function ToolCatalog() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get("q") ?? "";
-  const category = searchParams.get("category") ?? "Todos";
-  const sortBy = searchParams.get("sort") ?? "name";
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
+  const activeSearchParams = isHydrated ? searchParams : new URLSearchParams();
+  const query = activeSearchParams.get('q') ?? '';
+  const category = activeSearchParams.get('category') ?? 'Todos';
+  const sortBy = activeSearchParams.get('sort') ?? 'name';
 
   const visibleTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -37,21 +55,26 @@ export default function ToolCatalog() {
       .toSorted((first, second) => sortTools(first, second, sortBy));
   }, [query, category, sortBy]);
 
-  const resultLabel = visibleTools.length === 1 ? "ferramenta encontrada" : "ferramentas encontradas";
+  const resultLabel =
+    visibleTools.length === 1 ? 'ferramenta encontrada' : 'ferramentas encontradas';
 
   function updateParam(name, value) {
-    setSearchParams((currentParams) => {
-      const nextParams = new URLSearchParams(currentParams);
-      const isDefault = (name === "category" && value === "Todos") || (name === "sort" && value === "name");
+    setSearchParams(
+      (currentParams) => {
+        const nextParams = new URLSearchParams(currentParams);
+        const isDefault =
+          (name === 'category' && value === 'Todos') || (name === 'sort' && value === 'name');
 
-      if (!value || isDefault) {
-        nextParams.delete(name);
-      } else {
-        nextParams.set(name, value);
-      }
+        if (!value || isDefault) {
+          nextParams.delete(name);
+        } else {
+          nextParams.set(name, value);
+        }
 
-      return nextParams;
-    }, { replace: true });
+        return nextParams;
+      },
+      { replace: true },
+    );
   }
 
   function resetFilters() {
@@ -60,6 +83,7 @@ export default function ToolCatalog() {
 
   return (
     <div className="tool-catalog">
+      <h2 className="sr-only">Ferramentas disponíveis</h2>
       <FilterBar
         query={query}
         category={category}
@@ -79,7 +103,9 @@ export default function ToolCatalog() {
       </div>
 
       {visibleTools.length === 0 && (
-        <p className="tool-empty">Nenhuma ferramenta corresponde a essa busca. Tente outro termo ou limpe os filtros.</p>
+        <p className="tool-empty">
+          Nenhuma ferramenta corresponde a essa busca. Tente outro termo ou limpe os filtros.
+        </p>
       )}
     </div>
   );

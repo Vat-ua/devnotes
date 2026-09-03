@@ -1,22 +1,12 @@
-import { Link } from "react-router"
+import { Link } from 'react-router';
 
-export const meta = {
-  slug: "uma-api-publica-nao-e-o-seu-modelo-de-interface",
-  category: "Dados remotos",
-  title: "Uma API pública não é o seu modelo de interface",
-  excerpt: "A resposta de um serviço externo é um contrato de transporte. Antes de chegar à tela, ela precisa ganhar nomes, formas e estados que façam sentido para o produto.",
-  readTime: "9 min de leitura",
-  date: "2026-09-01",
-  accent: "orange",
-}
+Uma API pública serve para experimentar `fetch`, mas a resposta dela não deveria definir o formato dos seus componentes. Ela é o contrato do serviço; a interface precisa de um contrato próprio.
 
-Uma API pública é ótima para aprender `fetch`, mas ela também revela uma fronteira importante: o formato que chega pela rede raramente é o formato que a interface realmente precisa.
+No Lab de personagens, por exemplo, a API entrega URLs, objetos aninhados e uma lista de episódios. O card só precisa de nome, status, origem, total de episódios e imagem.
 
-Uma resposta pode trazer nomes longos, campos opcionais, URLs internas e informações que o card jamais vai exibir. Renderizar tudo diretamente acopla a tela aos detalhes de outro serviço — e torna qualquer mudança mais cara.
+## Traduza a resposta antes de renderizar
 
-## Faça uma tradução na fronteira
-
-No Lab de personagens, a API retorna dados como `species`, `origin.name`, uma lista de episódios e uma URL de imagem. A interface, porém, precisa de um objeto simples e previsível.
+Converta os dados na função que faz o request. Assim, o restante da aplicação trabalha com um objeto pequeno e previsível.
 
 ```js
 function toCharacter(apiCharacter) {
@@ -32,34 +22,46 @@ function toCharacter(apiCharacter) {
 }
 ```
 
-Essa função é pequena, mas cria um contrato próprio. O card passa a depender de uma linguagem da aplicação, não da resposta inteira de uma API externa.
+Se a API trocar `origin.name` por outra estrutura, você corrige a adaptação em um lugar. `CharacterCard` não precisa saber que esses dados vieram de uma API externa.
 
-## Não deixe uma resposta antiga vencer
+## Cancele a busca que deixou de ser atual
 
-Pessoas digitam mais rápido do que a rede responde. Se uma busca por `Rick` termina depois de uma busca por `Morty`, o resultado antigo não pode substituir o novo apenas porque chegou por último.
+Uma pessoa pode digitar uma nova busca antes de a anterior terminar. Sem cancelamento, uma resposta antiga pode atualizar a tela depois da busca mais recente.
 
-Use um `AbortController` dentro do efeito. Quando a busca ou o filtro muda, o request anterior é cancelado antes que possa atualizar a interface.
+O Lab cria um `AbortController` para cada efeito e ignora o erro esperado do cancelamento:
 
 ```jsx
 useEffect(() => {
   const controller = new AbortController();
 
-  fetchCharacters({ query, status, signal: controller.signal })
-    .then(setCharacters)
-    .catch(handleError);
+  fetchCharacters({ query: query.trim(), status, signal: controller.signal })
+    .then(({ characters, nextPage }) => {
+      setCharacters(characters);
+      setNextPage(nextPage);
+      setState(characters.length === 0 ? 'empty' : 'ready');
+    })
+    .catch((error) => {
+      if (error.name !== 'AbortError') setState('error');
+    });
 
   return () => controller.abort();
 }, [query, status]);
 ```
 
-## Resposta vazia não é falha
+## Uma lista vazia não é um erro
 
-Algumas APIs usam `404` para comunicar que uma busca não encontrou resultados. Para o produto, isso não é um erro técnico: é um estado vazio que precisa explicar a situação e oferecer um próximo passo.
+Na Rick and Morty API, uma busca sem resultados responde com `404`. Para a interface, isso significa uma lista vazia — não uma falha de conexão.
 
-Separe pelo menos quatro resultados possíveis: carregando, pronto, vazio e erro. A diferença entre vazio e erro é uma das formas mais simples de deixar uma interface honesta.
+```js
+if (response.status === 404) {
+  return { characters: [], nextPage: null };
+}
+```
 
-## A rede continua fora do seu controle
+Vale deixar explícitos quatro estados: carregando, com resultados, vazio e erro. Cada um pede uma mensagem diferente; misturá-los torna a tela confusa e dificulta recuperar de um problema real.
 
-Mesmo uma API estável pode ficar lenta, mudar ou limitar requisições. Por isso, deixe o endpoint concentrado em uma função, mostre uma mensagem recuperável e mantenha o resto da interface independente do formato bruto.
+## Deixe a API em uma borda pequena
 
-<Link className="inline-content-link" to="/labs/explorador-de-personagens">Abra o Lab Explorador de personagens para testar a API e ver a adaptação dos dados em código →</Link>
+Concentre URL, parâmetros, erros HTTP e adaptação em `fetchCharacters`. Dessa forma, trocar o endpoint, adicionar autenticação ou testar a tela com dados locais não exige reescrever os componentes.
+
+Abra o Lab <Link className="inline-content-link" to="/labs/explorador-de-personagens">Explorador de personagens</Link> e veja essa fronteira funcionando.

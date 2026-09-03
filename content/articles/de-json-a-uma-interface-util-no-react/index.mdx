@@ -1,32 +1,57 @@
-import { Link } from "react-router"
+import { Link } from 'react-router';
 
-export const meta = {
-  slug: "de-json-a-uma-interface-util-no-react",
-  category: "React na prática",
-  title: "De JSON a uma interface útil no React",
-  excerpt: "Como transformar uma lista local de dados em cards pesquisáveis, filtráveis e fáceis de explorar sem complicar o estado.",
-  readTime: "8 min de leitura",
-  date: "2026-07-02",
-  accent: "lime",
-}
+Transformar um JSON em interface não é colocar um `map()` na tela. O trabalho começa ao decidir o que é dado de origem, o que é escolha da pessoa e o que pode ser calculado a partir dos dois.
 
-Uma lista de objetos parece simples até que a interface pede busca, filtros, ordenação e detalhes. A boa notícia é que a maior parte desse trabalho não pede estados complexos — pede separar dados de decisões.
+No Lab Explorador de países, `countries` é o dado de origem. O componente guarda somente três escolhas: texto de busca, continente e ordem.
 
-## Guarde a intenção, derive o resultado
+## Guarde os controles, não outra lista
 
-Em vez de salvar uma nova lista toda vez que o usuário digita, guarde apenas o que ele escolheu: a busca, o filtro ativo e a forma de ordenação. A lista visível nasce desses valores.
+Não salve `filteredCountries` em `useState`. Essa lista já pode ser obtida de `countries`, `query`, `continent` e `sortBy`; mantê-la em dois lugares cria sincronização desnecessária.
 
 ```jsx
-const visibleCountries = countries
-  .filter(matchesQuery)
-  .filter(matchesContinent)
-  .toSorted(bySelectedOrder);
+const filteredCountries = useMemo(() => {
+  return countries
+    .filter((country) => matchesQuery(country, normalizedQuery))
+    .filter((country) => matchesContinent(country, continent))
+    .toSorted((first, second) => sortCountries(first, second, sortBy));
+}, [normalizedQuery, continent, sortBy]);
 ```
 
-Esse formato evita que dados de origem e dados filtrados fiquem fora de sincronia. Também deixa cada regra pequena o bastante para testar e explicar.
+`toSorted()` devolve uma nova lista. Diferente de `sort()`, ela não altera o array original — uma propriedade importante quando os mesmos dados sustentam mais de uma visão.
 
-## Componentes com responsabilidade clara
+## Faça cada filtro uma função pequena
 
-O campo de busca não precisa conhecer os cards. O card não precisa saber como a lista foi filtrada. Quando cada componente recebe apenas o que precisa, a interface fica mais fácil de evoluir.
+As regras do Lab ficam fora do componente e respondem a uma pergunta cada uma: o texto corresponde? o país pertence ao continente? qual dos dois vem primeiro?
 
-<Link className="inline-content-link" to="/labs/explorador-de-paises">Abra o Lab Explorador de países para testar a implementação e ver os arquivos reais do exemplo →</Link>
+```js
+function matchesContinent(country, continent) {
+  return continent === 'Todos' || country.continent === continent;
+}
+```
+
+Isso deixa a combinação de regras legível e permite mudar uma delas sem mexer no rendering dos cards.
+
+## Mantenha os controles controlados
+
+O campo de busca e os selects recebem o valor do estado e notificam apenas a mudança. `FilterBar` não filtra dados nem conhece `countries`; `CountryExplorer` decide o que fazer com as escolhas.
+
+```jsx
+<FilterBar
+  query={query}
+  continent={continent}
+  sortBy={sortBy}
+  onQueryChange={setQuery}
+  onContinentChange={setContinent}
+  onSortChange={setSortBy}
+/>
+```
+
+Essa separação é simples, mas impede que cada controle passe a carregar uma regra diferente de filtragem.
+
+## Mostre detalhes com a semântica certa
+
+O card usa `<details>` e `<summary>` para população e idioma. Para uma abertura e fechamento local, o elemento nativo já entrega comportamento de teclado e informação de estado; não há motivo para criar outro `useState`.
+
+Por fim, trate zero resultados como um estado normal da interface. Uma busca que não encontra países ainda precisa dizer o que aconteceu e sugerir o próximo passo.
+
+Abra o Lab <Link className="inline-content-link" to="/labs/explorador-de-paises">Explorador de países</Link> para testar busca, continentes, ordenação e detalhes.

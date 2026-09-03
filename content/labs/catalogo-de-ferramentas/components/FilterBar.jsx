@@ -1,4 +1,4 @@
-import { RotateCcw, Search } from "lucide-react";
+import { RotateCcw, Search } from 'lucide-react';
 
 export default function FilterBar({ query, category, sortBy, onChange, onReset }) {
   return (
@@ -8,14 +8,14 @@ export default function FilterBar({ query, category, sortBy, onChange, onReset }
         <span className="sr-only">Buscar ferramenta</span>
         <input
           value={query}
-          onChange={(event) => onChange("q", event.target.value)}
+          onChange={(event) => onChange('q', event.target.value)}
           placeholder="Buscar ferramenta"
         />
       </label>
 
       <label>
         <span>Categoria</span>
-        <select value={category} onChange={(event) => onChange("category", event.target.value)}>
+        <select value={category} onChange={(event) => onChange('category', event.target.value)}>
           <option value="Todos">Todos</option>
           <option value="Frontend">Frontend</option>
           <option value="Backend">Backend</option>
@@ -26,7 +26,7 @@ export default function FilterBar({ query, category, sortBy, onChange, onReset }
 
       <label>
         <span>Ordenar</span>
-        <select value={sortBy} onChange={(event) => onChange("sort", event.target.value)}>
+        <select value={sortBy} onChange={(event) => onChange('sort', event.target.value)}>
           <option value="name">A–Z</option>
           <option value="popularity">Mais populares</option>
         </select>

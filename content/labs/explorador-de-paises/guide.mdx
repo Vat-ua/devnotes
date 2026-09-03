@@ -1,12 +1,12 @@
 ## Como o exemplo foi construído
 
-Os países começam em um arquivo de dados local. O componente principal não salva uma segunda lista no estado: ele guarda apenas a busca, o continente e a ordem escolhida.
+Os países vêm de um arquivo de dados local. O componente principal não mantém uma segunda lista no estado: guarda apenas a busca, o continente e a ordenação escolhida.
 
-Com esses três valores, a lista visível é derivada com `filter()` e `toSorted()`. Isso evita dados duplicados e mantém o resultado previsível.
+A partir desses três valores, a lista visível é derivada com filter() e toSorted(). Isso evita duplicar dados no estado e mantém o resultado previsível.
 
 ## O que vale reaproveitar
 
-- use uma chave estável em cada card, como o nome ou um `id`;
-- mantenha inputs como componentes controlados;
-- use `<details>` e `<summary>` quando um accordion simples já resolve;
-- trate a lista vazia como um estado legítimo da interface.
+- Use uma chave estável e única para cada card, como um `id`.
+- Mantenha os inputs como componentes controlados.
+- Use `<details>` e `<summary>` quando um accordion simples for suficiente.
+- Trate a lista vazia como um estado legítimo da interface.

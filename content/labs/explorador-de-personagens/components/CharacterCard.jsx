@@ -7,7 +7,9 @@ export default function CharacterCard({ character }) {
           {character.status}
         </span>
         <h3>{character.name}</h3>
-        <p>{character.species} · {character.origin}</p>
+        <p>
+          {character.species} · {character.origin}
+        </p>
         <small>{character.episodeCount} episódios</small>
       </div>
     </article>
