@@ -56,5 +56,5 @@ function contentMeta(content, path, type) {
 }
 
 function absoluteUrl(path) {
-  return `${siteUrl}${path === '/' ? '/' : path}`;
+  return `${siteUrl}${path === '/' ? '/' : `${path}/`}`;
 }
