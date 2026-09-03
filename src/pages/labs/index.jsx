@@ -14,11 +14,13 @@ export default function Labs() {
           Experimentos pequenos para observar comportamento, testar decisões e aprender fazendo.
         </p>
       </header>
-      <section className="content-grid archive-grid lab-grid">
+      <ul className="content-grid archive-grid lab-grid">
         {labs.map((lab, index) => (
-          <LabCard key={lab.slug} lab={lab} featured={index === 0} headingLevel={2} />
+          <li key={lab.slug}>
+            <LabCard lab={lab} featured={index === 0} headingLevel={2} />
+          </li>
         ))}
-      </section>
+      </ul>
     </div>
   );
 }

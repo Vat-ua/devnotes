@@ -15,16 +15,13 @@ export default function Articles() {
           claro.
         </p>
       </header>
-      <section className="content-grid archive-grid article-grid">
+      <ul className="content-grid archive-grid article-grid">
         {articles.map((article, index) => (
-          <ArticleCard
-            key={article.slug}
-            article={article}
-            featured={index === 0}
-            headingLevel={2}
-          />
+          <li key={article.slug}>
+            <ArticleCard article={article} featured={index === 0} headingLevel={2} />
+          </li>
         ))}
-      </section>
+      </ul>
     </div>
   );
 }
