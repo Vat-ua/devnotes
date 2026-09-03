@@ -40,6 +40,22 @@
 <body>
   <script>
     (() => {
+      const basePath = "%BASE_URL%".replace(/\/$/, "");
+      const relativePath = location.pathname.slice(basePath.length);
+      const isWithinBase =
+        !basePath || location.pathname === basePath || location.pathname.startsWith(`${basePath}/`);
+      const isPagePath =
+        isWithinBase &&
+        (location.pathname === basePath ||
+          (relativePath && !relativePath.endsWith("/") && !relativePath.includes(".")));
+
+      if (isPagePath) {
+        location.replace(`${location.pathname}/${location.search}${location.hash}`);
+      }
+    })();
+  </script>
+  <script>
+    (() => {
       const savedTheme = localStorage.getItem("devnotes-theme");
       const theme = savedTheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.dataset.theme = theme;
