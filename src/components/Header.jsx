@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import { NavLink } from "react-router";
-import { Menu, X } from "lucide-react";
-import BrandMark from "./BrandMark.jsx";
-import ThemeToggle from "./ThemeToggle";
+import { useEffect, useRef, useState } from 'react';
+import { NavLink } from 'react-router';
+import { Menu, X } from 'lucide-react';
+import BrandMark from './BrandMark.jsx';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef(null);
+  const navigationRef = useRef(null);
 
   function closeMenu() {
     setMenuOpen(false);
@@ -13,12 +15,19 @@ export default function Header() {
 
   useEffect(() => {
     function onKeyDown(event) {
-      if (event.key === "Escape") closeMenu();
+      if (event.key === 'Escape' && menuOpen) {
+        closeMenu();
+        menuButtonRef.current?.focus();
+      }
     }
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (menuOpen) navigationRef.current?.querySelector('a')?.focus();
+  }, [menuOpen]);
 
   return (
     <header className="site-header">
@@ -28,27 +37,13 @@ export default function Header() {
           DevNotes
         </NavLink>
 
-        <div className="header-actions">
-          <ThemeToggle />
-
-          <button
-            className="menu-toggle"
-            type="button"
-            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={menuOpen}
-            aria-controls="main-navigation"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            {menuOpen ? <X aria-hidden="true" size={19} /> : <Menu aria-hidden="true" size={20} />}
-          </button>
-        </div>
-
         <nav
-          className={`navigation ${menuOpen ? "is-open" : ""}`}
+          className={`navigation ${menuOpen ? 'is-open' : ''}`}
           id="main-navigation"
           aria-label="Navegação principal"
+          ref={navigationRef}
         >
-          <NavLink to="/" end onClick={closeMenu}>
+          <NavLink to="/" onClick={closeMenu}>
             Início
           </NavLink>
 
@@ -64,6 +59,22 @@ export default function Header() {
             Sobre
           </NavLink>
         </nav>
+
+        <div className="header-actions">
+          <ThemeToggle />
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
+            onClick={() => setMenuOpen((open) => !open)}
+            ref={menuButtonRef}
+          >
+            {menuOpen ? <X aria-hidden="true" size={19} /> : <Menu aria-hidden="true" size={20} />}
+          </button>
+        </div>
       </div>
     </header>
   );

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
-import CodeExplorer from "../../components/content/CodeExplorer.jsx";
-import { formatContentDate, getLabBySlug, loadLab, loadLabGuide } from "../../content/registry.js";
+import { Link, useParams } from 'react-router';
+import AsyncModule from '../../components/content/AsyncModule.jsx';
+import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
+import CodeExplorer from '../../components/content/CodeExplorer.jsx';
+import { formatContentDate, getLabBySlug, loadLab, loadLabGuide } from '@content/registry';
 
 export default function Lab() {
   const { slug } = useParams();
@@ -13,7 +14,9 @@ export default function Lab() {
     return (
       <main className="page-shell empty-state">
         <h1>Este lab não existe.</h1>
-        <Link className="btn btn-primary" to="/labs">Ver labs</Link>
+        <Link className="btn btn-primary" to="/labs">
+          Ver labs
+        </Link>
       </main>
     );
   }
@@ -38,12 +41,26 @@ export default function Lab() {
         key={`lab-${slug}`}
         loader={labLoader}
         fallback={<p className="lab-loading">Carregando experimento…</p>}
+        errorFallback={
+          <p className="content-error" role="alert">
+            Não foi possível carregar este experimento. Atualize a página e tente novamente.
+          </p>
+        }
       >
         {(module) => <LabContent module={module} lab={lab} />}
       </AsyncModule>
       {guideLoader && (
         <section className="lab-notes">
-          <AsyncModule key={`guide-${slug}`} loader={guideLoader} fallback={null}>
+          <AsyncModule
+            key={`guide-${slug}`}
+            loader={guideLoader}
+            fallback={null}
+            errorFallback={
+              <p className="content-error" role="alert">
+                Não foi possível carregar o guia deste Lab.
+              </p>
+            }
+          >
             {(module) => <LabGuide module={module} />}
           </AsyncModule>
         </section>
@@ -81,21 +98,7 @@ function LabGuide({ module }) {
   return (
     <>
       <span className="eyebrow">Por trás do exemplo</span>
-      <Guide />
+      <Guide components={{ pre: MdxCodeBlock }} />
     </>
   );
-}
-
-function AsyncModule({ loader, fallback, children }) {
-  const [module, setModule] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    loader().then((module) => {
-      if (!cancelled) setModule(module);
-    });
-    return () => { cancelled = true; };
-  }, [loader]);
-
-  return module ? children(module) : fallback;
 }

@@ -1,8 +1,8 @@
 export default function Footer() {
   function scrollToTop() {
-    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ? "auto"
-      : "smooth";
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
 
     window.scrollTo({ top: 0, behavior });
   }
