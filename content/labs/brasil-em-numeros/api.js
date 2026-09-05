@@ -1,8 +1,5 @@
 import { monthsBefore } from './series.js';
 
-const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000;
-
 export function normalizeSeries(rows) {
   if (!Array.isArray(rows)) throw new Error('O Banco Central retornou um formato inesperado.');
   const dates = new Set();
@@ -33,10 +30,7 @@ export function normalizeSeries(rows) {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export async function fetchSeries(config, { signal, refresh = false } = {}) {
-  const saved = cache.get(config.series);
-  if (!refresh && saved && Date.now() - saved.savedAt < CACHE_DURATION) return saved.result;
-
+export async function fetchSeries(config, { signal } = {}) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Sao_Paulo',
     year: 'numeric',
@@ -74,8 +68,5 @@ export async function fetchSeries(config, { signal, refresh = false } = {}) {
   ) {
     throw new Error('Os dados recebidos não correspondem ao período ou à unidade esperada.');
   }
-  const result = { points, url, checkedAt: new Date().toISOString() };
-  if (!requestSignal.aborted && points.length)
-    cache.set(config.series, { result, savedAt: Date.now() });
-  return result;
+  return points;
 }

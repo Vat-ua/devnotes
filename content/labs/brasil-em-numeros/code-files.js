@@ -13,17 +13,17 @@ export const codeFiles = [
   },
   {
     name: 'api.js',
-    description: 'Consulta oficial, validação, cancelamento e cache de cinco minutos.',
+    description: 'Consulta oficial, validação e cancelamento.',
     source: api,
   },
   {
     name: 'series.js',
-    description: 'Séries, unidades, janelas e cálculos derivados.',
+    description: 'Séries, unidades e recorte do histórico.',
     source: series,
   },
   {
     name: 'HistoryChart.jsx',
-    description: 'Gráficos SVG, inspeção por teclado e tabela acessível.',
+    description: 'Gráficos SVG e um seletor de observações acessível.',
     source: chart,
   },
   {

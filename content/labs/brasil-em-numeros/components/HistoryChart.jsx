@@ -23,17 +23,7 @@ export default function HistoryChart({ points, config }) {
     )
     .join(' ');
   const digits = config.currency ? 4 : 2;
-  const description = `${config.label}, ${config.unit}. De ${formatDate(points[0].date, config.monthly)} a ${formatDate(points.at(-1).date, config.monthly)}. Valores exatos no controle e na tabela abaixo.`;
-
-  function inspect(event) {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const position = ((event.clientX - bounds.left) / bounds.width) * 760;
-    let nearest = 0;
-    points.forEach((entry, index) => {
-      if (Math.abs(x(entry) - position) < Math.abs(x(points[nearest]) - position)) nearest = index;
-    });
-    setSelected(nearest);
-  }
+  const description = `${config.label}, ${config.unit}. De ${formatDate(points[0].date, config.monthly)} a ${formatDate(points.at(-1).date, config.monthly)}. Valores exatos no controle abaixo.`;
 
   return (
     <figure className="br-chart">
@@ -54,8 +44,6 @@ export default function HistoryChart({ points, config }) {
           preserveAspectRatio="none"
           role="img"
           aria-labelledby={`${id}-title`}
-          onPointerMove={inspect}
-          onPointerDown={inspect}
         >
           <title id={`${id}-title`}>{description}</title>
           {[min, (min + max) / 2, max].map((value) => (
@@ -96,8 +84,8 @@ export default function HistoryChart({ points, config }) {
         <span>{formatDate(points.at(-1).date, config.monthly)}</span>
       </div>
       <div className="br-inspector">
-        <label htmlFor={`${id}-range`}>
-          Explorar observações <span className="br-subtle">· arraste ou use as setas</span>
+        <label className="sr-only" htmlFor={`${id}-range`}>
+          Explorar histórico
         </label>
         <output htmlFor={`${id}-range`}>
           <time dateTime={config.monthly ? point.date.slice(0, 7) : point.date}>
@@ -118,35 +106,6 @@ export default function HistoryChart({ points, config }) {
           aria-valuetext={`${formatDate(point.date, config.monthly)}: ${formatNumber(point.value, digits)} ${config.unit}`}
         />
       </div>
-      <details className="br-table-details">
-        <summary>Ver {points.length} observações em tabela</summary>
-        <div
-          className="br-table-scroll"
-          tabIndex="0"
-          role="region"
-          aria-label="Histórico de valores"
-        >
-          <table>
-            <caption>
-              {config.label} — {config.unit}
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">{config.monthly ? 'Mês de referência' : 'Data'}</th>
-                <th scope="col">Valor ({config.unit})</th>
-              </tr>
-            </thead>
-            <tbody>
-              {points.toReversed().map((entry) => (
-                <tr key={entry.date}>
-                  <td>{formatDate(entry.date, config.monthly)}</td>
-                  <td>{formatNumber(entry.value, digits)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
     </figure>
   );
 }

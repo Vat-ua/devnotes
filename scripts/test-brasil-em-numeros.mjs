@@ -3,10 +3,9 @@ import { test } from 'node:test';
 import { fetchSeries, normalizeSeries } from '../content/labs/brasil-em-numeros/api.js';
 import {
   formatDate,
-  getSeries,
+  indicators,
   monthsBefore,
   selectPeriod,
-  summarize,
 } from '../content/labs/brasil-em-numeros/series.js';
 
 test('datas do SGS preservam mês, ordem e sinal', () => {
@@ -54,27 +53,11 @@ test('janelas respeitam fim de mês, ano bissexto e meses de referência', () =>
   assert.equal(selectPeriod(businessDays, 1, false)[0].date, '2026-08-03');
 });
 
-test('variação cambial é relativa; diferença entre taxas é em pontos percentuais', () => {
-  const points = [
-    { date: '2026-01-01', value: 4 },
-    { date: '2026-02-01', value: 5 },
-    { date: '2026-03-01', value: 5 },
-  ];
-  assert.equal(summarize(points, getSeries('dolar')).change, 25);
-  assert.equal(summarize(points, getSeries('selic')).change, 1);
-  assert.equal(summarize(points, getSeries('selic')).max.date, '2026-02-01');
-  assert.equal(summarize([points[0]], getSeries('selic')).change, 0);
-  assert.equal(getSeries('ipca', 'annual').series, 13522);
-  assert.equal(getSeries('ipca', 'monthly').series, 433);
-});
-
-test('consulta limita datas, mantém apenas cache válido e propaga falhas e cancelamento', async () => {
+test('consulta limita datas, propaga falhas e cancelamento', async () => {
   const original = globalThis.fetch;
-  let calls = 0;
   let behavior = 'valid';
   let lastUrl;
   globalThis.fetch = async (url, { signal }) => {
-    calls++;
     lastUrl = new URL(url);
     signal.throwIfAborted();
     if (behavior === 'http') return new Response('{}', { status: 503 });
@@ -84,28 +67,26 @@ test('consulta limita datas, mantém apenas cache válido e propaga falhas e can
     return new Response(JSON.stringify([{ data: date, valor: '5.1234' }]));
   };
   try {
-    const config = getSeries('dolar');
-    const result = await fetchSeries(config, { refresh: true });
-    assert.equal(result.points[0].value, 5.1234);
+    const config = indicators.dolar;
+    const result = await fetchSeries(config);
+    assert.equal(result[0].value, 5.1234);
     assert.equal(lastUrl.hostname, 'api.bcb.gov.br');
     assert.equal(lastUrl.searchParams.get('formato'), 'json');
     const date = (name) => lastUrl.searchParams.get(name).split('/').reverse().join('-');
     assert.ok((Date.parse(date('dataFinal')) - Date.parse(date('dataInicial'))) / 86400000 < 430);
-    await fetchSeries(config);
-    assert.equal(calls, 1);
     for (const next of ['http', 'invalid']) {
       behavior = next;
-      await assert.rejects(fetchSeries(config, { refresh: true }));
+      await assert.rejects(fetchSeries(config));
     }
     behavior = 'empty';
-    assert.deepEqual((await fetchSeries(config, { refresh: true })).points, []);
+    assert.deepEqual(await fetchSeries(config), []);
     behavior = 'valid';
     const controller = new AbortController();
     controller.abort();
-    await assert.rejects(fetchSeries(config, { signal: controller.signal, refresh: true }), {
+    await assert.rejects(fetchSeries(config, { signal: controller.signal }), {
       name: 'AbortError',
     });
-    assert.equal((await fetchSeries(config)).points[0].value, 5.1234);
+    assert.equal((await fetchSeries(config))[0].value, 5.1234);
   } finally {
     globalThis.fetch = original;
   }

@@ -11,7 +11,6 @@ export const indicators = {
     months: 61,
     description:
       'A meta definida pelo Copom, em percentual ao ano. Cada degrau marca uma mudança de patamar.',
-    note: 'A meta Selic orienta os juros da economia. Não é a Selic efetiva diária nem uma promessa de rendimento.',
   },
   dolar: {
     name: 'Dólar',
@@ -25,8 +24,7 @@ export const indicators = {
     months: 13,
     currency: 'US$',
     description:
-      'A cotação de referência de venda, em reais por dólar. Explore os fechamentos publicados pelo Banco Central.',
-    note: 'Referência PTAX de fechamento, não cotação em tempo real. O preço de uma compra inclui condições da instituição, tarifas e impostos. Fins de semana e feriados podem não ter observações.',
+      'Referência PTAX de venda, em reais por dólar. Fechamentos publicados, sem cotações em tempo real.',
   },
   euro: {
     name: 'Euro',
@@ -40,8 +38,7 @@ export const indicators = {
     months: 13,
     currency: '€',
     description:
-      'A cotação de referência de venda, em reais por euro. Uma história própria, além do movimento do dólar.',
-    note: 'Referência de venda do BCB, calculada a partir do dólar e da paridade euro/dólar. Não é cotação em tempo real nem preço final de uma compra. Só aparecem datas publicadas.',
+      'A referência de venda do Banco Central, em reais por euro. Sem cotações em tempo real.',
   },
   ipca: {
     name: 'IPCA',
@@ -55,23 +52,9 @@ export const indicators = {
     months: 62,
     monthly: true,
     description:
-      'A inflação medida pelo IBGE e disponibilizada pelo Banco Central. Veja cada mês ou a variação acumulada em 12 meses.',
-    note: 'O mês exibido é o de referência, não a data de divulgação. Uma taxa mensal negativa indica queda média de preços naquele mês. O acumulado em 12 meses combina as variações, não as soma.',
+      'A inflação mensal medida pelo IBGE. Valores negativos indicam queda média de preços no mês de referência.',
   },
 };
-
-export function getSeries(indicator, mode) {
-  const config = indicators[indicator];
-  return indicator === 'ipca' && mode === 'annual'
-    ? {
-        ...config,
-        series: 13522,
-        unit: '% em 12 meses',
-        label: 'IPCA · acumulado em 12 meses',
-        kind: 'line',
-      }
-    : config;
-}
 
 export function sourceUrl(series) {
   return `https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarGraficoPorId&hdOidSeriesSelecionadas=${series}`;
@@ -86,11 +69,10 @@ export function formatDate(date, monthly = false) {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
-export function formatNumber(value, digits = 2, signed = false) {
+export function formatNumber(value, digits = 2) {
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-    ...(signed ? { signDisplay: 'exceptZero' } : {}),
   }).format(value);
 }
 
@@ -109,13 +91,4 @@ export function selectPeriod(points, months, monthly) {
   if (!points.length) return [];
   const start = monthsBefore(points.at(-1).date, monthly ? months - 1 : months);
   return points.filter((point) => point.date >= start);
-}
-
-export function summarize(points, config) {
-  const first = points[0];
-  const last = points.at(-1);
-  const min = points.reduce((result, point) => (point.value < result.value ? point : result));
-  const max = points.reduce((result, point) => (point.value > result.value ? point : result));
-  const change = config.currency ? (last.value / first.value - 1) * 100 : last.value - first.value;
-  return { first, last, min, max, change };
 }

@@ -1,63 +1,28 @@
-## Primeiro, uma pergunta que vale explorar
+## useState: o que a pessoa escolhe
 
-O dólar ficou mais caro nos últimos três meses? Quando a Selic mudou de patamar? Um mês de inflação baixa significa que os preços caíram? Este Lab parte dessas perguntas para construir uma interface pequena, alimentada diretamente pelo Banco Central.
+O indicador, o período, a observação do gráfico e a quantia digitada são estados da interface. Cada mudança atualiza a tela. O recorte do histórico e a conversão são calculados a partir desses valores, sem precisar de outros estados.
 
-Escolha um indicador, altere a janela e percorra as observações. No câmbio, compare quanto o mesmo valor em moeda estrangeira representa em reais nas duas pontas. A tabela permite conferir os números por trás do desenho, inclusive com leitor de tela.
+## useEffect: quando buscar os dados
 
-## A fonte muda a forma de contar a história
+Ao escolher um indicador, seu componente consulta o Banco Central. O efeito conecta a interface à API e cancela a consulta anterior quando o indicador muda. Alterar o período usa o histórico já recebido, sem uma nova requisição.
 
-O [SGS do Banco Central](https://www3.bcb.gov.br/sgspub/) reúne séries observadas e oferece JSON sem chave de acesso. Também existe a [API PTAX no Olinda](https://dadosabertos.bcb.gov.br/dataset/taxas-de-cambio-todos-os-boletins-diarios), com boletins intradiários, compra, venda e paridades. Para este produto, as séries diárias do SGS entregam o histórico necessário com uma resposta menor e uniforme. As expectativas Focus são projeções; não substituem as observações usadas aqui.
+## A resposta também faz parte da interface
 
-| Indicador                                                                                                                                                | Série oficial | Unidade e leitura                                                       |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------- |
-| [Meta Selic](https://dadosabertos.bcb.gov.br/dataset/432-taxa-de-juros---meta-selic-definida-pelo-copom)                                                 | 432           | Percentual ao ano, meta definida pelo Copom.                            |
-| [Dólar de venda](https://dadosabertos.bcb.gov.br/dataset/1-taxa-de-cambio---livre---dolar-americano-venda---diario)                                      | 1             | Reais por dólar, referência PTAX de fechamento.                         |
-| [Euro de venda](https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarGraficoPorId&hdOidSeriesSelecionadas=21619)    | 21619         | Reais por euro; o BCB usa a cotação do dólar e a paridade euro/dólar.   |
-| [IPCA mensal](https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarGraficoPorId&hdOidSeriesSelecionadas=433)        | 433           | Variação percentual do mês, produzida pelo IBGE e distribuída pelo BCB. |
-| [IPCA em 12 meses](https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarGraficoPorId&hdOidSeriesSelecionadas=13522) | 13522         | Variação acumulada em 12 meses, publicada pelo BCB.                     |
+Enquanto os dados chegam, mostramos o carregamento. Se a consulta falha ou não retorna observações, explicamos o que aconteceu e oferecemos uma nova tentativa.
 
-A Selic usa degraus porque sua meta permanece no mesmo patamar até uma mudança. A linha do câmbio liga as observações disponíveis, sem criar cotações para feriados ou fins de semana. Os pontos respeitam a distância entre as datas. O IPCA mensal usa barras em torno de zero; o acumulado em 12 meses usa uma linha separada, na sua própria escala. Uma inflação positiva menor significa aumento mais lento dos preços, não queda de preços.
+## De onde vêm os dados?
 
-As janelas de câmbio são de 1, 3, 6 e 12 meses. Juros e inflação ganham contexto com 12, 24 e 60 meses. Elas terminam na última observação retornada, cuja data sempre fica visível. No IPCA, `01/07/2026`, por exemplo, representa julho de 2026; não significa que o índice foi divulgado no primeiro dia do mês.
+Usamos a API pública do **SGS — Sistema Gerenciador de Séries Temporais do Banco Central do Brasil**. Ela retorna dados em JSON e permite consultas por intervalo de datas, sem chave de acesso. As séries usadas são **432** (meta Selic), **1** (dólar de venda), **21619** (euro de venda) e **433** (IPCA mensal, produzido pelo IBGE).
 
-## useState guarda o que pode mudar
+Este [exemplo de consulta](https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01/08/2026&dataFinal=31/08/2026) busca o dólar de venda em agosto de 2026:
 
-`EconomyExplorer` guarda o indicador escolhido. `Indicator` guarda a janela, a medida de inflação, o estado da consulta e a chave usada para tentar novamente. `HistoryChart` guarda a observação selecionada. O conversor guarda o texto digitado, inclusive quando o campo está vazio.
-
-Os extremos, a janela filtrada, o traçado e a conversão são calculados durante a renderização. Não precisam de estados próprios nem de efeitos para sincronizar cópias dos mesmos dados.
-
-```jsx
-const [months, setMonths] = useState(12);
-const points = selectPeriod(request.points, months, config.monthly);
+```text
+https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados
+  ?formato=json
+  &dataInicial=01/08/2026
+  &dataFinal=31/08/2026
 ```
 
-Ao mudar de indicador, a `key` reinicia as escolhas locais com padrões adequados. Ao mudar a janela, apenas o gráfico reinicia sua seleção na última observação. A quantia do conversor permanece enquanto você compara períodos da mesma moeda.
+A URL está dividida em linhas apenas para facilitar a leitura. O código da série escolhe o indicador; `dataInicial` e `dataFinal` delimitam o histórico.
 
-## useEffect conecta a escolha à fonte externa
-
-O efeito de `Indicator` consulta a série quando o indicador, a medida de inflação ou a chave de atualização muda. A função `fetchSeries()` cuida da URL, do HTTP, da validação e da transformação de `{ data, valor }` em `{ date, value }`.
-
-O cleanup cancela a requisição com `AbortController`. Uma flag local também impede respostas antigas de atualizar o estado, inclusive quando o cache já resolveu a promessa. Assim, uma troca rápida entre IPCA mensal e acumulado não mistura séries. Carregamento, vazio, erro e sucesso são estados explícitos; uma falha nunca produz uma curva inventada.
-
-```jsx
-return () => {
-  active = false;
-  controller.abort();
-};
-```
-
-As consultas têm limite de 20 segundos e um cache em memória de cinco minutos. Somente respostas válidas e não vazias entram no cache. O botão Atualizar ignora o cache local; o BCB ainda pode aplicar o próprio cache HTTP. Alterar a janela usa o histórico já carregado, sem outra requisição. Os intervalos consultados ficam abaixo do limite de dez anos imposto pelo SGS às séries diárias.
-
-## Unidades são parte da implementação
-
-No câmbio, a variação relativa é `(último / primeiro - 1) × 100`. A conversão multiplica a quantia em moeda estrangeira pela cotação em reais, mantendo quatro casas no valor de referência e duas no resultado monetário.
-
-Na Selic e no IPCA, a diferença entre taxas aparece em **pontos percentuais**, não como variação percentual. O acumulado de inflação segue a composição `((1 + taxa1 / 100) × … × (1 + taxa12 / 100) - 1) × 100`. O Lab usa diretamente a série oficial 13522, preservando seu arredondamento, em vez de reconstruir essa série a partir das taxas mensais arredondadas.
-
-Datas são interpretadas explicitamente e formatadas em UTC para evitar que um fuso transforme o primeiro dia do mês no dia anterior. A data final da consulta e seu horário de consulta usam Brasília. A resposta é validada: datas impossíveis, duplicações, valores inválidos e observações fora da janela geram erro visível.
-
-## Um gráfico pequeno também precisa ser utilizável
-
-O SVG é suficiente para três tipos simples de gráfico; nenhuma biblioteca foi adicionada. A escala vertical ajustada fica identificada, barras incluem zero e séries constantes recebem uma margem para continuar legíveis. O seletor nativo de intervalo oferece teclado e toque, com data, valor e unidade em `aria-valuetext`. A tabela oferece uma alternativa textual completa.
-
-Os arquivos acima são o código real do Lab. Os estilos usam `@layer labs`, tokens de tema e a tipografia herdada do DevNotes. Não há dados simulados nem histórico de reserva embutido: se a fonte estiver indisponível, a interface explica e permite tentar novamente.
+As datas indicam as observações publicadas, não cotações em tempo real. No IPCA, identificam o mês de referência. O número em destaque e o conversor usam o último dado publicado; o seletor abaixo do gráfico permite explorar o passado.
