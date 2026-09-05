@@ -10,7 +10,7 @@ export default function EconomyExplorer() {
     <div className="br-explorer">
       <header className="br-heading">
         <h2>
-          Brasil em números<span>.</span>
+          Indicadores do Brasil<span>.</span>
         </h2>
         <p>Escolha um indicador. Explore sua história.</p>
       </header>

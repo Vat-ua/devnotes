@@ -1,20 +1,22 @@
-## useState: o que a pessoa escolhe
+## Das escolhas aos dados
 
-O indicador, o período, a observação do gráfico e a quantia digitada são estados da interface. Cada mudança atualiza a tela. O recorte do histórico e a conversão são calculados a partir desses valores, sem precisar de outros estados.
+`useState` guarda o indicador escolhido, o período, a observação selecionada e a quantia digitada. O gráfico e a conversão acompanham essas escolhas.
 
-## useEffect: quando buscar os dados
+`useEffect` conecta a interface ao Banco Central: consulta o histórico ao escolher um indicador e cancela o pedido anterior quando essa escolha muda. Alterar o período apenas recorta os dados já recebidos.
 
-Ao escolher um indicador, seu componente consulta o Banco Central. O efeito conecta a interface à API e cancela a consulta anterior quando o indicador muda. Alterar o período usa o histórico já recebido, sem uma nova requisição.
+## O que vale reaproveitar
 
-## A resposta também faz parte da interface
+* Guarde em estado as escolhas; calcule o que pode ser derivado delas.
+* Cancele consultas que já não correspondem ao indicador selecionado.
+* Trate carregamento, erro e resposta vazia como partes da interface.
+* Mantenha data e unidade junto de cada valor.
 
-Enquanto os dados chegam, mostramos o carregamento. Se a consulta falha ou não retorna observações, explicamos o que aconteceu e oferecemos uma nova tentativa.
+## A API por trás dos números
 
-## De onde vêm os dados?
+Os dados vêm da API pública do **SGS — Sistema Gerenciador de Séries Temporais do Banco Central do Brasil**, que retorna séries históricas em JSON sem exigir chave de acesso.
+Neste Lab usamos as séries **432** (meta Selic), **1** (dólar de venda), **21619** (euro de venda) e **433** (IPCA mensal, produzido pelo IBGE).
 
-Usamos a API pública do **SGS — Sistema Gerenciador de Séries Temporais do Banco Central do Brasil**. Ela retorna dados em JSON e permite consultas por intervalo de datas, sem chave de acesso. As séries usadas são **432** (meta Selic), **1** (dólar de venda), **21619** (euro de venda) e **433** (IPCA mensal, produzido pelo IBGE).
-
-Este [exemplo de consulta](https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01/08/2026&dataFinal=31/08/2026) busca o dólar de venda em agosto de 2026:
+Por exemplo, esta consulta busca o dólar de venda em agosto de 2026:
 
 ```text
 https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados
@@ -23,6 +25,4 @@ https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados
   &dataFinal=31/08/2026
 ```
 
-A URL está dividida em linhas apenas para facilitar a leitura. O código da série escolhe o indicador; `dataInicial` e `dataFinal` delimitam o histórico.
-
-As datas indicam as observações publicadas, não cotações em tempo real. No IPCA, identificam o mês de referência. O número em destaque e o conversor usam o último dado publicado; o seletor abaixo do gráfico permite explorar o passado.
+Os valores exibidos correspondem aos últimos dados publicados pelo Banco Central; não são cotações em tempo real.

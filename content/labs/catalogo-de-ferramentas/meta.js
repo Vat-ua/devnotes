@@ -3,8 +3,7 @@ export const meta = {
   number: '02',
   type: 'React Router · URL state',
   title: 'Catálogo de ferramentas',
-  excerpt:
-    'Sincronize busca, categoria e ordenação com a URL para criar uma interface que pode ser recarregada, compartilhada e navegada.',
+  excerpt: 'Use a URL para manter busca, categoria e ordenação — e preservar o estado da interface.',
   accent: 'violet',
   prompt: 'Filtre o catálogo e observe os parâmetros da URL mudarem.',
   date: '2026-08-30',
