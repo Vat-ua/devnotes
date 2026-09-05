@@ -10,10 +10,10 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero home-hero">
+      <section className="hero">
         <div className="container hero-layout">
           <div className="hero-copy">
-            <div className="hero-label">
+            <div className="eyebrow hero-label">
               <span />
               DevNotes · desenvolvimento full stack
             </div>
@@ -116,7 +116,7 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="content-grid article-grid">
+          <div className="article-grid">
             {latestArticles.map((article, index) => (
               <ArticleCard key={article.slug} article={article} featured={index === 0} />
             ))}
@@ -142,7 +142,7 @@ export default function Home() {
               levá-los para um projeto real.
             </p>
           </header>
-          <div className="content-grid lab-grid">
+          <div className="lab-grid">
             {latestLabs.map((lab, index) => (
               <LabCard key={lab.slug} lab={lab} featured={index === 0} />
             ))}

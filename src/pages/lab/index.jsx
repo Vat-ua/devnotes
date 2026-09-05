@@ -12,7 +12,7 @@ export default function Lab() {
 
   if (!lab || !labLoader) {
     return (
-      <div className="page-shell empty-state">
+      <div className="container page-shell empty-state">
         <h1>Este lab não existe.</h1>
         <Link className="btn btn-primary" to="/labs">
           Ver labs
@@ -22,20 +22,20 @@ export default function Lab() {
   }
 
   return (
-    <div className="lab-shell">
+    <div className="container page-shell">
       <nav className="content-breadcrumb" aria-label="Navegação estrutural">
         <Link to="/labs">Labs</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{lab.type}</span>
       </nav>
-      <header className="lab-heading">
-        <h1>{lab.title}</h1>
+      <header className="content-heading">
+        <h1 className="content-title">{lab.title}</h1>
         <p className="content-publish-details">
           <time dateTime={lab.date}>{formatContentDate(lab.date)}</time>
           <span aria-hidden="true">·</span>
           <span>{lab.readTime}</span>
         </p>
-        <p>{lab.excerpt}</p>
+        <p className="content-deck">{lab.excerpt}</p>
       </header>
       <AsyncModule
         key={`lab-${slug}`}
@@ -98,7 +98,9 @@ function LabGuide({ module }) {
   return (
     <>
       <span className="eyebrow">Por trás do exemplo</span>
-      <Guide components={{ pre: MdxCodeBlock }} />
+      <div className="prose">
+        <Guide components={{ pre: MdxCodeBlock }} />
+      </div>
     </>
   );
 }

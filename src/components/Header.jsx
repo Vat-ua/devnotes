@@ -64,7 +64,7 @@ export default function Header() {
           <ThemeToggle />
 
           <button
-            className="menu-toggle"
+            className="icon-button menu-toggle"
             type="button"
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={menuOpen}

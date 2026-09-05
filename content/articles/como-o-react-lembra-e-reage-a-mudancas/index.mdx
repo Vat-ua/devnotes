@@ -1,0 +1,199 @@
+import { Link } from 'react-router';
+
+Um componente React é uma função que calcula a interface a partir de `props`, estado e contexto. Para que essa interface mude ao longo do tempo, o componente precisa de duas coisas: memória para guardar alguns dados e uma maneira segura de interagir com o mundo externo. Esses papéis pertencem, respectivamente, ao `useState` e ao `useEffect`.
+
+## `useState`: A memória e o gatilho
+
+O `useState` permite que um componente guarde informações entre as renderizações. Mais do que apenas "guardar uma variável", atualizar um estado é o gatilho que avisa ao React: "Os dados mudaram, desenhe este componente novamente com a nova informação".
+
+Quando você chama o `useState`, ele retorna um array com dois itens: um "retrato" (snapshot) do estado atual e uma função para atualizá-lo.
+
+```javascript
+import { useState } from 'react';
+
+function CurrencyViewer() {
+  const [currency, setCurrency] = useState('USD');
+
+  return (
+    <div>
+      <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+        <option value="USD">Dólar Americano</option>
+        <option value="EUR">Euro</option>
+        <option value="GBP">Libra Esterlina</option>
+      </select>
+      <p>Moeda selecionada: {currency}</p>
+    </div>
+  );
+}
+```
+
+Mudar o valor no `select` invoca o `setCurrency`. Com isso, você pede ao React uma nova renderização do componente com a nova moeda.
+
+## A armadilha da renderização infinita
+
+Com a moeda selecionada, precisamos buscar o valor do câmbio em uma API. O instinto natural pode ser fazer a requisição diretamente no corpo do componente:
+
+```javascript
+// ❌ ANTIPADRÃO: Não faça isso!
+function CurrencyViewer() {
+  const [rate, setRate] = useState(null);
+
+  fetch('https://api.exemplo.com/rate')
+    .then(res => res.json())
+    .then(data => setRate(data.value)); // Atualiza o estado
+
+  return <div>Taxa: {rate}</div>;
+}
+```
+
+Isso pode criar um ciclo de renderizações e requisições repetidas. O componente renderiza e faz o `fetch`. Quando o `fetch` termina, chama `setRate`, que pede uma nova renderização. O componente renderiza novamente e faz outro `fetch`. Se a resposta gerar um novo estado a cada vez, esse ciclo pode continuar sem parar e travar a aplicação.
+
+O corpo do componente deve ser puro: ele deve apenas calcular a interface. Requisições, timers e manipulação direta do DOM são "efeitos colaterais" (side effects) e precisam de um lugar isolado.
+
+## `useEffect`: A ponte para o mundo externo
+
+O `useEffect` é o espaço seguro para códigos que precisam se comunicar com o mundo fora do React. Ele roda depois que o React atualiza a interface na tela, mantendo o ciclo de renderização livre de efeitos colaterais.
+
+O comportamento do `useEffect` é controlado pelo seu **array de dependências** (o segundo argumento):
+
+- `useEffect(() => {...})` (sem array): Executa após _cada renderização_ do componente.
+- `useEffect(() => {...}, [])` (array vazio): Executa apenas _uma vez_ após a montagem do componente.
+- `useEffect(() => {...}, [currency])`: Executa após a montagem e _sempre que a variável currency mudar_.
+
+Pense nas dependências como os valores que o efeito usa e observa. Em geral, toda `prop`, estado ou função criada no componente e usada dentro do efeito deve aparecer nesse array. O ESLint ajuda a encontrar dependências que ficaram de fora.
+
+> Em desenvolvimento, com o `StrictMode` ativo, React pode executar um efeito, limpar e executar de novo para revelar problemas de limpeza. Isso não acontece da mesma forma na versão de produção.
+
+## Uma regra importante para hooks
+
+Chame hooks no topo do componente — nunca dentro de `if`, loops ou funções de evento. Assim, React encontra cada estado e efeito sempre na mesma ordem em todas as renderizações.
+
+## Limpando efeitos: a função de cleanup
+
+Existe uma quarta peça nesse quebra-cabeça, fácil de esquecer: a **função de limpeza** (cleanup function), que é o valor opcional retornado pela função passada ao `useEffect`.
+
+```javascript
+useEffect(() => {
+  // ... o efeito
+
+  return () => {
+    // ... a limpeza
+  };
+}, [dependencia]);
+```
+
+O React executa essa função de limpeza **antes** de rodar o efeito novamente (quando uma dependência muda) e também quando o componente sai da tela (é desmontado). Ela existe para desfazer o que o efeito anterior começou — cancelar uma inscrição, limpar um timer ou cancelar uma requisição que ainda está em andamento.
+
+Isso importa porque efeitos assíncronos não terminam necessariamente na ordem em que começam. Se o usuário troca a moeda rapidamente (USD → EUR → GBP), três requisições podem sair quase juntas, mas nada garante que voltem na mesma ordem. Sem limpeza, uma resposta antiga de "USD" pode chegar por último e sobrescrever o estado, mesmo com "GBP" já selecionado na tela.
+
+## Juntando tudo: buscando dados reais
+
+Para buscar dados de forma resiliente, precisamos de três estados: a moeda selecionada, o status de carregamento e possíveis erros. Veja como `useState`, `useEffect` e a limpeza trabalham em conjunto:
+
+```javascript
+import { useState, useEffect } from 'react';
+
+export function CurrencyViewer() {
+  const [currency, setCurrency] = useState('USD');
+  const [rate, setRate] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // 1. Um controlador para cancelar a requisição deste efeito
+    const controller = new AbortController();
+    let ignore = false;
+
+    // 2. Iniciamos o estado de carregamento e limpamos erros anteriores
+    setIsLoading(true);
+    setError(null);
+
+    // 3. Fazemos a requisição isolada no efeito
+    async function loadRate() {
+      try {
+        const response = await fetch(
+          `https://api.exemplo.com/rates/${currency}`,
+          { signal: controller.signal }
+        );
+        if (!response.ok) throw new Error('Falha ao buscar dados');
+
+        const data = await response.json();
+        if (!ignore) {
+          setRate(data.value);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        // Cancelar uma requisição não é um erro para mostrar à pessoa usuária
+        if (!ignore && err.name !== 'AbortError') {
+          setError(err.message);
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadRate();
+
+    // 4. Cleanup: cancela a requisição e ignora respostas tardias
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [currency]); // O efeito reage SOMENTE quando 'currency' muda
+
+  return (
+    <div className="widget">
+      <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+        <option value="USD">Dólar</option>
+        <option value="EUR">Euro</option>
+        <option value="GBP">Libra</option>
+      </select>
+
+      <div className="result">
+        {isLoading && <p>Carregando taxas...</p>}
+        {error && <p className="error">Erro: {error}</p>}
+        {!isLoading && !error && rate && (
+          <p>1 {currency} = {rate} BRL</p>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+Neste fluxo, o usuário altera o `select`, o que muda o estado `currency`. O React atualiza a tela com a nova moeda selecionada. Como `currency` está no array de dependências, o `useEffect` roda de novo — mas antes disso, executa a limpeza do efeito anterior. Ela cancela a requisição e marca aquele efeito como ignorado, caso uma resposta já esteja terminando. Assim, só a resposta da requisição mais recente pode atualizar o estado.
+
+<ReactUpdateScenes />
+
+## Onde não usar `useEffect`
+
+Um dos erros mais comuns é usar `useEffect` para atualizar um estado com base em outro estado existente (estado derivado).
+
+Se você tem o estado do preço base e o estado da taxa de imposto, você **não** precisa de um `useEffect` para calcular o preço final.
+
+```javascript
+// ❌ Desnecessário: Causa duas renderizações
+const [price, setPrice] = useState(100);
+const [tax, setTax] = useState(0.2);
+const [total, setTotal] = useState(0);
+
+useEffect(() => {
+  setTotal(price + (price * tax));
+}, [price, tax]);
+
+// ✅ Correto: Calcule durante a renderização
+const [price, setPrice] = useState(100);
+const [tax, setTax] = useState(0.2);
+const total = price + (price * tax); // Variável comum
+```
+
+Se um valor pode ser calculado a partir dos dados que você já possui em `useState` ou nas `props` do componente, basta criar uma constante comum. O React sempre fará o cálculo usando os valores mais recentes durante o fluxo natural de renderização. Essa divisão de responsabilidades deixa o componente mais simples de entender e manter.
+
+Abra o Lab <Link to="/labs/brasil-em-numeros">Brasil em números</Link> para ver `useState` e `useEffect` trabalhando juntos com dados reais.
+
+## Para ir mais fundo
+
+Neste artigo, focamos em como `useState` e `useEffect` participam do ciclo de atualização de um componente e da sua interação com o mundo externo.
+
+Se você quiser entender com mais profundidade por que componentes React renderizam novamente, como essas atualizações se propagam entre componentes pai e filho e o que realmente acontece depois de uma chamada a `setState`, vale ler o artigo [Why React Re-Renders](https://www.joshwcomeau.com/react/why-react-re-renders/), de Josh W. Comeau.
+
+É uma ótima continuação para aprofundar o modelo mental apresentado aqui e entender melhor o que acontece por trás de uma nova renderização.

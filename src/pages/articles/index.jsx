@@ -3,7 +3,7 @@ import { articles } from '@content/registry';
 
 export default function Articles() {
   return (
-    <div className="page-shell">
+    <div className="container page-shell">
       <header className="page-intro">
         <h1>
           Notas para pensar,
@@ -15,7 +15,7 @@ export default function Articles() {
           claro.
         </p>
       </header>
-      <ul className="content-grid archive-grid">
+      <ul className="archive-grid">
         {articles.map((article, index) => (
           <li key={article.slug}>
             <ArticleCard article={article} featured={index === 0} headingLevel={2} />
