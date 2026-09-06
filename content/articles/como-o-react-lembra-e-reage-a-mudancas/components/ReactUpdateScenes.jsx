@@ -1,3 +1,5 @@
+import './ReactUpdateScenes.css';
+
 const scenes = [
   {
     title: 'Antes da escolha',
@@ -27,8 +29,7 @@ export default function ReactUpdateScenes() {
   return (
     <figure className="react-update-scenes" aria-labelledby="currency-scenes-title">
       <figcaption className="react-update-scenes-heading" id="currency-scenes-title">
-        <strong>Uma escolha. Três momentos.</strong>
-        <p>O mesmo exemplo, antes, durante e depois da busca. Valores ilustrativos.</p>
+        <p>Visualmente, esse fluxo pode ser acompanhado em três momentos:</p>
       </figcaption>
       <ol className="currency-scenes">
         {scenes.map(({ title, currency, value, loading, method, explanation }, index) => (

@@ -1,7 +1,6 @@
 import { Link, useParams } from 'react-router';
 import AsyncModule from '../../components/content/AsyncModule.jsx';
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
-import ReactUpdateScenes from '../../components/content/ReactUpdateScenes.jsx';
 import { formatContentDate, getArticleBySlug, loadArticle } from '@content/registry';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
@@ -56,12 +55,7 @@ export default function Article() {
             {(module) => {
               const Content = module.default;
               return (
-                <Content
-                  components={{
-                    pre: MdxCodeBlock,
-                    ReactUpdateScenes,
-                  }}
-                />
+                <Content components={{ pre: MdxCodeBlock }} />
               );
             }}
           </AsyncModule>
