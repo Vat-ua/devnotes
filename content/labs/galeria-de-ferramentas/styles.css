@@ -1,0 +1,249 @@
+/* Estilos do Lab: Galeria de ferramentas */
+@layer labs {
+  .tool-gallery {
+    padding: 1.25rem 0 0.25rem;
+  }
+
+  .gallery-intro {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0.25rem 0 1.5rem;
+  }
+
+  .gallery-kicker {
+    color: color-mix(in srgb, var(--violet) 72%, var(--text));
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .gallery-intro h3 {
+    margin: 0.5rem 0 0;
+    font-size: clamp(1.875rem, 6vw, 3.25rem);
+    line-height: 0.98;
+  }
+
+  .gallery-intro > div > p {
+    max-width: 580px;
+    margin-top: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .gallery-count {
+    width: fit-content;
+    display: grid;
+    align-self: end;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .gallery-count strong {
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .gallery-flow {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery-flow li {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.1875rem 0.625rem;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+  }
+
+  .gallery-flow li > span {
+    grid-row: span 2;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .gallery-flow strong {
+    font-size: 0.8125rem;
+  }
+
+  .gallery-flow code {
+    min-width: 0;
+    overflow: hidden;
+    color: color-mix(in srgb, var(--text) 68%, var(--muted));
+    font-size: 0.6875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gallery-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .gallery-card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--bg);
+  }
+
+  .gallery-card.is-featured {
+    border-color: color-mix(in srgb, var(--lime) 70%, var(--line));
+    background: color-mix(in srgb, var(--lime) 9%, var(--bg));
+    box-shadow: inset 0 3px 0 var(--lime);
+  }
+
+  .gallery-card-heading {
+    min-height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .gallery-category,
+  .gallery-featured {
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .gallery-category {
+    color: color-mix(in srgb, var(--violet) 72%, var(--text));
+  }
+
+  .gallery-featured {
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    background: var(--lime);
+    color: var(--color-on-accent);
+  }
+
+  .gallery-card h3 {
+    margin: 0.75rem 0 0;
+    font-size: 1.375rem;
+    line-height: 1;
+  }
+
+  .gallery-card > p {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .gallery-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery-tags li {
+    padding: 0.25rem 0.4375rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: color-mix(in srgb, var(--text) 82%, var(--muted));
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .gallery-details {
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  .gallery-details summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    list-style: none;
+  }
+
+  .gallery-details summary:focus-visible {
+    border-radius: 4px;
+    outline: 3px solid var(--violet);
+    outline-offset: 4px;
+  }
+
+  .gallery-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .gallery-details summary svg {
+    flex: none;
+    transition: transform 180ms ease;
+  }
+
+  .gallery-details[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .gallery-details ul {
+    display: grid;
+    gap: 0.4375rem;
+    margin: 0.75rem 0 0;
+    padding-left: 1.125rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
+  .gallery-details li::marker {
+    color: var(--lime);
+  }
+
+  @media (min-width: 640px) {
+    .gallery-intro {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+
+    .gallery-flow {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 960px) {
+    .gallery-flow {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

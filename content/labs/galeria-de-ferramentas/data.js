@@ -1,0 +1,52 @@
+export const tools = [
+  {
+    id: 'react',
+    name: 'React',
+    category: 'Frontend',
+    description: 'Biblioteca para construir interfaces a partir de componentes reutilizáveis.',
+    tags: ['Interfaces', 'Componentes'],
+    useCases: ['Painéis interativos', 'Aplicações de produto', 'Interfaces orientadas a dados'],
+    featured: true,
+  },
+  {
+    id: 'vite',
+    name: 'Vite',
+    category: 'Frontend',
+    description: 'Ferramenta de desenvolvimento e build para projetos web modernos.',
+    tags: ['Build', 'DX'],
+    useCases: ['Iniciar projetos', 'Servidor de desenvolvimento', 'Build de produção'],
+  },
+  {
+    id: 'react-router',
+    name: 'React Router',
+    category: 'Frontend',
+    description: 'Biblioteca para relacionar URLs, layouts e páginas em aplicações React.',
+    tags: ['Rotas', 'Navegação'],
+    useCases: ['Páginas aninhadas', 'Parâmetros de URL', 'Navegação sem recarregar'],
+  },
+  {
+    id: 'vitest',
+    name: 'Vitest',
+    category: 'Qualidade',
+    description: 'Ferramenta de testes com uma experiência integrada ao ecossistema do Vite.',
+    tags: ['Testes', 'Automação'],
+    useCases: ['Testes unitários', 'Testes de componentes', 'Cobertura de código'],
+  },
+  {
+    id: 'node',
+    name: 'Node.js',
+    category: 'Backend',
+    description: 'Runtime JavaScript para serviços, automações e ferramentas de desenvolvimento.',
+    tags: ['Runtime', 'Servidor'],
+    useCases: ['APIs HTTP', 'Scripts de automação', 'Ferramentas de linha de comando'],
+  },
+  {
+    id: 'postgresql',
+    name: 'PostgreSQL',
+    category: 'Dados',
+    description:
+      'Banco relacional para armazenar dados consistentes e fazer consultas expressivas.',
+    tags: ['SQL', 'Persistência'],
+    useCases: ['Dados relacionais', 'Transações', 'Consultas e relatórios'],
+  },
+];

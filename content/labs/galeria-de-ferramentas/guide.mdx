@@ -1,0 +1,41 @@
+import { Link } from 'react-router';
+
+## Os dados vêm primeiro
+
+`tools` é um array de objetos comuns. Cada objeto descreve uma ferramenta e traz um `id` estável, textos, tags, casos de uso e, quando necessário, a indicação de destaque. Os dados não carregam JSX nem conhecem a aparência dos cards.
+
+Essa separação permite trocar o conteúdo sem duplicar a estrutura da interface.
+
+## Um objeto vira um componente
+
+`ToolGallery` percorre o array com `.map()` e devolve um `ToolCard` para cada objeto:
+
+```jsx
+{
+  tools.map((tool) => (
+    <ToolCard
+      key={tool.id}
+      name={tool.name}
+      category={tool.category}
+      description={tool.description}
+      tags={tool.tags}
+      useCases={tool.useCases}
+      featured={tool.featured}
+    />
+  ));
+}
+```
+
+As props deixam explícito o contrato do card. A estrutura é sempre a mesma; os valores mudam conforme o objeto atual. `featured = false` também mostra como um componente pode oferecer um valor padrão quando uma prop não foi informada.
+
+## `key` identifica o item da lista
+
+`key={tool.id}` ajuda o React a reconhecer cada card entre renderizações. O ID pertence aos dados, é único e não muda enquanto a aplicação está sendo executada. A `key` é usada pelo próprio React e não chega a `ToolCard` como uma prop comum.
+
+## Composição divide responsabilidades
+
+`ToolGrid` recebe os cards por `children` e cuida apenas do layout. `ToolDetails` cuida da parte expansível e é usado dentro de `ToolCard`. Juntos, componentes pequenos formam a galeria completa sem concentrar todas as responsabilidades em uma função.
+
+O elemento nativo `<details>` mantém a demonstração interativa sem adicionar estado ao React. Abrir um card muda apenas um comportamento que o próprio navegador já sabe controlar.
+
+Retome os conceitos e compare cada parte do código no artigo <Link to="/articles/componentes-e-props-no-react">Componentes e props no React</Link>.
