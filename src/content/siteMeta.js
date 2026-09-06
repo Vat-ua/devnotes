@@ -5,6 +5,9 @@ export const site = {
   description: 'Notas, ideias e laboratórios para quem constrói na web.',
   url: siteUrl,
   image: `${siteUrl}/devnotes-social.png`,
+  imageAlt: 'DevNotes — ideias para construir na web',
+  imageWidth: 1729,
+  imageHeight: 910,
 };
 
 export function getPageMeta(pathname, articles, labs) {
@@ -40,7 +43,15 @@ export function getPageMeta(pathname, articles, labs) {
     title: 'Página não encontrada — DevNotes',
     description: site.description,
   };
-  return { ...page, canonical: absoluteUrl(path), image: site.image, type: 'website' };
+  return {
+    ...page,
+    canonical: absoluteUrl(path),
+    image: site.image,
+    imageAlt: site.imageAlt,
+    imageWidth: site.imageWidth,
+    imageHeight: site.imageHeight,
+    type: 'website',
+  };
 }
 
 function contentMeta(content, path, type) {
@@ -48,7 +59,10 @@ function contentMeta(content, path, type) {
     title: `${content.title} — DevNotes`,
     description: content.description,
     canonical: absoluteUrl(path),
-    image: content.ogImage ? absoluteUrl(content.ogImage) : site.image,
+    image: absoluteUrl(`/social${path}.png`),
+    imageAlt: `${content.title} — ${type === 'article' ? 'artigo' : 'Lab'} do DevNotes`,
+    imageWidth: 1200,
+    imageHeight: 630,
     type,
     publishedTime: type === 'article' ? content.publishedAt : undefined,
     section: type === 'article' ? content.category : undefined,

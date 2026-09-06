@@ -15,9 +15,13 @@ export default function PageMeta() {
     setMeta('property', 'og:type', meta.type);
     setMeta('property', 'og:url', meta.canonical);
     setMeta('property', 'og:image', meta.image);
+    setMeta('property', 'og:image:alt', meta.imageAlt);
+    setMeta('property', 'og:image:width', meta.imageWidth);
+    setMeta('property', 'og:image:height', meta.imageHeight);
     setMeta('name', 'twitter:title', meta.title);
     setMeta('name', 'twitter:description', meta.description);
     setMeta('name', 'twitter:image', meta.image);
+    setMeta('name', 'twitter:image:alt', meta.imageAlt);
     setMeta('property', 'article:published_time', meta.publishedTime);
     setMeta('property', 'article:section', meta.section);
     setCanonical(meta.canonical);

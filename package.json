@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "pnpm validate:content && vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "dev": "pnpm generate:social && vite",
+    "build": "pnpm validate:content && pnpm generate:social && vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "generate:social": "node scripts/generate-social-cards.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@mdx-js/rollup": "^3.1.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@shikijs/rehype": "^4.4.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",

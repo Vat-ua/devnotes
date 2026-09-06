@@ -46,14 +46,14 @@ function pageMeta(meta) {
     `<meta property="og:description" content="${escapeHtml(meta.description)}">`,
     `<meta property="og:url" content="${meta.canonical}">`,
     `<meta property="og:image" content="${meta.image}">`,
-    `<meta property="og:image:alt" content="DevNotes — ideias para construir na web">`,
-    '<meta property="og:image:width" content="1200">',
-    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:alt" content="${escapeHtml(meta.imageAlt)}">`,
+    `<meta property="og:image:width" content="${meta.imageWidth}">`,
+    `<meta property="og:image:height" content="${meta.imageHeight}">`,
     '<meta name="twitter:card" content="summary_large_image">',
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}">`,
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}">`,
     `<meta name="twitter:image" content="${meta.image}">`,
-    '<meta name="twitter:image:alt" content="DevNotes — ideias para construir na web">',
+    `<meta name="twitter:image:alt" content="${escapeHtml(meta.imageAlt)}">`,
   ];
 
   if (meta.publishedTime)

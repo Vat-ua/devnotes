@@ -10,13 +10,13 @@ await validateContentType({
   type: 'articles',
   requiredFiles: ['meta.js', 'index.mdx'],
   requiredStrings: ['title', 'description', 'category', 'publishedAt'],
-  optionalStrings: ['ogImage'],
+  optionalStrings: [],
 });
 await validateContentType({
   type: 'labs',
   requiredFiles: ['meta.js', 'Lab.jsx', 'guide.mdx'],
   requiredStrings: ['title', 'description', 'demoInstruction', 'publishedAt'],
-  optionalStrings: ['ogImage'],
+  optionalStrings: [],
   requiredStringArrays: ['topics'],
 });
 
