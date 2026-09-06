@@ -154,11 +154,27 @@ function App() {
 
 O `.map()` percorre o array e, para cada objeto, retorna um novo `ToolCard`. Os dados de cada ferramenta são passados ao componente através das props. Esse padrão aparece o tempo todo em React: **dados → .map() → componentes → props → interface**.
 
-### Por que usamos key?
+### Por que usamos `key`?
 
-Ao renderizar uma lista, o React precisa identificar cada item entre uma renderização e outra. Para isso usamos `key={tool.id}`.
+Ao renderizar uma lista, o React precisa identificar cada item entre uma renderização e outra. Para isso usamos uma `key` estável:
 
-A chave deve ser estável e única entre os itens daquela lista. Por isso, um ID vindo dos próprios dados costuma ser uma boa escolha. Evite gerar uma chave durante a renderização (por exemplo, com `Math.random()`), porque ela mudaria a cada vez. Também é importante saber que a `key` não chega ao componente como uma prop comum; ela é usada internamente pelo React.
+```jsx
+<ToolCard key={tool.id} {...tool} />
+```
+
+Como `id` vem dos próprios dados e identifica cada ferramenta, ele é uma boa escolha.
+Em listas estáticas, também seria possível usar o índice do array:
+
+```jsx
+tools.map((tool, index) => (
+  <ToolCard key={index} {...tool} />
+))
+```
+
+Isso só é seguro quando os itens não mudam de posição, não são adicionados e não são removidos. Sempre que houver um identificador estável nos dados, prefira usá-lo.
+Evite gerar uma `key` durante a renderização, por exemplo com `Math.random()`, porque ela mudaria a cada vez.
+
+A `key` é usada pelo React para identificar o item da lista. Se o componente também precisar do ID, passe esse valor separadamente como uma prop.
 
 ## Repassando props com spread
 
