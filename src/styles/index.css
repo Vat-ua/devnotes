@@ -990,7 +990,7 @@
     height: 34px;
     top: 32px;
     right: 32%;
-    background: var(--color-accent-warm);
+    background: var(--color-accent);
   }
 
   /* Prosa MDX: artigos e guias dos Labs compartilham o mesmo ritmo. */
