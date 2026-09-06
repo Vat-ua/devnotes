@@ -1,8 +1,8 @@
 export const meta = {
-  slug: 'catalogo-de-ferramentas',
+  slug: 'explorador-de-ferramentas',
   number: '02',
   type: 'React Router · URL state',
-  title: 'Catálogo de ferramentas',
+  title: 'Explorador de ferramentas',
   excerpt: 'Use a URL para manter busca, categoria e ordenação — e preservar o estado da interface.',
   accent: 'violet',
   prompt: 'Filtre o catálogo e observe os parâmetros da URL mudarem.',
