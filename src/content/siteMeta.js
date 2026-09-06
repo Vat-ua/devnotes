@@ -46,11 +46,11 @@ export function getPageMeta(pathname, articles, labs) {
 function contentMeta(content, path, type) {
   return {
     title: `${content.title} — DevNotes`,
-    description: content.excerpt,
+    description: content.description,
     canonical: absoluteUrl(path),
     image: content.ogImage ? absoluteUrl(content.ogImage) : site.image,
     type,
-    publishedTime: type === 'article' ? content.date : undefined,
+    publishedTime: type === 'article' ? content.publishedAt : undefined,
     section: type === 'article' ? content.category : undefined,
   };
 }

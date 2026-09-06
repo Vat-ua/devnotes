@@ -26,16 +26,14 @@ export default function Lab() {
       <nav className="content-breadcrumb" aria-label="Navegação estrutural">
         <Link to="/labs">Labs</Link>
         <span aria-hidden="true">/</span>
-        <span aria-current="page">{lab.type}</span>
+        <span aria-current="page">{lab.topics.join(' · ')}</span>
       </nav>
       <header className="content-heading">
         <h1 className="content-title">{lab.title}</h1>
         <p className="content-publish-details">
-          <time dateTime={lab.date}>{formatContentDate(lab.date)}</time>
-          <span aria-hidden="true">·</span>
-          <span>{lab.readTime}</span>
+          <time dateTime={lab.publishedAt}>{formatContentDate(lab.publishedAt)}</time>
         </p>
-        <p className="content-deck">{lab.excerpt}</p>
+        <p className="content-deck">{lab.description}</p>
       </header>
       <AsyncModule
         key={`lab-${slug}`}
@@ -73,10 +71,10 @@ function LabContent({ module, lab }) {
   const Component = module.default;
   return (
     <>
-      <section className={`lab-canvas accent-${lab.accent}`}>
+      <section className="lab-canvas">
         <div className="canvas-top">
           <h2 className="lab-preview-label">Demonstração interativa</h2>
-          <span>{lab.prompt}</span>
+          <span>{lab.demoInstruction}</span>
         </div>
         <Component />
       </section>

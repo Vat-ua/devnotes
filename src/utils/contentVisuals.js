@@ -1,4 +1,4 @@
-const labVisualPairs = [
+const contentVisualPairs = [
   ['orb-lime', 'orb-violet'],
   ['orb-sky', 'orb-coral'],
   ['orb-pink', 'orb-cyan'],
@@ -23,6 +23,6 @@ function hashString(value) {
   return hash >>> 0;
 }
 
-export function getLabVisualPair(slug) {
-  return labVisualPairs[hashString(slug) % labVisualPairs.length];
+export function getContentVisualPair(slug) {
+  return contentVisualPairs[hashString(slug) % contentVisualPairs.length];
 }

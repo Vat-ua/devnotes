@@ -7,16 +7,16 @@ export default function ArticleCard({ article, featured = false, headingLevel = 
 
   return (
     <Link
-      className={`content-card article-card accent-${article.accent} ${featured ? 'is-featured' : ''}`}
+      className={`content-card article-card ${featured ? 'is-featured' : ''}`}
       to={`/articles/${article.slug}`}
     >
       <div className="card-meta">
         <span>{article.category}</span>
-        <time dateTime={article.date}>{formatCardDate(article.date)}</time>
+        <time dateTime={article.publishedAt}>{formatCardDate(article.publishedAt)}</time>
       </div>
       <div>
         <Title>{article.title}</Title>
-        <p>{article.excerpt}</p>
+        <p>{article.description}</p>
       </div>
       <span className="card-link">
         Ler artigo <ArrowUpRight aria-hidden="true" size={18} />

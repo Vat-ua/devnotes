@@ -3,6 +3,7 @@ import AsyncModule from '../../components/content/AsyncModule.jsx';
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
 import ReactUpdateScenes from '../../components/content/ReactUpdateScenes.jsx';
 import { formatContentDate, getArticleBySlug, loadArticle } from '@content/registry';
+import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
 export default function Article() {
   const { slug } = useParams();
@@ -10,6 +11,8 @@ export default function Article() {
   const articleLoader = loadArticle(slug);
 
   if (!article || !articleLoader) return <MissingContent label="artigo" />;
+
+  const [primaryColor, secondaryColor] = getContentVisualPair(article.slug);
 
   return (
     <div className="container page-shell">
@@ -23,13 +26,18 @@ export default function Article() {
         <header className="content-heading">
           <h1 className="content-title">{article.title}</h1>
           <p className="content-publish-details">
-            <time dateTime={article.date}>{formatContentDate(article.date)}</time>
-            <span aria-hidden="true">·</span>
-            <span>{article.readTime}</span>
+            <time dateTime={article.publishedAt}>{formatContentDate(article.publishedAt)}</time>
           </p>
-          <p className="content-deck">{article.excerpt}</p>
+          <p className="content-deck">{article.description}</p>
         </header>
-        <div className={`article-art accent-${article.accent}`} aria-hidden="true">
+        <div
+          className="article-art"
+          style={{
+            '--article-art-primary': `var(--${primaryColor})`,
+            '--article-art-secondary': `var(--${secondaryColor})`,
+          }}
+          aria-hidden="true"
+        >
           <span />
           <span />
           <span />

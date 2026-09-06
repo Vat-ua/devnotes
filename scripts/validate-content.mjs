@@ -1,5 +1,5 @@
 import { access, readdir } from 'node:fs/promises';
-import { basename, join, relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const contentDir = getContentDirectory(process.argv.slice(2));
@@ -9,22 +9,15 @@ const issues = [];
 await validateContentType({
   type: 'articles',
   requiredFiles: ['meta.js', 'index.mdx'],
-  requiredMetadata: ['slug', 'category', 'title', 'excerpt', 'readTime', 'date', 'accent'],
+  requiredStrings: ['title', 'description', 'category', 'publishedAt'],
+  optionalStrings: ['ogImage'],
 });
 await validateContentType({
   type: 'labs',
   requiredFiles: ['meta.js', 'Lab.jsx', 'guide.mdx'],
-  requiredMetadata: [
-    'slug',
-    'number',
-    'type',
-    'title',
-    'excerpt',
-    'accent',
-    'prompt',
-    'date',
-    'readTime',
-  ],
+  requiredStrings: ['title', 'description', 'demoInstruction', 'publishedAt'],
+  optionalStrings: ['ogImage'],
+  requiredStringArrays: ['topics'],
 });
 
 if (issues.length > 0) {
@@ -35,10 +28,15 @@ if (issues.length > 0) {
   console.log('Validação de conteúdo concluída sem erros.');
 }
 
-async function validateContentType({ type, requiredFiles, requiredMetadata }) {
+async function validateContentType({
+  type,
+  requiredFiles,
+  requiredStrings,
+  optionalStrings,
+  requiredStringArrays = [],
+}) {
   const typeDir = join(contentDir, type);
   const entries = await getDirectories(typeDir, type);
-  const routes = new Map();
 
   for (const entry of entries) {
     const entryDir = join(typeDir, entry.name);
@@ -54,34 +52,80 @@ async function validateContentType({ type, requiredFiles, requiredMetadata }) {
     const meta = await loadMetadata(metaPath, type, entryDir);
     if (!meta) continue;
 
-    requiredMetadata.forEach((field) => {
-      if (typeof meta[field] !== 'string' || meta[field].trim() === '') {
-        addIssue(type, entryDir, `metadata obrigatório inválido ou ausente: meta.${field}`);
-      }
+    validateMetadata({
+      type,
+      entryDir,
+      meta,
+      requiredStrings,
+      optionalStrings,
+      requiredStringArrays,
     });
 
-    if (typeof meta.slug !== 'string' || meta.slug.trim() === '') continue;
-
-    if (basename(entryDir) !== meta.slug) {
-      addIssue(
-        type,
-        entryDir,
-        `folder name "${basename(entryDir)}" deve corresponder a meta.slug "${meta.slug}"`,
-      );
-    }
-
-    const route = `/${type}/${meta.slug}`;
-    const previousPath = routes.get(route);
-    if (previousPath) {
-      addIssue(
-        type,
-        entryDir,
-        `rota duplicada "${route}"; também definida em ${displayPath(previousPath)}`,
-      );
-    } else {
-      routes.set(route, entryDir);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.name)) {
+      addIssue(type, entryDir, 'o nome da pasta deve ser um slug válido em kebab-case');
     }
   }
+}
+
+function validateMetadata({
+  type,
+  entryDir,
+  meta,
+  requiredStrings,
+  optionalStrings,
+  requiredStringArrays,
+}) {
+  const allowedFields = new Set([...requiredStrings, ...optionalStrings, ...requiredStringArrays]);
+
+  for (const field of Object.keys(meta)) {
+    if (!allowedFields.has(field)) {
+      addIssue(type, entryDir, `metadata desconhecido: meta.${field}`);
+    }
+  }
+
+  for (const field of requiredStrings) {
+    if (!isNonEmptyString(meta[field])) {
+      addIssue(type, entryDir, `metadata obrigatório inválido ou ausente: meta.${field}`);
+    }
+  }
+
+  for (const field of optionalStrings) {
+    if (meta[field] !== undefined && !isNonEmptyString(meta[field])) {
+      addIssue(type, entryDir, `metadata opcional inválido: meta.${field}`);
+    }
+  }
+
+  for (const field of requiredStringArrays) {
+    if (
+      !Array.isArray(meta[field]) ||
+      meta[field].length === 0 ||
+      meta[field].some((value) => !isNonEmptyString(value))
+    ) {
+      addIssue(type, entryDir, `metadata obrigatório inválido ou ausente: meta.${field}`);
+    }
+  }
+
+  if (isNonEmptyString(meta.publishedAt) && !isIsoDate(meta.publishedAt)) {
+    addIssue(type, entryDir, 'meta.publishedAt deve ser uma data válida no formato YYYY-MM-DD');
+  }
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function isIsoDate(value) {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const [, year, month, day] = match;
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.valueOf()) &&
+    date.getUTCFullYear() === Number(year) &&
+    date.getUTCMonth() + 1 === Number(month) &&
+    date.getUTCDate() === Number(day)
+  );
 }
 
 async function getDirectories(typeDir, type) {

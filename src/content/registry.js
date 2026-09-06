@@ -1,4 +1,5 @@
 import { preloadContentModule } from './moduleCache.js';
+import { createContentEntries } from './metadata.js';
 
 const articleMetadataModules = import.meta.glob('../../content/articles/*/meta.js', {
   eager: true,
@@ -8,19 +9,9 @@ const labMetadataModules = import.meta.glob('../../content/labs/*/meta.js', { ea
 const labModules = import.meta.glob('../../content/labs/*/Lab.jsx');
 const labGuideModules = import.meta.glob('../../content/labs/*/guide.mdx');
 
-function byDate(first, second) {
-  return (
-    new Date(second.date) - new Date(first.date) || first.slug.localeCompare(second.slug, 'pt-BR')
-  );
-}
+export const articles = createContentEntries(articleMetadataModules);
 
-export const articles = Object.values(articleMetadataModules)
-  .map(({ meta }) => meta)
-  .sort(byDate);
-
-export const labs = Object.values(labMetadataModules)
-  .map(({ meta }) => meta)
-  .sort(byDate);
+export const labs = createContentEntries(labMetadataModules);
 
 export function getArticleBySlug(slug) {
   return articles.find((article) => article.slug === slug);

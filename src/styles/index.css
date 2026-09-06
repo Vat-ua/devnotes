@@ -967,7 +967,7 @@
   .article-art span {
     position: absolute;
     border-radius: 50%;
-    background: var(--color-accent);
+    background: var(--article-art-primary, var(--color-accent));
   }
 
   .article-art span:nth-child(1) {
@@ -982,7 +982,7 @@
     height: 120px;
     right: 14%;
     bottom: 24px;
-    background: var(--color-accent-secondary);
+    background: var(--article-art-secondary, var(--color-accent-secondary));
   }
 
   .article-art span:nth-child(3) {
@@ -990,14 +990,6 @@
     height: 34px;
     top: 32px;
     right: 32%;
-    background: var(--color-accent-warm);
-  }
-
-  .article-art.accent-violet span:first-child {
-    background: var(--color-accent-secondary);
-  }
-
-  .article-art.accent-orange span:first-child {
     background: var(--color-accent-warm);
   }
 
