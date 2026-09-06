@@ -2,17 +2,15 @@ import { Link } from 'react-router';
 
 ## Os dados vêm primeiro
 
-`tools` é um array de objetos comuns. Cada objeto descreve uma ferramenta e traz um `id` estável, textos, tags, casos de uso e, quando necessário, a indicação de destaque. Os dados não carregam JSX nem conhecem a aparência dos cards.
-
-Essa separação permite trocar o conteúdo sem duplicar a estrutura da interface.
+`tools` é um array de objetos. Cada objeto descreve uma ferramenta e reúne informações como `id`, nome, categoria, descrição, tags, casos de uso e, quando necessário, a indicação de destaque. Esses dados ficam separados dos componentes. Assim, podemos mudar o conteúdo da galeria sem repetir a estrutura dos cards.
 
 ## Um objeto vira um componente
 
-`ToolGallery` percorre o array com `.map()` e devolve um `ToolCard` para cada objeto:
+`ToolGallery` percorre o array com `.map()` e cria um `ToolCard` para cada ferramenta:
 
 ```jsx
-{
-  tools.map((tool) => (
+<ToolGrid>
+  {tools.map((tool) => (
     <ToolCard
       key={tool.id}
       name={tool.name}
@@ -22,20 +20,18 @@ Essa separação permite trocar o conteúdo sem duplicar a estrutura da interfac
       useCases={tool.useCases}
       featured={tool.featured}
     />
-  ));
-}
+  ))}
+</ToolGrid>
 ```
 
-As props deixam explícito o contrato do card. A estrutura é sempre a mesma; os valores mudam conforme o objeto atual. `featured = false` também mostra como um componente pode oferecer um valor padrão quando uma prop não foi informada.
+A estrutura de `ToolCard` continua a mesma, mas as props recebem valores diferentes a cada item do array. É isso que permite reutilizar o mesmo componente para mostrar ferramentas diferentes. Em `ToolCard`, `featured = false` também define um valor padrão para os casos em que essa prop não é informada.
 
-## `key` identifica o item da lista
+## `key` identifica cada item da lista
 
-`key={tool.id}` ajuda o React a reconhecer cada card entre renderizações. O ID pertence aos dados, é único e não muda enquanto a aplicação está sendo executada. A `key` é usada pelo próprio React e não chega a `ToolCard` como uma prop comum.
+`key={tool.id}` ajuda o React a identificar cada card entre uma renderização e outra. Como o `id` vem dos próprios dados, ele é uma boa escolha: é único para cada ferramenta e permanece estável. A `key` é usada pelo React e não chega a `ToolCard` como uma prop comum.
 
 ## Composição divide responsabilidades
 
-`ToolGrid` recebe os cards por `children` e cuida apenas do layout. `ToolDetails` cuida da parte expansível e é usado dentro de `ToolCard`. Juntos, componentes pequenos formam a galeria completa sem concentrar todas as responsabilidades em uma função.
+A galeria também é formada por componentes menores. `ToolGrid` recebe os cards por `children` e cuida do layout. `ToolDetails` cuida da parte expansível de cada card e é usado dentro de `ToolCard`. Assim, cada componente fica responsável por uma parte específica da interface, e juntos eles formam a galeria completa.
 
-O elemento nativo `<details>` mantém a demonstração interativa sem adicionar estado ao React. Abrir um card muda apenas um comportamento que o próprio navegador já sabe controlar.
-
-Retome os conceitos e compare cada parte do código no artigo <Link to="/articles/componentes-e-props-no-react">Componentes e props no React</Link>.
+Este Lab é a continuação prática do artigo <Link to="/articles/componentes-e-props-no-react">Componentes e props no React</Link>.

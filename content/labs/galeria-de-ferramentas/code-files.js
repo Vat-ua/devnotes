@@ -3,7 +3,6 @@ import toolDetailsSource from './components/ToolDetails.jsx?raw';
 import toolCardSource from './components/ToolCard.jsx?raw';
 import toolGridSource from './components/ToolGrid.jsx?raw';
 import toolGallerySource from './components/ToolGallery.jsx?raw';
-import labSource from './Lab.jsx?raw';
 import stylesSource from './styles.css?raw';
 
 export const codeFiles = [
@@ -31,11 +30,6 @@ export const codeFiles = [
     name: 'ToolGallery.jsx',
     description: 'O map que transforma cada objeto em um ToolCard com key estável.',
     source: toolGallerySource,
-  },
-  {
-    name: 'Lab.jsx',
-    description: 'A entrada que conecta a demonstração ao code explorer.',
-    source: labSource,
   },
   {
     name: 'styles.css',
