@@ -1,0 +1,226 @@
+import { Link } from 'react-router';
+
+Uma interface costuma repetir estruturas. Imagine uma página que apresenta algumas ferramentas:
+
+```jsx
+<div className="tool-card">
+  <h2>React</h2>
+  <p>Biblioteca para construir interfaces.</p>
+</div>
+
+<div className="tool-card">
+  <h2>Vite</h2>
+  <p>Ferramenta para desenvolvimento frontend.</p>
+</div>
+````
+
+Os dois blocos têm a mesma estrutura. O que muda são os dados. No React, podemos transformar essa parte repetida em um componente e reutilizá-la.
+
+## Componentes: uma estrutura reutilizável
+
+Um componente React pode ser uma função JavaScript que retorna `JSX`:
+
+```jsx
+function ToolCard() {
+  return (
+    <div className="tool-card">
+      <h2>React</h2>
+      <p>Biblioteca para construir interfaces.</p>
+    </div>
+  );
+}
+```
+
+Depois podemos usá-lo como parte da interface:
+
+```jsx
+function App() {
+  return (
+    <div>
+      <ToolCard/>
+    </div>
+  );
+}
+```
+
+`ToolCard` parece uma tag HTML, mas é um componente criado pela aplicação. Em React, nomes de componentes customizados sempre começam com letra maiúscula.
+
+Ainda existe um problema: esse componente sempre mostra "React". Para reutilizar a mesma estrutura com conteúdos diferentes, precisamos passar dados para ele. É aí que entram as props.
+
+## Props: dados que configuram o componente
+
+Para que o mesmo componente mostre conteúdos diferentes, podemos informar os dados quando usamos o componente:
+```jsx
+<ToolCard
+  name="React"
+  description="Biblioteca para construir interfaces."
+/>
+```
+
+Esses dados chegam ao componente em um objeto chamado `props`. Podemos acessar `props.name` e `props.description`, mas é comum desestruturar as propriedades diretamente nos parâmetros da função:
+
+```jsx
+function ToolCard({ name, description }) {
+  return (
+    <div className="tool-card">
+      <h2>{name}</h2>
+      <p>{description}</p>
+    </div>
+  );
+}
+```
+
+Assim, a estrutura de `ToolCard` continua a mesma, enquanto o conteúdo pode mudar a cada uso.
+
+### Valores padrão (Default Props)
+
+Como bônus da desestruturação, podemos definir valores padrão. Se uma prop nem sempre for enviada pelo componente pai, garantimos um valor seguro de fallback:
+
+```jsx
+function ToolCard({ name, description, featured = false }) {
+  return (
+    <div className="tool-card">
+      {featured && <span className="badge">Destaque</span>}
+      <h2>{name}</h2>
+      <p>{description}</p>
+    </div>
+  );
+}
+```
+
+Ao usar o componente, podemos passar strings entre aspas. Outros valores JavaScript são colocados entre chaves, por exemplo:
+
+```jsx
+<ToolCard
+  name="React"
+  description="Biblioteca para construir interfaces."
+  featured
+/>
+
+const tool = {
+  name: 'React',
+  description: 'Biblioteca para construir interfaces.',
+  featured: true,
+}
+
+<ToolCard
+  name={tool.name}
+  description={tool.description}
+  featured={tool.featured}
+/>
+```
+
+> **Dica:** Quando uma prop booleana é verdadeira, você não precisa escrever `featured={true}`. Basta escrever o nome da prop: `<ToolCard featured name="React" />`. Se você omitir a prop, ela assumirá o valor `false` que definimos no parâmetro.
+
+## De um array para vários componentes
+
+Em aplicações reais, os dados muitas vezes estão organizados em arrays de objetos:
+
+```jsx
+const tools = [
+  {
+    id: 'react',
+    name: 'React',
+    description: 'Biblioteca para construir interfaces.',
+    featured: true,
+  },
+  {
+    id: 'vite',
+    name: 'Vite',
+    description: 'Ferramenta para desenvolvimento frontend.',
+    featured: false,
+  },
+];
+```
+
+Podemos transformar esse array em componentes usando o método `.map()`:
+
+```jsx
+function App() {
+  return (
+    <div>
+      {tools.map((tool) => (
+        <ToolCard
+          key={tool.id}
+          name={tool.name}
+          description={tool.description}
+          featured={tool.featured}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+O `.map()` percorre o array e, para cada objeto, retorna um novo `ToolCard`. Os dados de cada ferramenta são passados ao componente através das props. Esse padrão aparece o tempo todo em React: **dados → .map() → componentes → props → interface**.
+
+### Por que usamos key?
+
+Ao renderizar uma lista, o React precisa identificar cada item entre uma renderização e outra. Para isso usamos `key={tool.id}`.
+
+A chave deve ser estável e única entre os itens daquela lista. Por isso, um ID vindo dos próprios dados costuma ser uma boa escolha. Evite gerar uma chave durante a renderização (por exemplo, com `Math.random()`), porque ela mudaria a cada vez. Também é importante saber que a `key` não chega ao componente como uma prop comum; ela é usada internamente pelo React.
+
+## Repassando props com spread
+
+No exemplo anterior, escrevemos cada prop explicitamente. Como as propriedades do objeto têm exatamente os mesmos nomes esperados pelo componente, podemos usar a sintaxe de _spread_ (`...`) do JavaScript:
+
+```jsx
+<ToolCard key={tool.id} {...tool}/>
+```
+
+Isso repassa todas as propriedades do objeto como props separadas de uma só vez. A forma compacta é muito útil quando o formato dos dados combina com as props do componente. A versão explícita, porém, continua sendo válida e muitas vezes deixa mais claro quais dados estão sendo enviados.
+
+## children: conteúdo dentro de componentes
+
+Até agora, cada `ToolCard` foi renderizado diretamente dentro de uma `div`. Podemos também criar um componente responsável apenas por organizar os cards de forma visual:
+
+```jsx
+function ToolGrid({ children }) {
+  return <div className="tool-grid">{children}</div>;
+}
+```
+
+Agora podemos usar esse componente como contêiner:
+
+```jsx
+function App() {
+  return (
+    <ToolGrid>
+      {tools.map((tool) => (
+        <ToolCard key={tool.id} {...tool}/>
+      ))}
+    </ToolGrid>
+  );
+}
+```
+
+Tudo o que aparece entre a tag de abertura `<ToolGrid>` e a de fechamento `</ToolGrid>` chega ao componente através da prop especial `children`.
+
+Nesse caso, o `ToolGrid` não precisa saber quantas ferramentas existem nem quais dados elas recebem. Sua responsabilidade é apenas definir o layout da lista. Esse padrão é chamado de **composição**: componentes menores são combinados para formar partes maiores da interface.
+
+## Props são dados de entrada
+
+Props são dados que um componente recebe e devem ser tratadas como somente leitura. O componente pode usar esses dados para construir a interface, mas não deve modificar as props recebidas.
+Por exemplo, isto deve ser evitado:
+
+```jsx
+// ❌ Nunca tente modificar as props
+function ToolCard(props) {
+  props.name = 'Outro nome'; // Errado!
+  return <h2>{props.name}</h2>;
+}
+```
+
+## Em resumo
+
+Para fixar o modelo mental de como o React estrutura a interface:
+
+-   **Componentes** são funções JavaScript com letra maiúscula que retornam JSX.
+-   **Props** são dados recebidos pelo componente e usados para configurar o que ele renderiza.
+-   **Imutabilidade:** Nunca modifique props recebidas dentro do componente. Trate-as como apenas leitura.
+-   **Listas:** Use `.map()` para transformar arrays de dados em componentes e forneça uma `key` estável para cada item.
+-   **Composição:** Use a prop `children` para criar componentes de layout ou contêineres flexíveis.
+
+Quer colocar tudo isso em prática? Abra o Lab Explorador de Ferramentas para construir uma lista real de componentes recebendo dados de um array.
+
+E quando algum valor precisa mudar depois que a interface já foi renderizada? Por exemplo, quando quem usa a aplicação marca uma ferramenta como favorita, abre um menu ou digita em um campo de busca? Nesse caso, precisamos representar dados que mudam ao longo do tempo. É aí que entra o **estado** — e o `useState`.
