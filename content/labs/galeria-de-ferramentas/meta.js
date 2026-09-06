@@ -1,8 +1,7 @@
 export const meta = {
   title: 'Galeria de ferramentas',
-  description:
-    'Transforme um array de objetos em uma galeria composta por componentes reutilizáveis e configurados por props.',
+  description: 'Crie uma galeria a partir de um array usando componentes, props e .map().',
   topics: ['React', 'Componentes e props'],
-  demoInstruction: 'Abra os cards e observe como cada objeto configura a mesma estrutura.',
+  demoInstruction: 'Veja como o array vira uma interface.',
   publishedAt: '2026-09-05',
 };
