@@ -1,16 +1,11 @@
-import { Link, useParams } from 'react-router';
-import AsyncModule from '../../components/content/AsyncModule.jsx';
+import { Suspense } from 'react';
+import { Link } from 'react-router';
+
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
-import { formatContentDate, getArticleBySlug, loadArticle } from '@content/registry';
+import { formatContentDate } from '@content/registry';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
-export default function Article() {
-  const { slug } = useParams();
-  const article = getArticleBySlug(slug);
-  const articleLoader = loadArticle(slug);
-
-  if (!article || !articleLoader) return <MissingContent label="artigo" />;
-
+export default function Article({ article, Content }) {
   const [primaryColor, secondaryColor] = getContentVisualPair(article.slug);
 
   return (
@@ -42,37 +37,11 @@ export default function Article() {
           <span />
         </div>
         <div className="prose">
-          <AsyncModule
-            key={`article-${slug}`}
-            loader={articleLoader}
-            fallback={<p className="content-loading">Carregando artigo…</p>}
-            errorFallback={
-              <p className="content-error" role="alert">
-                Não foi possível carregar este artigo. Atualize a página e tente novamente.
-              </p>
-            }
-          >
-            {(module) => {
-              const Content = module.default;
-              return (
-                <Content components={{ pre: MdxCodeBlock }} />
-              );
-            }}
-          </AsyncModule>
+          <Suspense fallback={<p className="content-loading">Carregando artigo…</p>}>
+            <Content components={{ pre: MdxCodeBlock }} />
+          </Suspense>
         </div>
       </article>
-    </div>
-  );
-}
-
-function MissingContent({ label }) {
-  return (
-    <div className="container page-shell empty-state">
-      <span className="eyebrow">404</span>
-      <h1>Este {label} não existe.</h1>
-      <Link className="btn btn-primary" to="/articles">
-        Voltar
-      </Link>
     </div>
   );
 }

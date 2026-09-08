@@ -59,7 +59,7 @@ function contentMeta(content, path, type) {
     title: `${content.title} — DevNotes`,
     description: content.description,
     canonical: absoluteUrl(path),
-    image: absoluteUrl(`/social${path}.png`),
+    image: absoluteAssetUrl(`/social${path}.png`),
     imageAlt: `${content.title} — ${type === 'article' ? 'artigo' : 'Lab'} do DevNotes`,
     imageWidth: 1200,
     imageHeight: 630,
@@ -71,4 +71,8 @@ function contentMeta(content, path, type) {
 
 function absoluteUrl(path) {
   return `${siteUrl}${path === '/' ? '/' : `${path}/`}`;
+}
+
+function absoluteAssetUrl(path) {
+  return `${siteUrl}${path}`;
 }

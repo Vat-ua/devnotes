@@ -1,13 +1,12 @@
-import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
+import { reactRouter } from '@react-router/dev/vite';
 import rehypeShiki from '@shikijs/rehype';
+import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 
 function rehypeRemoveCodeBlockTabStops() {
-  return (tree) => {
-    visit(tree);
-  };
+  return (tree) => visit(tree);
 
   function visit(node) {
     if (node.type === 'element' && node.tagName === 'pre') {
@@ -19,20 +18,15 @@ function rehypeRemoveCodeBlockTabStops() {
   }
 }
 
-// https://vite.dev/config/
-export default defineConfig(({ mode, isSsrBuild }) => {
-  const env = loadEnv(mode, process.cwd(), 'VITE_');
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const basename = process.env.DEVNOTES_BASE_PATH ?? env.VITE_BASE_PATH ?? '/devnotes/';
 
   return {
-    base: env.VITE_BASE_PATH || '/',
+    base: `${basename.replace(/\/$/, '')}/`,
     resolve: {
       alias: {
-        '@content/registry': fileURLToPath(
-          new URL(
-            isSsrBuild ? './src/content/registry.server.js' : './src/content/registry.js',
-            import.meta.url,
-          ),
-        ),
+        '@content/registry': fileURLToPath(new URL('./app/content.js', import.meta.url)),
       },
     },
     plugins: [
@@ -63,7 +57,8 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           ],
         }),
       },
-      react({ include: /\.(jsx|js|mdx|md)$/ }),
+      react(),
+      reactRouter(),
     ],
   };
 });

@@ -3,19 +3,24 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
   "scripts": {
-    "dev": "pnpm generate:social && vite",
-    "build": "pnpm validate:content && pnpm generate:social && vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "dev": "pnpm generate:social && react-router dev",
+    "build": "pnpm validate:content && pnpm generate:social && react-router build",
     "generate:social": "node scripts/generate-social-cards.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "format": "prettier --write \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\""
+    "preview": "node scripts/serve-pages.mjs",
+    "format": "prettier --write \"app/**/*.{js,jsx}\" \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\"",
+    "format:check": "prettier --check \"app/**/*.{js,jsx}\" \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\""
   },
   "dependencies": {
+    "@react-router/node": "8.3.1",
     "@shikijs/langs": "^4.4.3",
     "@shikijs/themes": "^4.4.3",
+    "isbot": "^5",
     "lucide-react": "^1.38.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -24,6 +29,7 @@
   },
   "devDependencies": {
     "@mdx-js/rollup": "^3.1.1",
+    "@react-router/dev": "8.3.1",
     "@resvg/resvg-js": "^2.6.2",
     "@shikijs/rehype": "^4.4.3",
     "@types/react": "^19.2.18",
