@@ -1,8 +1,8 @@
 import EconomyExplorer from './components/EconomyExplorer.jsx';
 import './styles.css';
 
-function Lab() {
+function Demo() {
   return <EconomyExplorer />;
 }
 
-export default Lab;
+export default Demo;

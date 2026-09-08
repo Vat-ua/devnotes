@@ -11,7 +11,7 @@ export default function ArticleCard({ article, featured = false, headingLevel = 
       to={`/articles/${article.slug}`}
     >
       <div className="card-meta">
-        <span>{article.category}</span>
+        <span>{article.topics.join(' · ')}</span>
         <time dateTime={article.publishedAt}>{formatCardDate(article.publishedAt)}</time>
       </div>
       <div>

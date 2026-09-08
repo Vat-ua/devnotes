@@ -5,18 +5,18 @@ import { createContentEntries } from '../src/content/metadata.js';
 const articleMetadataModules = import.meta.glob('../content/articles/*/meta.js', { eager: true });
 const articleModules = import.meta.glob('../content/articles/*/index.mdx');
 const labMetadataModules = import.meta.glob('../content/labs/*/meta.js', { eager: true });
-const labModules = import.meta.glob('../content/labs/*/Lab.jsx');
-const labGuideModules = import.meta.glob('../content/labs/*/guide.mdx');
+const labDemoModules = import.meta.glob('../content/labs/*/Demo.jsx');
+const labBodyModules = import.meta.glob('../content/labs/*/index.mdx');
 const labCodeFileModules = import.meta.glob('../content/labs/*/code-files.js');
 
-export const articles = createContentEntries(articleMetadataModules);
-export const labs = createContentEntries(labMetadataModules);
+export const articles = createContentEntries(articleMetadataModules, 'article');
+export const labs = createContentEntries(labMetadataModules, 'lab');
 
 const articlesBySlug = new Map(articles.map((article) => [article.slug, article]));
 const labsBySlug = new Map(labs.map((lab) => [lab.slug, lab]));
 const lazyArticles = createLazyModules(articleModules, 'index.mdx');
-const lazyLabs = createLazyModules(labModules, 'Lab.jsx');
-const lazyGuides = createLazyModules(labGuideModules, 'guide.mdx');
+const lazyLabDemos = createLazyModules(labDemoModules, 'Demo.jsx');
+const lazyLabBodies = createLazyModules(labBodyModules, 'index.mdx');
 const labCodeFileLoaders = createModuleLoaders(labCodeFileModules, 'code-files.js');
 
 export function getArticleBySlug(slug) {
@@ -31,12 +31,12 @@ export function getLazyArticle(slug) {
   return lazyArticles.get(slug);
 }
 
-export function getLazyLab(slug) {
-  return lazyLabs.get(slug);
+export function getLazyLabDemo(slug) {
+  return lazyLabDemos.get(slug);
 }
 
-export function getLazyLabGuide(slug) {
-  return lazyGuides.get(slug);
+export function getLazyLabBody(slug) {
+  return lazyLabBodies.get(slug);
 }
 
 export function loadLabCodeFiles(slug) {

@@ -49,7 +49,7 @@ async function loadContent(kind) {
           kind,
           slug: entry.name,
           title: meta.title,
-          label: kind === 'articles' ? meta.category : meta.topics.join(' · '),
+          label: meta.topics.join(' · '),
         };
       }),
   );

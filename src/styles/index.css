@@ -993,7 +993,7 @@
     background: var(--color-accent);
   }
 
-  /* Prosa MDX: artigos e guias dos Labs compartilham o mesmo ritmo. */
+  /* Corpos MDX de Articles e Labs compartilham o mesmo ritmo. */
   .prose {
     max-width: var(--measure-reading);
     color: color-mix(in srgb, var(--color-text) 86%, var(--color-text-muted));
@@ -1181,6 +1181,7 @@
   }
 
   .lab-notes > .eyebrow {
+    margin-top: 0;
     margin-bottom: 0.875rem;
     color: var(--color-accent-secondary);
   }

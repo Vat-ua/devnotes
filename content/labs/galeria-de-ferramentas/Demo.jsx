@@ -1,8 +1,8 @@
 import ToolGallery from './components/ToolGallery.jsx';
 import './styles.css';
 
-function Lab() {
+function Demo() {
   return <ToolGallery />;
 }
 
-export default Lab;
+export default Demo;

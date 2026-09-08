@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 
 import CodeExplorer from '../../src/components/content/CodeExplorer.jsx';
 import LabPage from '../../src/pages/lab/index.jsx';
-import { getLabBySlug, getLazyLab, getLazyLabGuide, loadLabCodeFiles } from '../content.js';
+import { getLabBySlug, getLazyLabBody, getLazyLabDemo, loadLabCodeFiles } from '../content.js';
 import { contentMeta, pageMeta } from '../meta.js';
 
 const lazyCodeExplorers = new Map();
@@ -17,20 +17,13 @@ export function meta({ params }) {
 
 export default function Lab({ params }) {
   const lab = getLabBySlug(params.slug);
-  const LabComponent = getLazyLab(params.slug);
-  const Guide = getLazyLabGuide(params.slug);
+  const Demo = getLazyLabDemo(params.slug);
+  const Content = getLazyLabBody(params.slug);
   const LabCodeExplorer = getLazyCodeExplorer(params.slug);
 
-  if (!lab || !LabComponent) return <MissingLab />;
+  if (!lab || !Demo || !Content) return <MissingLab />;
 
-  return (
-    <LabPage
-      lab={lab}
-      LabComponent={LabComponent}
-      Guide={Guide}
-      LabCodeExplorer={LabCodeExplorer}
-    />
-  );
+  return <LabPage lab={lab} Demo={Demo} Content={Content} LabCodeExplorer={LabCodeExplorer} />;
 }
 
 function getLazyCodeExplorer(slug) {

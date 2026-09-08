@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
-import { Link } from 'react-router';
 
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
-import { formatContentDate } from '@content/registry';
+import ContentBody from '../../components/content/ContentBody.jsx';
+import ContentHeader from '../../components/content/ContentHeader.jsx';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
 export default function Article({ article, Content }) {
@@ -10,20 +10,8 @@ export default function Article({ article, Content }) {
 
   return (
     <div className="container page-shell">
-      <nav className="content-breadcrumb" aria-label="Navegação estrutural">
-        <Link to="/articles">Artigos</Link>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{article.category}</span>
-      </nav>
-
-      <article>
-        <header className="content-heading">
-          <h1 className="content-title">{article.title}</h1>
-          <p className="content-publish-details">
-            <time dateTime={article.publishedAt}>{formatContentDate(article.publishedAt)}</time>
-          </p>
-          <p className="content-deck">{article.description}</p>
-        </header>
+      <article className="content-page article-page">
+        <ContentHeader content={article} collectionLabel="Artigos" collectionPath="/articles" />
         <div
           className="article-art"
           style={{
@@ -36,11 +24,11 @@ export default function Article({ article, Content }) {
           <span />
           <span />
         </div>
-        <div className="prose">
+        <ContentBody>
           <Suspense fallback={<p className="content-loading">Carregando artigo…</p>}>
             <Content components={{ pre: MdxCodeBlock }} />
           </Suspense>
-        </div>
+        </ContentBody>
       </article>
     </div>
   );

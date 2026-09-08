@@ -1,6 +1,7 @@
 import { access, readdir } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { CONTENT_FILES, getContentEntryIssues } from '../src/content/metadata.js';
 
 const contentDir = getContentDirectory(process.argv.slice(2));
 const projectDir = resolve(contentDir, '..');
@@ -8,16 +9,11 @@ const issues = [];
 
 await validateContentType({
   type: 'articles',
-  requiredFiles: ['meta.js', 'index.mdx'],
-  requiredStrings: ['title', 'description', 'category', 'publishedAt'],
-  optionalStrings: [],
+  kind: 'article',
 });
 await validateContentType({
   type: 'labs',
-  requiredFiles: ['meta.js', 'Lab.jsx', 'guide.mdx'],
-  requiredStrings: ['title', 'description', 'demoInstruction', 'publishedAt'],
-  optionalStrings: [],
-  requiredStringArrays: ['topics'],
+  kind: 'lab',
 });
 
 if (issues.length > 0) {
@@ -28,15 +24,10 @@ if (issues.length > 0) {
   console.log('Validação de conteúdo concluída sem erros.');
 }
 
-async function validateContentType({
-  type,
-  requiredFiles,
-  requiredStrings,
-  optionalStrings,
-  requiredStringArrays = [],
-}) {
+async function validateContentType({ type, kind }) {
   const typeDir = join(contentDir, type);
   const entries = await getDirectories(typeDir, type);
+  const requiredFiles = CONTENT_FILES[kind].required;
 
   for (const entry of entries) {
     const entryDir = join(typeDir, entry.name);
@@ -49,83 +40,13 @@ async function validateContentType({
 
     if (missingFiles.includes('meta.js')) continue;
 
-    const meta = await loadMetadata(metaPath, type, entryDir);
-    if (!meta) continue;
+    const metadataModule = await loadMetadata(metaPath, type, entryDir);
+    if (!metadataModule) continue;
 
-    validateMetadata({
-      type,
-      entryDir,
-      meta,
-      requiredStrings,
-      optionalStrings,
-      requiredStringArrays,
-    });
-
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.name)) {
-      addIssue(type, entryDir, 'o nome da pasta deve ser um slug válido em kebab-case');
-    }
+    getContentEntryIssues({ kind, slug: entry.name, meta: metadataModule.meta }).forEach((issue) =>
+      addIssue(type, entryDir, issue),
+    );
   }
-}
-
-function validateMetadata({
-  type,
-  entryDir,
-  meta,
-  requiredStrings,
-  optionalStrings,
-  requiredStringArrays,
-}) {
-  const allowedFields = new Set([...requiredStrings, ...optionalStrings, ...requiredStringArrays]);
-
-  for (const field of Object.keys(meta)) {
-    if (!allowedFields.has(field)) {
-      addIssue(type, entryDir, `metadata desconhecido: meta.${field}`);
-    }
-  }
-
-  for (const field of requiredStrings) {
-    if (!isNonEmptyString(meta[field])) {
-      addIssue(type, entryDir, `metadata obrigatório inválido ou ausente: meta.${field}`);
-    }
-  }
-
-  for (const field of optionalStrings) {
-    if (meta[field] !== undefined && !isNonEmptyString(meta[field])) {
-      addIssue(type, entryDir, `metadata opcional inválido: meta.${field}`);
-    }
-  }
-
-  for (const field of requiredStringArrays) {
-    if (
-      !Array.isArray(meta[field]) ||
-      meta[field].length === 0 ||
-      meta[field].some((value) => !isNonEmptyString(value))
-    ) {
-      addIssue(type, entryDir, `metadata obrigatório inválido ou ausente: meta.${field}`);
-    }
-  }
-
-  if (isNonEmptyString(meta.publishedAt) && !isIsoDate(meta.publishedAt)) {
-    addIssue(type, entryDir, 'meta.publishedAt deve ser uma data válida no formato YYYY-MM-DD');
-  }
-}
-
-function isNonEmptyString(value) {
-  return typeof value === 'string' && value.trim() !== '';
-}
-
-function isIsoDate(value) {
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return false;
-
-  const [, year, month, day] = match;
-  const date = new Date(`${value}T00:00:00Z`);
-  return (
-    !Number.isNaN(date.valueOf()) &&
-    date.getUTCFullYear() === Number(year) &&
-    date.getUTCMonth() + 1 === Number(month) &&
-    date.getUTCDate() === Number(day)
-  );
 }
 
 async function getDirectories(typeDir, type) {
@@ -156,11 +77,7 @@ async function findMissingFiles(entryDir, filenames) {
 async function loadMetadata(metaPath, type, entryDir) {
   try {
     const module = await import(`${pathToFileURL(metaPath).href}?content-validation`);
-    if (!module.meta || typeof module.meta !== 'object' || Array.isArray(module.meta)) {
-      addIssue(type, entryDir, 'meta.js deve exportar um objeto chamado meta');
-      return null;
-    }
-    return module.meta;
+    return module;
   } catch (error) {
     addIssue(type, entryDir, `não foi possível carregar meta.js: ${error.message}`);
     return null;

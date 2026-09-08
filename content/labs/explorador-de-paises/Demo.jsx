@@ -1,8 +1,8 @@
 import CountryExplorer from './components/CountryExplorer.jsx';
 import './styles.css';
 
-function Lab() {
+function Demo() {
   return <CountryExplorer />;
 }
 
-export default Lab;
+export default Demo;

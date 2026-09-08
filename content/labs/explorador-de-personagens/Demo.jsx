@@ -1,8 +1,8 @@
 import CharacterExplorer from './components/CharacterExplorer.jsx';
 import './styles.css';
 
-function Lab() {
+function Demo() {
   return <CharacterExplorer />;
 }
 
-export default Lab;
+export default Demo;

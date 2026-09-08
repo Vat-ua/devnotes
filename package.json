@@ -11,6 +11,7 @@
     "build": "pnpm validate:content && pnpm generate:social && react-router build",
     "generate:social": "node scripts/generate-social-cards.mjs",
     "validate:content": "node scripts/validate-content.mjs",
+    "test": "node scripts/test-content-metadata.mjs && node scripts/test-brasil-em-numeros.mjs",
     "lint": "oxlint",
     "preview": "node scripts/serve-pages.mjs",
     "format": "prettier --write \"app/**/*.{js,jsx}\" \"src/**/*.{js,jsx}\" \"content/**/*.{js,jsx,mdx}\" \"scripts/**/*.{js,mjs}\" \"*.{js,json}\" \".github/**/*.{yml,yaml}\"",
