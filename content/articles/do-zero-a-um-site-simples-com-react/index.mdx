@@ -1,3 +1,5 @@
+import ContentDisclosure from '../../../src/components/content/ContentDisclosure.jsx';
+
 Vamos criar um site de três páginas — **Início**, **Serviços** e **Sobre** —, com navegação entre elas e Header + Footer compartilhados.
 Ao clicar nos links na navegação, a URL muda e o React mostra a página correspondente sem recarregar todo o documento. É essa navegação que transforma nosso exemplo em uma pequena SPA (_Single Page Application_).
 
@@ -491,6 +493,56 @@ export default function Servicos() {
 ```
 
 Você pode fazer o mesmo com `Home.jsx` e `Sobre.jsx`, adicionando seções, textos, imagens ou outros componentes.
+
+<ContentDisclosure label="Para ir além" title="Controle o scroll entre páginas">
+
+Em uma SPA, abrir outra página pelo menu nem sempre leva a viewport ao topo. Já ao usar **Voltar** ou **Avançar**, é melhor não sobrescrever a posição que o navegador pode restaurar. Para cobrir esse caso simples com `BrowserRouter`, crie `src/components/ScrollToTop.jsx`:
+
+```jsx
+// src/components/ScrollToTop.jsx
+import { useEffect } from 'react';
+import { useLocation, useNavigationType } from 'react-router';
+
+export default function ScrollToTop() {
+  const { pathname } = useLocation();
+  const navigationType = useNavigationType();
+
+  useEffect(() => {
+    if (navigationType !== 'POP') {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, navigationType]);
+
+  return null;
+}
+```
+
+`useLocation()` detecta a mudança de página. `useNavigationType()` informa se ela veio de uma navegação nova (`PUSH` ou `REPLACE`) ou do histórico (`POP`). Nesse último caso, o efeito não força o topo e deixa disponível a restauração nativa do navegador.
+
+Importe o componente em `src/layouts/AppLayout.jsx` e renderize-o antes do Header:
+
+```jsx
+// src/layouts/AppLayout.jsx
+import { Outlet } from 'react-router';
+import Header from '../components/Header.jsx';
+import Footer from '../components/Footer.jsx';
+import ScrollToTop from '../components/ScrollToTop.jsx';
+
+export default function AppLayout() {
+  return (
+    <div className="app-shell">
+      <ScrollToTop /> {/* novo */}
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
+  );
+}
+```
+
+Esse ajuste cobre a navegação básica do exemplo, mas não implementa uma restauração completa. Em aplicações que usam Data ou Framework Mode, prefira o `<ScrollRestoration />` do React Router, que gerencia as posições por entrada do histórico.
+
+</ContentDisclosure>
 
 ## 10. Teste o build
 
