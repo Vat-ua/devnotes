@@ -38,8 +38,8 @@ function toFrameworkMeta(meta) {
     descriptors.push({ property: 'article:published_time', content: meta.publishedTime });
   }
 
-  if (meta.section) {
-    descriptors.push({ property: 'article:section', content: meta.section });
+  for (const tag of meta.tags ?? []) {
+    descriptors.push({ property: 'article:tag', content: tag });
   }
 
   return descriptors;

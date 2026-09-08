@@ -65,7 +65,7 @@ function contentMeta(content, path, type) {
     imageHeight: 630,
     type,
     publishedTime: type === 'article' ? content.publishedAt : undefined,
-    section: type === 'article' ? content.topics[0] : undefined,
+    tags: type === 'article' ? content.topics : undefined,
   };
 }
 
