@@ -1,7 +1,6 @@
 import mdx from '@mdx-js/rollup';
 import { reactRouter } from '@react-router/dev/vite';
 import rehypeShiki from '@shikijs/rehype';
-import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 
@@ -57,7 +56,6 @@ export default defineConfig(({ mode }) => {
           ],
         }),
       },
-      react(),
       reactRouter(),
     ],
   };
