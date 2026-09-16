@@ -2,6 +2,7 @@
   "name": "devnotes",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "pnpm@12.4.2",
   "type": "module",
   "engines": {
     "node": ">=22.22.0"
