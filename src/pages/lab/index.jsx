@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 
+import Callout from '../../components/content/Callout.jsx';
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
 import ContentBody from '../../components/content/ContentBody.jsx';
 import ContentHeader from '../../components/content/ContentHeader.jsx';
+import ContentTable from '../../components/content/ContentTable.jsx';
 
 export default function Lab({ lab, Demo, Content, LabCodeExplorer }) {
   return (
@@ -31,7 +33,7 @@ export default function Lab({ lab, Demo, Content, LabCodeExplorer }) {
         )}
         <ContentBody className="lab-notes" label="Por trás do exemplo">
           <Suspense fallback={null}>
-            <Content components={{ pre: MdxCodeBlock }} />
+            <Content components={{ Callout, pre: MdxCodeBlock, table: ContentTable }} />
           </Suspense>
         </ContentBody>
       </article>

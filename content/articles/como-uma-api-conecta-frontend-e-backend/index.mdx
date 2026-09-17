@@ -1,0 +1,362 @@
+Uma interface pode começar com dados escritos diretamente no código:
+
+```js
+const products = [
+  { id: 1, title: 'Notebook', price: 3500 },
+  { id: 2, title: 'Teclado', price: 180 },
+];
+```
+
+Mas imagine uma loja em que os produtos precisam ser cadastrados, atualizados e consultados por diferentes usuários. Manter essas informações diretamente no frontend deixa de ser uma boa solução.
+
+Podemos armazenar os dados em um backend e disponibilizá-los por meio de uma **API** (_Application Programming Interface_). O frontend solicita os dados, o backend processa a requisição e devolve uma resposta.
+
+Vamos entender essa comunicação usando o [DummyJSON](https://dummyjson.com/), uma API pública com dados de teste.
+
+## 1. Abra uma API no navegador
+
+Acesse o [produto com ID 1 no DummyJSON](https://dummyjson.com/products/1).
+
+Em vez de uma página tradicional, você verá informações sobre um produto. Este é um trecho da resposta:
+
+```json {copy=false}
+{
+  "id": 1,
+  "title": "Essence Mascara Lash Princess",
+  "category": "beauty",
+  "price": 9.99
+}
+```
+
+O conteúdo está em **JSON**, um formato de texto usado para representar e trocar dados entre sistemas.
+
+O que aconteceu quando você abriu o endereço?
+
+1. O navegador enviou uma requisição (_request_) ao servidor.
+2. O servidor processou o pedido e devolveu uma resposta (_response_) com os dados do produto.
+
+Essa comunicação utiliza o protocolo **HTTP**, que define como clientes e servidores trocam mensagens na web.
+
+Em uma aplicação real, o backend pode consultar um banco de dados, validar informações ou executar outras operações antes de responder.
+
+O frontend não precisa conhecer esses detalhes internos. Ele precisa saber como se comunicar com a API.
+
+## 2. Faça a mesma requisição com JavaScript
+
+Em vez de abrir a URL manualmente, podemos buscar os dados usando `fetch()`:
+
+```js
+async function getProduct() {
+  const response = await fetch('https://dummyjson.com/products/1');
+  const product = await response.json();
+
+  console.log(product.title);
+  console.log(product.price);
+}
+
+getProduct();
+```
+
+O código faz duas operações principais:
+
+- `fetch()` envia a requisição e retorna uma Promise que fornece um objeto `Response`.
+- `response.json()` lê o corpo da resposta e interpreta o JSON, produzindo um valor JavaScript.
+
+Usamos `await` para aguardar essas operações assíncronas.
+
+**Resultado no console:**
+
+```text {copy=false}
+Essence Mascara Lash Princess
+9.99
+```
+
+Agora temos um objeto JavaScript e podemos acessar normalmente suas propriedades:
+
+```js {copy=false}
+product.title;
+product.price;
+```
+
+Mas apenas imprimir os dados no console não resolve nosso problema inicial. Queremos exibir o produto na interface.
+
+## 3. Mostre o produto na página
+
+Vamos criar uma página que busca um produto na API e mostra seu nome e preço.
+
+Crie um arquivo `index.html`:
+
+```html
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meu produto</title>
+  </head>
+  <body>
+    <h1>Produto</h1>
+    <p id="product">Carregando produto...</p>
+
+    <script>
+      const element = document.querySelector('#product');
+
+      async function loadProduct() {
+        try {
+          const response = await fetch('https://dummyjson.com/products/1');
+
+          if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+          }
+
+          const product = await response.json();
+
+          element.textContent = `${product.title} — US$ ${product.price.toFixed(2)}`;
+        } catch (error) {
+          console.error(error);
+          element.textContent = 'Não foi possível carregar o produto.';
+        }
+      }
+
+      loadProduct();
+    </script>
+  </body>
+</html>
+```
+
+Abra o arquivo no navegador. Se a requisição funcionar, a página mostrará:
+
+> **Produto**
+>
+> Essence Mascara Lash Princess — US$ 9.99
+
+Observe que não escrevemos o nome nem o preço diretamente no HTML. Esses valores vieram da API.
+
+O JavaScript localiza o elemento `#product` e atualiza seu conteúdo quando os dados chegam. A verificação com `response.ok` e o bloco `try/catch` tratam possíveis erros e mostram uma mensagem ao usuário; veremos esse fluxo em mais detalhes na seção 6.
+
+O fluxo completo é:
+
+```text {copy=false}
+Frontend
+   │
+   │ GET /products/1
+   ▼
+Backend (API)
+   │
+   │ Resposta com JSON
+   ▼
+Frontend
+   │
+   ▼
+Produto exibido na página
+```
+
+Em React, podemos usar o mesmo `fetch()` e armazenar o resultado no estado de um componente. A maneira de atualizar a interface muda, mas a comunicação com a API continua sendo HTTP.
+
+## 4. Use URLs para acessar recursos
+
+Até agora, utilizamos:
+
+```text
+https://dummyjson.com/products/1
+```
+
+Nesse endereço, `https://dummyjson.com` identifica a origem da API, enquanto `/products/1` é o caminho solicitado.
+
+Podemos pensar em `products` como uma coleção de **recursos** disponibilizados pela API.
+
+Compare:
+
+| Endpoint          | Resultado         |
+| ----------------- | ----------------- |
+| `GET /products`   | Lista de produtos |
+| `GET /products/1` | Produto com ID 1  |
+| `GET /products/2` | Produto com ID 2  |
+
+Um endpoint identifica uma operação disponibilizada pela API, combinando um caminho e, em APIs HTTP, um método como `GET`.
+
+Vamos buscar todos os produtos:
+
+```js
+const response = await fetch('https://dummyjson.com/products');
+const data = await response.json();
+
+console.log(data.products);
+```
+
+A resposta agora contém um array na propriedade `products`, além de informações como `total`, `skip` e `limit`.
+
+Também podemos pesquisar produtos usando parâmetros na URL:
+
+[https://dummyjson.com/products/search?q=phone](https://dummyjson.com/products/search?q=phone)
+
+O parâmetro `q=phone` informa ao servidor o termo que queremos pesquisar.
+
+Cada API define seus próprios endpoints, parâmetros e formatos de resposta. Essas regras formam o **contrato de comunicação** que o frontend precisa seguir.
+
+## 5. Envie dados para o backend
+
+Até agora, usamos o método HTTP `GET` para consultar produtos. Quando chamamos `fetch()` sem informar um método, ele utiliza `GET` por padrão.
+
+Mas uma loja também precisa cadastrar, alterar e remover produtos.
+
+Imagine que um usuário preencheu um formulário para cadastrar um teclado, informando o nome e o preço. Precisamos enviar esses dados ao backend. Para simular essa operação, vamos usar o endpoint `POST /products/add` do DummyJSON:
+
+```js
+const response = await fetch('https://dummyjson.com/products/add', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    title: 'Mechanical Keyboard',
+    price: 250,
+  }),
+});
+
+const product = await response.json();
+
+console.log(product);
+```
+
+Dessa vez, estamos enviando informações ao servidor. Observe as três opções adicionadas ao `fetch()`:
+
+| Opção            | Função                                       |
+| ---------------- | -------------------------------------------- |
+| `method: 'POST'` | Indica a operação solicitada.                |
+| `headers`        | Informa que o conteúdo enviado está em JSON. |
+| `body`           | Contém os dados do produto.                  |
+
+`JSON.stringify()` converte o objeto JavaScript em texto JSON antes do envio.
+
+O servidor recebe os dados, processa a operação e devolve uma resposta com o produto criado, incluindo um identificador.
+
+### E para atualizar ou remover?
+
+Imagine que queremos alterar apenas o preço de um produto:
+
+```js
+await fetch('https://dummyjson.com/products/1', {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ price: 12.99 }),
+});
+```
+
+Para solicitar a remoção do mesmo produto:
+
+```js
+await fetch('https://dummyjson.com/products/1', {
+  method: 'DELETE',
+});
+```
+
+Os métodos HTTP indicam diferentes operações sobre os recursos:
+
+| Método   | Operação comum         |
+| -------- | ---------------------- |
+| `GET`    | Consultar              |
+| `POST`   | Criar ou enviar dados  |
+| `PATCH`  | Atualizar parcialmente |
+| `DELETE` | Remover                |
+
+Existe também `PUT`, usado para criar ou substituir a representação do recurso identificado pela URL.
+
+<Callout title="Importante">
+  O DummyJSON simula as operações de criação, atualização e exclusão. Ele retorna o resultado
+  esperado, mas não modifica permanentemente os dados do servidor. Você pode consultar os detalhes
+  na [documentação oficial](https://dummyjson.com/docs/products).
+</Callout>
+
+## 6. Verifique a resposta
+
+Nem toda requisição termina como esperado. O produto pode não existir, os dados enviados podem ser inválidos ou o servidor pode encontrar um problema.
+
+Toda resposta HTTP possui um código de status que informa o resultado da requisição.
+
+Alguns exemplos:
+
+| Status                      | Significado             |
+| --------------------------- | ----------------------- |
+| `200 OK`                    | Requisição bem-sucedida |
+| `201 Created`               | Recurso criado          |
+| `400 Bad Request`           | Problema na requisição  |
+| `404 Not Found`             | Recurso não encontrado  |
+| `500 Internal Server Error` | Erro no servidor        |
+
+Podemos consultar o código diretamente:
+
+```js {copy=false}
+console.log(response.status);
+```
+
+**Um detalhe importante:** `fetch()` não rejeita a Promise automaticamente quando o servidor responde com `404` ou `500`.
+
+Por isso, incluímos esta verificação no exemplo anterior:
+
+```js {copy=false}
+if (!response.ok) {
+  throw new Error(`Erro HTTP: ${response.status}`);
+}
+```
+
+`response.ok` é `true` quando o status está entre `200` e `299`.
+
+Quando a verificação falha, lançamos um erro que pode ser tratado pelo `catch`. Falhas de rede também podem fazer `fetch()` rejeitar a Promise.
+
+### Inspecione a requisição no navegador
+
+Abra nossa página HTML, pressione `F12` (ou abra as ferramentas de desenvolvimento pelo menu do navegador) e selecione a aba **Rede (Network)**.
+
+Recarregue a página e procure pela requisição `products/1`.
+
+Ao selecioná-la, você poderá verificar:
+
+- **Cabeçalhos (Headers):** URL, método HTTP e status da resposta.
+- **Resposta (Response):** JSON devolvido pelo servidor.
+
+Experimente trocar `/products/1` por `/products/999999` no código e recarregar a página. Observe o status da requisição e a mensagem apresentada na interface.
+
+Essa é uma forma prática de descobrir se um problema está na comunicação com a API ou no código que utiliza a resposta.
+
+## 7. Onde entra REST?
+
+REST (_Representational State Transfer_) é um estilo de arquitetura usado no desenvolvimento de sistemas distribuídos.
+
+Uma de suas características é organizar a comunicação em torno de recursos, utilizando uma interface uniforme.
+
+Nos nossos exemplos, temos o recurso `/products/1` e diferentes operações sobre ele:
+
+```http {copy=false}
+GET    /products/1
+PATCH  /products/1
+DELETE /products/1
+```
+
+A URL identifica o recurso, enquanto o método HTTP indica a operação solicitada.
+
+Em APIs organizadas dessa maneira, também é comum utilizar `POST /products` para criar um produto. O DummyJSON adota o endpoint `/products/add`.
+
+REST envolve outros princípios, como requisições que contêm as informações necessárias para serem compreendidas independentemente de requisições anteriores. Portanto, usar URLs e métodos HTTP não é suficiente, por si só, para caracterizar uma API como REST.
+
+Para começar a consumir APIs, o essencial é compreender a comunicação que vimos ao longo do artigo:
+
+```text {copy=false}
+Frontend
+   │
+   │ Request: URL + método + dados
+   ▼
+Backend (API)
+   │
+   │ Response: status + dados
+   ▼
+Frontend
+```
+
+O frontend não precisa saber como o backend foi implementado. Ele precisa conhecer o contrato da API: quais operações estão disponíveis, quais dados enviar e quais respostas esperar.
+
+Isso permite que uma interface em React, por exemplo, se comunique com um backend desenvolvido em Node.js, Python, Java ou outras tecnologias.
+
+Agora que você conhece esse fluxo, experimente explorar outras requisições do DummyJSON e observar seus resultados na aba Rede do navegador.

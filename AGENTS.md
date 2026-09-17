@@ -46,7 +46,11 @@
 
 * Mudanças de arquitetura não devem degradar prerendering, hydration, navegação, URLs públicas, comportamento do histórico ou deploy existente. Evite substituir uma solução funcional por uma abstração mais complexa sem benefício concreto.
 
-* Valide mudanças de UI nos temas claro e escuro, em mobile e desktop, além de lint e build de produção. Para mudanças de navegação ou routing, valide também navegação interna, acesso direto por URL, recarregamento e histórico Voltar/Avançar. Se alguma verificação não puder ser executada, informe a limitação.
+* Valide mudanças formais com testes, build e inspeção do HTML gerado.
+
+* Use o navegador para mudanças significativas de layout ou interação. Agrupe a validação visual depois de concluir uma série de mudanças e inspecione apenas a área relevante, não a página inteira.
+
+* Não repita verificações em mobile, desktop, tema claro e tema escuro quando a mudança não afetar esses modos. Para mudanças de navegação ou routing, valide também navegação interna, acesso direto por URL, recarregamento e histórico Voltar/Avançar. Se alguma verificação não puder ser executada, informe a limitação.
 
 ## Manutenção destas instruções
 

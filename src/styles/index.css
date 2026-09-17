@@ -1032,7 +1032,7 @@
     margin-top: 2.5rem;
   }
 
-  .prose > :where(p, ul, ol, blockquote) :where(a) {
+  .prose > :where(p, ul, ol, blockquote, .content-callout, .content-table-scroll) :where(a) {
     color: var(--color-text);
     font-weight: 800;
     text-decoration-color: var(--color-text-muted);
@@ -1043,7 +1043,9 @@
       text-decoration-thickness 180ms ease;
   }
 
-  .prose > :where(p, ul, ol, blockquote) :where(a:hover, a:focus-visible) {
+  .prose
+    > :where(p, ul, ol, blockquote, .content-callout, .content-table-scroll)
+    :where(a:hover, a:focus-visible) {
     text-decoration-color: currentColor;
     text-decoration-thickness: 3px;
   }
@@ -1070,6 +1072,47 @@
     margin-top: 1.5rem;
   }
 
+  .prose > :where(.content-callout) {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--color-border);
+  }
+
+  .content-callout-title {
+    margin: 0;
+    color: color-mix(in srgb, var(--color-accent-secondary) 70%, var(--color-text));
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .content-callout-body {
+    min-width: 0;
+  }
+
+  .content-callout-body > :where(*) {
+    margin: 0;
+  }
+
+  .content-callout-body > :where(* + *) {
+    margin-top: 1rem;
+  }
+
+  .content-callout-body > :where(ul, ol) {
+    padding-left: 1.25rem;
+  }
+
+  @media (min-width: 720px) {
+    .prose > :where(.content-callout) {
+      grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+  }
+
   .prose > :where(hr) {
     height: 1px;
     margin-block: 3rem;
@@ -1085,33 +1128,48 @@
     border-radius: 20px;
   }
 
-  .prose > :where(table) {
-    display: block;
+  .prose > :where(.content-table-scroll) {
     max-width: 100%;
     overflow-x: auto;
-    border: 1px solid var(--color-border);
-    border-radius: 14px;
-    border-collapse: separate;
-    border-spacing: 0;
+  }
+
+  .content-table-scroll table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: 0.9em;
   }
 
-  .prose > :where(table) :where(th, td) {
-    padding: 0.75rem;
+  .content-table-scroll :where(th, td) {
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--color-border);
     text-align: left;
+    vertical-align: top;
   }
 
-  .prose > :where(table) :where(th) {
-    background: var(--color-surface-subtle);
-    font-family: var(--font-display);
+  .content-table-scroll :where(th) {
+    border-bottom: 2px solid var(--color-text);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .prose > :where(table) :where(tr:last-child td) {
+  .content-table-scroll :where(th:first-child, td:first-child) {
+    padding-left: 0;
+  }
+
+  .content-table-scroll :where(th:last-child, td:last-child) {
+    padding-right: 0;
+  }
+
+  .content-table-scroll :where(tr:last-child td) {
     border-bottom: 0;
   }
 
-  .prose > :where(p, h2, h3, ul, ol, blockquote, table) :where(code:not(pre code)) {
+  .prose
+    > :where(p, h2, h3, ul, ol, blockquote, .content-callout, .content-table-scroll)
+    :where(code:not(pre code)) {
     padding: 0.1em 0.3em;
     border-radius: 6px;
     background: var(--color-surface-subtle);

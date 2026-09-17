@@ -1,6 +1,7 @@
 import mdx from '@mdx-js/rollup';
 import { reactRouter } from '@react-router/dev/vite';
 import rehypeShiki from '@shikijs/rehype';
+import remarkGfm from 'remark-gfm';
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 
@@ -32,6 +33,7 @@ export default defineConfig(({ mode }) => {
       {
         enforce: 'pre',
         ...mdx({
+          remarkPlugins: [remarkGfm],
           rehypePlugins: [
             [
               rehypeShiki,
