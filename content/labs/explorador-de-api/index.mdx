@@ -1,0 +1,22 @@
+import { Link } from 'react-router';
+
+Este Lab complementa o artigo <Link to="/articles/como-uma-api-conecta-frontend-e-backend">Como uma API conecta frontend e backend</Link>. Em vez de esconder a comunicação atrás de uma interface pronta, ele mantém a requisição e a resposta no centro do experimento.
+
+## Três experimentos
+
+1. **Compare sucesso e erro HTTP.** Consulte o produto `1` e depois tente um ID que não existe, como `999999`. Compare o status, o valor de `response.ok` e o JSON recebido. Mesmo no segundo caso, o servidor enviou uma resposta.
+2. **Observe como o frontend monta a requisição.** Pesquise por `phone` e depois crie um produto. Identifique o parâmetro `q` na URL e, no `POST`, o cabeçalho `Content-Type` e o JSON enviado no corpo da requisição.
+3. **Teste uma alteração simulada.** Atualize ou exclua o produto `1` e observe a resposta. Em seguida, consulte o mesmo ID com `GET`: os dados originais continuam no servidor.
+
+<Callout title="Dados simulados">
+  As requisições são reais, mas o DummyJSON não persiste operações de criação, atualização ou
+  exclusão. O resultado mostra como a API responderia sem modificar sua base de dados. Em APIs
+  reais, uma exclusão bem-sucedida pode responder com `204 No Content`, sem corpo. O DummyJSON, por
+  outro lado, devolve o produto com `isDeleted` e `deletedOn` para representar a exclusão simulada.
+</Callout>
+
+## O que observar no código
+
+- `buildApiRequest()` transforma os campos visíveis em método, URL, headers e body.
+- `executeApiRequest()` mantém respostas HTTP, inclusive `404`, separadas de falhas de rede.
+- A interface guarda uma cópia da requisição enviada junto da resposta. Assim, editar o formulário depois do envio não altera o contexto do resultado exibido.
