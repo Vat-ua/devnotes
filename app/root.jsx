@@ -65,8 +65,9 @@ export default function Root() {
 
   return (
     <div className="app-shell">
+      <SkipLink />
       <Header />
-      <main>
+      <main id="conteudo-principal" tabIndex={-1}>
         <Outlet />
       </main>
       <Footer />
@@ -79,8 +80,9 @@ export function ErrorBoundary({ error }) {
 
   return (
     <div className="app-shell">
+      <SkipLink />
       <Header />
-      <main>
+      <main id="conteudo-principal" tabIndex={-1}>
         <div className="container page-shell empty-state">
           <span className="eyebrow">{notFound ? '404' : 'Erro'}</span>
           <h1>{notFound ? 'Esta página não existe.' : 'Algo deu errado.'}</h1>
@@ -91,6 +93,14 @@ export function ErrorBoundary({ error }) {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function SkipLink() {
+  return (
+    <a className="skip-link" href="#conteudo-principal">
+      Ir para o conteúdo principal
+    </a>
   );
 }
 
