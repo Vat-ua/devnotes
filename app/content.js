@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 
+import { getArticleSeriesNavigation as createArticleSeriesNavigation } from '../src/content/discovery.js';
 import { createContentEntries } from '../src/content/metadata.js';
 
 const articleMetadataModules = import.meta.glob('../content/articles/*/meta.js', { eager: true });
@@ -29,6 +30,10 @@ export function getLabBySlug(slug) {
 
 export function getLazyArticle(slug) {
   return lazyArticles.get(slug);
+}
+
+export function getArticleSeriesNavigation(article) {
+  return createArticleSeriesNavigation(articles, article);
 }
 
 export function getLazyLabDemo(slug) {

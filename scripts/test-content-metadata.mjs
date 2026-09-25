@@ -118,3 +118,47 @@ test('rejeita publicationOrder duplicado ou com lacunas na mesma data', () => {
     'meta.publicationOrder deve formar uma sequência contínua de 1 a 2 em 2026-09-08',
   ]);
 });
+
+test('normaliza e exige os campos de série em conjunto', () => {
+  assert.equal(
+    normalizeContentMetadata({
+      kind: 'article',
+      slug: 'um-artigo',
+      meta: { ...articleMeta, series: ' Uma série ', seriesOrder: 1 },
+    }).series,
+    'Uma série',
+  );
+  assert.deepEqual(
+    getContentEntryIssues({
+      kind: 'article',
+      slug: 'um-artigo',
+      meta: { ...articleMeta, series: 'Uma série' },
+    }),
+    ['meta.series e meta.seriesOrder devem ser informados juntos'],
+  );
+});
+
+test('rejeita posições duplicadas ou descontínuas dentro de uma série', () => {
+  const issues = getContentCollectionIssues(
+    [
+      {
+        slug: 'primeiro',
+        publishedAt: '2026-09-08',
+        series: 'Uma série',
+        seriesOrder: 1,
+      },
+      {
+        slug: 'segundo',
+        publishedAt: '2026-09-09',
+        series: 'Uma série',
+        seriesOrder: 1,
+      },
+    ],
+    'article',
+  );
+
+  assert.deepEqual(issues, [
+    'meta.seriesOrder 1 está duplicado na série "Uma série": primeiro, segundo',
+    'meta.seriesOrder deve formar uma sequência contínua de 1 a 2 na série "Uma série"',
+  ]);
+});

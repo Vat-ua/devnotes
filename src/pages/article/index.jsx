@@ -1,13 +1,14 @@
 import { Suspense } from 'react';
 
 import Callout from '../../components/content/Callout.jsx';
+import ArticleSeriesNavigation from '../../components/content/ArticleSeriesNavigation.jsx';
 import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
 import ContentBody from '../../components/content/ContentBody.jsx';
 import ContentHeader from '../../components/content/ContentHeader.jsx';
 import ContentTable from '../../components/content/ContentTable.jsx';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
-export default function Article({ article, Content }) {
+export default function Article({ article, Content, seriesNavigation }) {
   const [primaryColor, secondaryColor] = getContentVisualPair(article.slug);
 
   return (
@@ -31,6 +32,7 @@ export default function Article({ article, Content }) {
             <Content components={{ Callout, pre: MdxCodeBlock, table: ContentTable }} />
           </Suspense>
         </ContentBody>
+        {seriesNavigation && <ArticleSeriesNavigation navigation={seriesNavigation} />}
       </article>
     </div>
   );

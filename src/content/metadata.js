@@ -1,6 +1,6 @@
 const commonFields = ['title', 'description', 'publishedAt', 'publicationOrder', 'topics'];
 const fieldsByKind = {
-  article: commonFields,
+  article: [...commonFields, 'series', 'seriesOrder'],
   lab: [...commonFields, 'demoInstruction'],
 };
 
@@ -40,6 +40,7 @@ export function normalizeContentMetadata({ kind, slug, meta, source = slug }) {
     description: meta.description.trim(),
     publishedAt: meta.publishedAt.trim(),
     topics: meta.topics.map((topic) => topic.trim()),
+    ...(kind === 'article' && meta.series !== undefined ? { series: meta.series.trim() } : {}),
     ...(kind === 'lab' ? { demoInstruction: meta.demoInstruction.trim() } : {}),
     kind,
     slug,
@@ -99,6 +100,23 @@ export function getContentMetadataIssues({ kind, meta }) {
     issues.push('meta.publicationOrder deve ser um número inteiro positivo');
   }
 
+  if (kind === 'article') {
+    const hasSeries = meta.series !== undefined;
+    const hasSeriesOrder = meta.seriesOrder !== undefined;
+
+    if (hasSeries !== hasSeriesOrder) {
+      issues.push('meta.series e meta.seriesOrder devem ser informados juntos');
+    }
+
+    if (hasSeries && !isNonEmptyString(meta.series)) {
+      issues.push('meta.series deve ser um texto não vazio');
+    }
+
+    if (hasSeriesOrder && (!Number.isInteger(meta.seriesOrder) || meta.seriesOrder < 1)) {
+      issues.push('meta.seriesOrder deve ser um número inteiro positivo');
+    }
+  }
+
   return issues;
 }
 
@@ -143,6 +161,37 @@ export function getContentCollectionIssues(entries, kind) {
       issues.push(
         `meta.publicationOrder deve formar uma sequência contínua de 1 a ${dateEntries.length} em ${publishedAt}`,
       );
+    }
+  }
+
+  if (kind === 'article') {
+    const entriesBySeries = groupBy(
+      entries.filter((entry) => entry.series !== undefined),
+      (entry) => entry.series,
+    );
+
+    for (const [series, seriesEntries] of entriesBySeries) {
+      const entriesByOrder = groupBy(seriesEntries, (entry) => entry.seriesOrder);
+
+      for (const [seriesOrder, orderEntries] of entriesByOrder) {
+        if (orderEntries.length > 1) {
+          issues.push(
+            `meta.seriesOrder ${seriesOrder} está duplicado na série "${series}": ${formatSlugs(orderEntries)}`,
+          );
+        }
+      }
+
+      const actualOrders = [...entriesByOrder.keys()].toSorted((first, second) => first - second);
+      const expectedOrders = Array.from({ length: seriesEntries.length }, (_, index) => index + 1);
+
+      if (
+        actualOrders.length !== expectedOrders.length ||
+        actualOrders.some((order, index) => order !== expectedOrders[index])
+      ) {
+        issues.push(
+          `meta.seriesOrder deve formar uma sequência contínua de 1 a ${seriesEntries.length} na série "${series}"`,
+        );
+      }
     }
   }
 

@@ -5,4 +5,6 @@ export const meta = {
   topics: ['Node.js', 'Express', 'APIs'],
   publishedAt: '2026-09-25',
   publicationOrder: 1,
+  series: 'Backend com Node.js e Express',
+  seriesOrder: 1,
 };
