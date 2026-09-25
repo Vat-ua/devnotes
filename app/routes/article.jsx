@@ -3,7 +3,12 @@
 import { Link } from 'react-router';
 
 import ArticlePage from '../../src/pages/article/index.jsx';
-import { getArticleBySlug, getArticleSeriesNavigation, getLazyArticle } from '../content.js';
+import {
+  getArticleBySlug,
+  getArticleSeriesNavigation,
+  getContinueReadingArticles,
+  getLazyArticle,
+} from '../content.js';
 import { contentMeta, pageMeta } from '../meta.js';
 
 export function meta({ params }) {
@@ -18,8 +23,18 @@ export default function Article({ params }) {
   if (!article || !Content) return <MissingArticle />;
 
   const seriesNavigation = getArticleSeriesNavigation(article);
+  const continueReadingArticles = getContinueReadingArticles(article, {
+    excludeSlugs: [seriesNavigation?.previous?.slug, seriesNavigation?.next?.slug].filter(Boolean),
+  });
 
-  return <ArticlePage article={article} Content={Content} seriesNavigation={seriesNavigation} />;
+  return (
+    <ArticlePage
+      article={article}
+      Content={Content}
+      seriesNavigation={seriesNavigation}
+      continueReadingArticles={continueReadingArticles}
+    />
+  );
 }
 
 export function ErrorBoundary() {

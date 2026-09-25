@@ -1,3 +1,5 @@
+import { compareContentPublication } from './metadata.js';
+
 export function getArticleSeriesNavigation(articles, currentArticle) {
   if (!currentArticle.series) return undefined;
 
@@ -15,4 +17,37 @@ export function getArticleSeriesNavigation(articles, currentArticle) {
     previous: seriesArticles[currentIndex - 1],
     next: seriesArticles[currentIndex + 1],
   };
+}
+
+export function getContinueReadingArticles(
+  articles,
+  currentArticle,
+  { limit = 3, excludeSlugs = [] } = {},
+) {
+  const currentTopics = new Set(currentArticle.topics);
+  const excludedSlugs = new Set([currentArticle.slug, ...excludeSlugs]);
+
+  return articles
+    .filter((article) => !excludedSlugs.has(article.slug))
+    .map((article) => ({
+      article,
+      sharedTopicCount: countSharedTopics(article.topics, currentTopics),
+    }))
+    .toSorted(
+      (first, second) =>
+        second.sharedTopicCount - first.sharedTopicCount ||
+        compareContentPublication(first.article, second.article),
+    )
+    .slice(0, limit)
+    .map(({ article }) => article);
+}
+
+function countSharedTopics(topics, currentTopics) {
+  let count = 0;
+
+  for (const topic of new Set(topics)) {
+    if (currentTopics.has(topic)) count += 1;
+  }
+
+  return count;
 }

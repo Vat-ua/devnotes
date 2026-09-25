@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getArticleSeriesNavigation } from '../src/content/discovery.js';
+import {
+  getArticleSeriesNavigation,
+  getContinueReadingArticles,
+} from '../src/content/discovery.js';
 
 const articles = [
   {
@@ -44,4 +47,81 @@ test('trata as extremidades e artigos sem série', () => {
   assert.equal(getArticleSeriesNavigation(articles, articles[1]), undefined);
   assert.equal(getArticleSeriesNavigation(articles, articles[2]).previous, undefined);
   assert.equal(getArticleSeriesNavigation(articles, articles[0]).next, undefined);
+});
+
+test('prioriza topics compartilhados e usa a publicação como desempate', () => {
+  const currentArticle = {
+    slug: 'atual',
+    publishedAt: '2026-09-10',
+    topics: ['React', 'APIs'],
+  };
+  const candidates = [
+    {
+      slug: 'recente-sem-topic',
+      publishedAt: '2026-09-12',
+      topics: ['Node.js'],
+    },
+    {
+      slug: 'dois-topics',
+      publishedAt: '2026-09-01',
+      topics: ['React', 'APIs'],
+    },
+    {
+      slug: 'um-topic-antigo',
+      publishedAt: '2026-09-02',
+      topics: ['React'],
+    },
+    {
+      slug: 'um-topic-recente',
+      publishedAt: '2026-09-08',
+      topics: ['APIs'],
+    },
+  ];
+
+  assert.deepEqual(
+    getContinueReadingArticles([currentArticle, ...candidates], currentArticle).map(
+      ({ slug }) => slug,
+    ),
+    ['dois-topics', 'um-topic-recente', 'um-topic-antigo'],
+  );
+});
+
+test('completa com artigos recentes e respeita limite e exclusões', () => {
+  const currentArticle = {
+    slug: 'atual',
+    publishedAt: '2026-09-10',
+    topics: ['React'],
+  };
+  const candidates = [
+    {
+      slug: 'excluido',
+      publishedAt: '2026-09-12',
+      topics: ['React'],
+    },
+    {
+      slug: 'mais-recente',
+      publishedAt: '2026-09-09',
+      topics: ['Node.js'],
+    },
+    {
+      slug: 'mais-antigo',
+      publishedAt: '2026-09-08',
+      topics: ['CSS'],
+    },
+  ];
+  const originalOrder = candidates.map(({ slug }) => slug);
+  const recommendations = getContinueReadingArticles(
+    [...candidates, currentArticle],
+    currentArticle,
+    { limit: 2, excludeSlugs: ['excluido'] },
+  );
+
+  assert.deepEqual(
+    recommendations.map(({ slug }) => slug),
+    ['mais-recente', 'mais-antigo'],
+  );
+  assert.deepEqual(
+    candidates.map(({ slug }) => slug),
+    originalOrder,
+  );
 });

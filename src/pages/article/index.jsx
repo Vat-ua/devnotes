@@ -6,9 +6,10 @@ import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
 import ContentBody from '../../components/content/ContentBody.jsx';
 import ContentHeader from '../../components/content/ContentHeader.jsx';
 import ContentTable from '../../components/content/ContentTable.jsx';
+import ContinueReading from '../../components/content/ContinueReading.jsx';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
-export default function Article({ article, Content, seriesNavigation }) {
+export default function Article({ article, Content, seriesNavigation, continueReadingArticles }) {
   const [primaryColor, secondaryColor] = getContentVisualPair(article.slug);
 
   return (
@@ -34,6 +35,7 @@ export default function Article({ article, Content, seriesNavigation }) {
         </ContentBody>
         {seriesNavigation && <ArticleSeriesNavigation navigation={seriesNavigation} />}
       </article>
+      <ContinueReading articles={continueReadingArticles} />
     </div>
   );
 }
