@@ -1,0 +1,332 @@
+import { Link } from 'react-router';
+
+Até agora, enviamos requisições para APIs prontas e recebemos dados. Quando usamos `fetch('https://dummyjson.com/products/1')`, porém, existe um programa do outro lado: ele recebe a requisição, decide qual código deve executá-la e prepara uma resposta.
+
+Neste artigo, vamos construir esse lado da comunicação. Nossa API terá duas operações:
+
+```http {copy=false}
+GET /tools
+GET /tools/:id
+```
+
+A primeira devolverá uma lista de ferramentas. A segunda buscará uma ferramenta pelo identificador. É pouco código, mas o bastante para enxergar o caminho completo:
+
+```text {copy=false}
+Cliente
+  │
+  │ GET /tools/2
+  ▼
+Express procura uma rota correspondente
+  │
+  ▼
+Handler recebe req e res
+  │
+  │ res.json(...)
+  ▼
+Cliente recebe status + JSON
+```
+
+## Onde entram Node.js e Express
+
+**Node.js** executa JavaScript fora do navegador. Neste caso, ele mantém um processo em execução, abre uma porta da máquina e permite que nosso código receba requisições HTTP.
+
+Seria possível criar o servidor apenas com os módulos do Node.js. O **Express** acrescenta uma interface menor para tarefas comuns desse servidor: relacionar métodos e caminhos a funções, ler dados da requisição e construir a resposta.
+
+Express não substitui Node.js. Nosso código continua sendo executado pelo Node; Express é uma biblioteca usada por esse código.
+
+Antes de começar, confirme que Node.js e `pnpm` estão instalados:
+
+```bash {copy=false}
+# terminal
+node --version
+pnpm --version
+```
+
+Use uma versão LTS do Node.js que ainda esteja recebendo atualizações. A [tabela oficial de versões](https://nodejs.org/en/about/previous-releases) mostra quais linhas continuam mantidas. O Express 5 exige Node.js 18 ou superior, mas esse é apenas o requisito técnico mínimo: versões do Node que já chegaram ao fim do suporte não devem ser usadas em projetos novos.
+
+## Crie o projeto
+
+No terminal, crie uma pasta para a API e inicialize o projeto:
+
+```bash {copy=false}
+# terminal
+mkdir tools-api
+cd tools-api
+pnpm init
+```
+
+Abra o `package.json` criado pelo comando e deixe estes campos:
+
+```json {copy=false}
+{
+  "name": "tools-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  }
+}
+```
+
+`"type": "module"` faz o Node tratar arquivos `.js` como ES Modules. Assim, podemos usar `import` no servidor. O script `dev` adiciona o modo de observação do próprio Node, que reinicia o processo quando salvamos uma alteração.
+
+Durante o artigo, usaremos `pnpm dev` para desenvolver com reinício automático. O comando `pnpm start` executa o mesmo servidor sem observar mudanças nos arquivos.
+
+<Callout title="E o nodemon?">
+  Nodemon é uma ferramenta popular que também reinicia processos Node.js quando os arquivos mudam.
+  Neste projeto, não precisamos instalar outra dependência: versões atuais do Node já oferecem o
+  modo estável `--watch`. Você ainda encontrará nodemon em muitos projetos e materiais,
+  especialmente nos que foram configurados antes desse recurso.
+</Callout>
+
+Agora instale o Express 5:
+
+```bash {copy=false}
+# terminal
+pnpm add express@5
+```
+
+O comando adiciona Express às dependências do `package.json` e registra a versão exata instalada no `pnpm-lock.yaml`.
+
+## Abra o servidor para requisições
+
+Crie `server.js` na raiz do projeto com este conteúdo:
+
+```js
+// server.js
+import express from 'express';
+
+const app = express();
+const port = 3000;
+
+app.listen(port, () => {
+  console.log(`API disponível em http://localhost:${port}`);
+});
+```
+
+Neste ponto, a estrutura relevante do projeto é pequena:
+
+```text {copy=false}
+tools-api/
+├── package.json
+├── pnpm-lock.yaml
+└── server.js
+```
+
+O código da API está todo em `server.js`. O `package.json` descreve o projeto, seus scripts e suas dependências; o `pnpm-lock.yaml` registra as versões instaladas pelo `pnpm`.
+
+Ao executar `express()`, recebemos em `app` uma aplicação Express. Esse objeto concentra a configuração do servidor: nele registraremos as rotas e, ao final, pediremos que comece a escutar uma porta.
+
+`app.listen(3000)` mantém o processo esperando conexões na porta `3000`. A função passada como segundo argumento é executada quando o servidor fica disponível; ela serve apenas para confirmar o endereço no terminal.
+
+Inicie a API:
+
+```bash {copy=false}
+# terminal
+pnpm dev
+```
+
+Mantenha esse terminal aberto. Quando o servidor estiver pronto, ele mostrará:
+
+```text {copy=false}
+API disponível em http://localhost:3000
+```
+
+O processo continua ativo porque o servidor está esperando requisições. Digite `http://localhost:3000` na barra de endereço do navegador. Express responderá que não encontrou `GET /`: o servidor existe, mas ainda não registramos uma rota capaz de atender esse pedido.
+
+Para encerrá-lo, pressione `Ctrl + C`.
+
+## Relacione uma requisição a uma resposta
+
+Sem interromper o servidor, adicione esta rota em `server.js`, antes de `app.listen()`:
+
+```js
+// server.js
+app.get('/tools', (req, res) => {
+  res.json({ message: 'Lista de ferramentas' });
+});
+```
+
+Essa linha reúne as duas partes que identificam a operação:
+
+- `get` corresponde ao método HTTP `GET`;
+- `'/tools'` é o caminho solicitado.
+
+Quando uma requisição combina com ambos, Express executa a função passada como segundo argumento. Essa função é o **handler** da rota.
+
+O handler recebe dois objetos. `req` representa a requisição que chegou e dá acesso a informações como parâmetros, cabeçalhos e método. `res` representa a resposta que estamos construindo. Ao chamar `res.json()`, Express serializa o valor como JSON, define o tipo do conteúdo e envia a resposta ao cliente.
+
+Embora ainda não usemos `req`, mantemos o parâmetro para deixar explícita a assinatura do handler. O fluxo desta rota é:
+
+```text {copy=false}
+GET /tools → app.get('/tools', handler) → res.json(...) → 200 OK
+```
+
+Salve `server.js`. Como iniciamos o processo com `pnpm dev`, Node reinicia o servidor automaticamente. Digite `http://localhost:3000/tools` no navegador. O navegador funciona como cliente e mostra a resposta:
+
+```json {copy=false}
+{
+  "message": "Lista de ferramentas"
+}
+```
+
+O status é `200 OK` porque `res.json()` usa `200` por padrão quando não escolhemos outro código.
+
+## Devolva dados da API
+
+Nosso endpoint já responde, mas ainda não contém a lista prometida. Em `server.js`, crie o array antes da rota e substitua o handler anterior pela versão abaixo:
+
+```js
+// server.js
+const tools = [
+  { id: 1, name: 'React', category: 'Frontend' },
+  { id: 2, name: 'Express', category: 'Backend' },
+];
+
+app.get('/tools', (req, res) => {
+  res.json(tools);
+});
+```
+
+Salve o arquivo e recarregue `http://localhost:3000/tools`. Agora `GET /tools` recebe um array JSON:
+
+```json {copy=false}
+[
+  { "id": 1, "name": "React", "category": "Frontend" },
+  { "id": 2, "name": "Express", "category": "Backend" }
+]
+```
+
+Por enquanto, os dados estão apenas na memória do processo. Alterar o array muda o que a API responde, mas nada é salvo fora do programa. Ao reiniciar o servidor, o array volta exatamente ao conteúdo escrito em `server.js`.
+
+## Use um parâmetro da URL
+
+Além da coleção completa, queremos consultar uma única ferramenta. Adicione outra rota em `server.js`, depois de `app.get('/tools', ...)` e antes de `app.listen()`:
+
+```js
+// server.js
+app.get('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  res.json(tool);
+});
+```
+
+Os dois-pontos em `:id` marcam uma parte variável do caminho. Por isso, a mesma definição corresponde a URLs diferentes:
+
+```text {copy=false}
+/tools/1 → req.params.id é "1"
+/tools/2 → req.params.id é "2"
+```
+
+Express disponibiliza o valor em `req.params`. Parâmetros de URL chegam como strings, então usamos `Number()` antes de compará-lo aos IDs numéricos do array. Em seguida, `find()` procura a ferramenta correspondente.
+
+Depois de salvar, digite `http://localhost:3000/tools/2` no navegador. A API responderá:
+
+```json {copy=false}
+{
+  "id": 2,
+  "name": "Express",
+  "category": "Backend"
+}
+```
+
+Express testa as rotas registradas para o método e o caminho recebidos. `GET /tools` corresponde à rota da lista; `GET /tools/2` corresponde à rota com `:id`. É assim que a biblioteca sabe qual handler executar.
+
+## Responda quando algo não existe
+
+Existe um problema no handler atual. Se buscarmos `/tools/99`, `find()` devolverá `undefined`, mas isso não explica ao cliente que a ferramenta não existe.
+
+Em `server.js`, substitua o handler de `GET /tools/:id` pela versão que trata esse caso antes da resposta de sucesso:
+
+```js
+// server.js
+app.get('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  res.json(tool);
+});
+```
+
+`res.status(404)` define o status HTTP e devolve o mesmo objeto `res`, permitindo encadear `.json()`. O `return` encerra o handler depois do envio da resposta; sem ele, a execução seguiria e tentaria responder novamente.
+
+Esse `404` significa que a rota existe, mas o recurso procurado nela não. Há outro caso: uma requisição para uma rota que a API nem sequer oferece, como `GET /users`.
+
+Podemos dar a essas requisições uma resposta JSON consistente. Depois de todas as rotas e antes de `app.listen()`, adicione:
+
+```js
+// server.js
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+```
+
+Express verifica os handlers na ordem em que foram registrados. Esse último handler não restringe método nem caminho, então recebe o que não foi respondido antes. Por isso ele precisa ficar depois das rotas válidas.
+
+## Veja o resultado completo
+
+Ao final, `server.js` contém todo o fluxo da nossa pequena API:
+
+```js
+// server.js
+import express from 'express';
+
+const app = express();
+const port = 3000;
+
+const tools = [
+  { id: 1, name: 'React', category: 'Frontend' },
+  { id: 2, name: 'Express', category: 'Backend' },
+];
+
+app.get('/tools', (req, res) => {
+  res.json(tools);
+});
+
+app.get('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  res.json(tool);
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+
+app.listen(port, () => {
+  console.log(`API disponível em http://localhost:${port}`);
+});
+```
+
+Mantenha `pnpm dev` em execução e abra um segundo terminal. Não é necessário entrar na pasta do projeto: use `curl` para inspecionar também os cabeçalhos e códigos de status:
+
+```bash {copy=false}
+# segundo terminal
+curl -i http://localhost:3000/tools
+curl -i http://localhost:3000/tools/2
+curl -i http://localhost:3000/tools/99
+curl -i http://localhost:3000/users
+```
+
+Compare os dois últimos resultados. Ambos usam `404`, mas comunicam situações diferentes: um recurso ausente em uma rota conhecida e uma rota que não faz parte da API.
+
+## O que construímos — e o que ainda falta
+
+Agora o backend deixa de ser uma caixa preta. Quando o cliente envia uma requisição, Express compara o método e o caminho com as rotas registradas. A rota correspondente executa um handler, o handler lê o que precisa em `req` e finaliza o ciclo enviando uma resposta por `res`.
+
+Nossa API ainda só consulta um array criado junto com o processo. Ela não recebe novas ferramentas, não altera nem remove dados e não mantém informações depois de reiniciar. Essas limitações são intencionais: primeiro isolamos o percurso de uma requisição; CRUD e persistência podem entrar depois, quando houver uma pergunta concreta que exija cada recurso.
+
+Se quiser revisar o lado do cliente antes de continuar, leia <Link to="/articles/como-uma-api-conecta-frontend-e-backend">Como uma API conecta frontend e backend</Link>.

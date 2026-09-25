@@ -1,0 +1,468 @@
+import { Link } from 'react-router';
+import ContentDisclosure from '../../../src/components/content/ContentDisclosure.jsx';
+
+No artigo anterior, criamos uma API capaz de responder a duas requisições: `GET /tools` devolve uma lista de ferramentas e `GET /tools/:id` procura uma delas pelo identificador.
+
+Agora vamos completar o ciclo. A API receberá dados do cliente para criar, atualizar e remover ferramentas — ainda usando o mesmo `server.js` e um array em memória.
+
+## 1. De consultas a um CRUD
+
+CRUD reúne quatro operações comuns sobre recursos: **Create**, **Read**, **Update** e **Delete**. Em uma API HTTP, podemos relacioná-las a métodos e caminhos:
+
+| Operação | Requisição          | Resposta de sucesso    |
+| -------- | ------------------- | ---------------------- |
+| Create   | `POST /tools`       | `201` + recurso criado |
+| Read     | `GET /tools`        | `200` + lista          |
+| Read     | `GET /tools/:id`    | `200` + recurso        |
+| Update   | `PATCH /tools/:id`  | `200` + recurso        |
+| Delete   | `DELETE /tools/:id` | `204`, sem conteúdo    |
+
+CRUD não é um recurso específico do Express. É uma forma de pensar nas operações que o sistema oferece. Express relaciona cada combinação de método e caminho ao handler que realizará a operação.
+
+Este artigo parte do projeto `tools-api` criado em <Link to="/articles/como-criar-uma-api-com-node-e-express">Como criar uma API com Node.js e Express</Link>. Mantenha `pnpm dev` em execução enquanto acompanha as alterações.
+
+<ContentDisclosure label="Ponto de partida" title="Código inicial deste artigo">
+
+Todo o código da API continua em um único arquivo:
+
+```js
+// server.js
+import express from 'express';
+
+const app = express();
+const port = 3000;
+
+const tools = [
+  { id: 1, name: 'React', category: 'Frontend' },
+  { id: 2, name: 'Express', category: 'Backend' },
+];
+
+app.get('/tools', (req, res) => {
+  res.json(tools);
+});
+
+app.get('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  res.json(tool);
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+
+app.listen(port, () => {
+  console.log(`API disponível em http://localhost:${port}`);
+});
+```
+
+</ContentDisclosure>
+
+As rotas novas devem ficar antes do último `app.use()`. Ele continua sendo o fallback para requisições que não corresponderam a nenhuma operação da API.
+
+## 2. Como os dados do cliente chegam a `req.body`
+
+Em uma requisição `GET`, as informações usadas pela nossa API estavam na URL. Para criar uma ferramenta, o cliente enviará também um corpo em JSON:
+
+```http {copy=false}
+POST /tools
+Content-Type: application/json
+
+{
+  "name": "Fastify",
+  "category": "Backend"
+}
+```
+
+O corpo de uma requisição HTTP chega como uma sequência de bytes. Para que o handler receba um objeto JavaScript, adicione `express.json()` depois de criar `app` e antes de registrar as rotas:
+
+```js
+// server.js
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+```
+
+`express.json()` é um middleware. Ele examina requisições com conteúdo JSON, interpreta o corpo e disponibiliza o resultado em `req.body` antes de entregar a execução ao handler seguinte:
+
+```text {copy=false}
+JSON no request
+      ↓
+express.json()
+      ↓
+req.body
+      ↓
+validação no handler
+      ↓
+response
+```
+
+A ordem importa: se o middleware fosse registrado depois das rotas, os handlers seriam executados antes que o corpo tivesse sido interpretado. Em Express 5, `req.body` permanece `undefined` quando nenhum parser processa a requisição.
+
+Mesmo quando existe um objeto em `req.body`, seus valores vieram do cliente. O servidor não pode assumir que os campos obrigatórios existem, que são strings ou que possuem conteúdo. Por isso cada operação que recebe dados precisa validar o que aceita.
+
+## 3. Criando uma ferramenta com `POST`
+
+Nossa primeira operação de escrita receberá `name` e `category`, atribuirá um ID e adicionará a ferramenta ao array. Perto da declaração de `tools`, crie também o próximo identificador e uma pequena função de validação:
+
+```js
+// server.js
+const tools = [
+  { id: 1, name: 'React', category: 'Frontend' },
+  { id: 2, name: 'Express', category: 'Backend' },
+];
+
+let nextId = 3;
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+```
+
+Usar um contador evita gerar um ID repetido apenas porque algum item foi removido do array. Essa estratégia serve para o exemplo em memória; a responsabilidade mudará quando os dados forem armazenados em um banco.
+
+Agora adicione a rota `POST /tools` antes do fallback:
+
+```js
+// server.js
+app.post('/tools', (req, res) => {
+  const { name, category } = req.body ?? {};
+
+  if (!isNonEmptyString(name) || !isNonEmptyString(category)) {
+    return res.status(400).json({
+      error: 'Nome e categoria são obrigatórios',
+    });
+  }
+
+  const tool = {
+    id: nextId,
+    name: name.trim(),
+    category: category.trim(),
+  };
+
+  nextId += 1;
+  tools.push(tool);
+
+  res.location(`/tools/${tool.id}`).status(201).json(tool);
+});
+```
+
+`req.body ?? {}` evita tentar desestruturar `undefined` quando não existe um corpo JSON. Em seguida, validamos os dois campos e encerramos o handler com `400 Bad Request` quando os dados não atendem ao contrato.
+
+Ao criar `tool`, copiamos somente os campos aceitos pela API. Espalhar todo o conteúdo de `req.body` permitiria que o cliente acrescentasse propriedades que não fazem parte do recurso ou tentasse escolher o próprio `id`.
+
+Quando os dados são válidos, `push()` altera o array e `201 Created` comunica que um novo recurso foi criado. O header `Location`, definido por `res.location()`, é uma pequena conveniência: ele informa que o novo recurso pode ser consultado em `/tools/3`, por exemplo.
+
+Para observar essa operação, precisamos de um cliente HTTP. O navegador resolve bem uma consulta `GET`, mas sua barra de endereço não permite escolher `POST`, configurar headers e enviar um corpo JSON. Ferramentas como Postman e Insomnia oferecem uma interface gráfica para isso; HTTPie e curl funcionam pelo terminal.
+
+<Callout title="Onde entra o curl?">
+  curl é um cliente de linha de comando, não um recurso do Express nem do navegador. Ele é usado em
+  desenvolvimento para fazer verificações rápidas, reproduzir requisições e compartilhar exemplos
+  que funcionam sem uma interface gráfica. Usaremos um comando para tornar todos os dados da
+  requisição visíveis, mas você pode montar a mesma chamada no cliente HTTP que preferir.
+</Callout>
+
+Salve o arquivo e mantenha `pnpm dev` em execução. Em outro terminal, envie nosso primeiro `POST` com curl:
+
+```bash {copy=false}
+# segundo terminal
+curl -i -X POST http://localhost:3000/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Fastify","category":"Backend"}'
+```
+
+A resposta inclui o status, a localização e a representação criada:
+
+```http {copy=false}
+HTTP/1.1 201 Created
+Location: /tools/3
+Content-Type: application/json; charset=utf-8
+
+{"id":3,"name":"Fastify","category":"Backend"}
+```
+
+Qualquer cliente enviará a mesma mensagem HTTP ao servidor. Para testar a validação, faça outra requisição omitindo `category`:
+
+```http {copy=false}
+POST /tools
+Content-Type: application/json
+
+{
+  "name": "Fastify"
+}
+```
+
+Como o corpo não atende ao contrato, a API não modifica o array e responde com `400 Bad Request`:
+
+```json {copy=false}
+{
+  "error": "Nome e categoria são obrigatórios"
+}
+```
+
+## 4. Atualizando parte de uma ferramenta com `PATCH`
+
+Para atualizar uma ferramenta, precisamos identificar o recurso pela URL e receber as mudanças no corpo. Usaremos `PATCH` porque o cliente pode enviar apenas os campos que deseja alterar.
+
+Adicione `PATCH /tools/:id` antes do fallback:
+
+```js
+// server.js
+app.patch('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  const { name, category } = req.body ?? {};
+  const hasName = name !== undefined;
+  const hasCategory = category !== undefined;
+
+  if (
+    (!hasName && !hasCategory) ||
+    (hasName && !isNonEmptyString(name)) ||
+    (hasCategory && !isNonEmptyString(category))
+  ) {
+    return res.status(400).json({
+      error: 'Envie nome ou categoria como texto não vazio',
+    });
+  }
+
+  if (hasName) tool.name = name.trim();
+  if (hasCategory) tool.category = category.trim();
+
+  res.json(tool);
+});
+```
+
+O handler distingue um campo ausente de um campo presente com valor inválido. Um corpo vazio não solicita alteração alguma; uma string vazia também não é um valor aceito. Nos dois casos, a API responde com `400`.
+
+`find()` devolve uma referência ao objeto que já está no array. Por isso, atribuir um novo valor a `tool.name` ou `tool.category` também altera o recurso armazenado em `tools`. O `id` não é lido do corpo e permanece sob controle da API.
+
+Se quiséssemos substituir a representação inteira, poderíamos definir outro contrato usando `PUT`. Aqui a operação é parcial, então `PATCH` expressa melhor o que o endpoint faz.
+
+Ao salvar o código, `node --watch` reinicia o processo e recria o array inicial. Portanto, teste esta etapa com uma ferramenta que já faz parte dele. No cliente HTTP de sua preferência, envie:
+
+```http {copy=false}
+PATCH /tools/2
+Content-Type: application/json
+
+{
+  "name": "Express 5"
+}
+```
+
+O servidor mantém `category` e devolve o recurso atualizado com `200 OK`:
+
+```json {copy=false}
+{
+  "id": 2,
+  "name": "Express 5",
+  "category": "Backend"
+}
+```
+
+Uma requisição para `/tools/99` continua recebendo `404`, pois não há recurso para atualizar.
+
+## 5. Removendo uma ferramenta com `DELETE`
+
+Para remover um item do array, precisamos encontrar sua posição. Adicione `DELETE /tools/:id` antes do fallback:
+
+```js
+// server.js
+app.delete('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const toolIndex = tools.findIndex((item) => item.id === id);
+
+  if (toolIndex === -1) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  tools.splice(toolIndex, 1);
+  res.status(204).end();
+});
+```
+
+Enquanto `find()` procura o próprio objeto, `findIndex()` devolve a posição usada por `splice()` para removê-lo. Se o índice for `-1`, nenhuma ferramenta corresponde ao ID e a API responde com `404`.
+
+Quando a remoção funciona, usamos `204 No Content`. Esse status informa que a operação foi concluída e que não existe conteúdo adicional na resposta. Por isso o handler termina com `.end()`, sem enviar JSON.
+
+Salve e solicite a remoção de uma ferramenta do array inicial:
+
+```http {copy=false}
+DELETE /tools/2
+```
+
+A resposta não possui corpo:
+
+```http {copy=false}
+HTTP/1.1 204 No Content
+```
+
+Se você repetir a mesma requisição antes de reiniciar o servidor, receberá `404`: o recurso já não existe no array.
+
+## 6. Completando o ciclo — e encontrando o limite do array
+
+Com todas as operações reunidas, `server.js` fica assim:
+
+```js
+// server.js
+import express from 'express';
+
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+const tools = [
+  { id: 1, name: 'React', category: 'Frontend' },
+  { id: 2, name: 'Express', category: 'Backend' },
+];
+
+let nextId = 3;
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+app.get('/tools', (req, res) => {
+  res.json(tools);
+});
+
+app.get('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  res.json(tool);
+});
+
+app.post('/tools', (req, res) => {
+  const { name, category } = req.body ?? {};
+
+  if (!isNonEmptyString(name) || !isNonEmptyString(category)) {
+    return res.status(400).json({
+      error: 'Nome e categoria são obrigatórios',
+    });
+  }
+
+  const tool = {
+    id: nextId,
+    name: name.trim(),
+    category: category.trim(),
+  };
+
+  nextId += 1;
+  tools.push(tool);
+
+  res.location(`/tools/${tool.id}`).status(201).json(tool);
+});
+
+app.patch('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const tool = tools.find((item) => item.id === id);
+
+  if (!tool) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  const { name, category } = req.body ?? {};
+  const hasName = name !== undefined;
+  const hasCategory = category !== undefined;
+
+  if (
+    (!hasName && !hasCategory) ||
+    (hasName && !isNonEmptyString(name)) ||
+    (hasCategory && !isNonEmptyString(category))
+  ) {
+    return res.status(400).json({
+      error: 'Envie nome ou categoria como texto não vazio',
+    });
+  }
+
+  if (hasName) tool.name = name.trim();
+  if (hasCategory) tool.category = category.trim();
+
+  res.json(tool);
+});
+
+app.delete('/tools/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const toolIndex = tools.findIndex((item) => item.id === id);
+
+  if (toolIndex === -1) {
+    return res.status(404).json({ error: 'Ferramenta não encontrada' });
+  }
+
+  tools.splice(toolIndex, 1);
+  res.status(204).end();
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+
+app.listen(port, () => {
+  console.log(`API disponível em http://localhost:${port}`);
+});
+```
+
+Salvar o arquivo reinicia o servidor e restaura os dois itens iniciais. Sem fazer novas alterações no código, percorra o contrato completo usando o cliente HTTP que preferir:
+
+```text {copy=false}
+POST   /tools   → 201: cria a ferramenta 3
+GET    /tools/3 → 200: consulta a ferramenta
+PATCH  /tools/3 → 200: atualiza a categoria
+GET    /tools/3 → 200: confirma a atualização
+DELETE /tools/3 → 204: remove a ferramenta
+GET    /tools/3 → 404: confirma a remoção
+```
+
+Se quiser executar o ciclo pelo terminal, os comandos correspondentes estão reunidos abaixo.
+
+<ContentDisclosure label="Teste manual" title="Percorra todo o CRUD com curl">
+
+Mantenha `pnpm dev` em execução e abra um segundo terminal:
+
+```bash {copy=false}
+# 1. Crie uma ferramenta: a resposta terá id 3
+curl -i -X POST http://localhost:3000/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Fastify","category":"Backend"}'
+
+# 2. Consulte o recurso criado
+curl -i http://localhost:3000/tools/3
+
+# 3. Atualize somente a categoria
+curl -i -X PATCH http://localhost:3000/tools/3 \
+  -H 'Content-Type: application/json' \
+  -d '{"category":"Servidor"}'
+
+# 4. Consulte novamente para observar a mudança
+curl -i http://localhost:3000/tools/3
+
+# 5. Remova a ferramenta
+curl -i -X DELETE http://localhost:3000/tools/3
+
+# 6. Confirme que ela não existe mais
+curl -i http://localhost:3000/tools/3
+```
+
+</ContentDisclosure>
+
+Independentemente do cliente escolhido, todas as requisições chegam ao mesmo processo Node.js e compartilham o mesmo array. Por isso cada operação enxerga a alteração feita pela anterior.
+
+Agora pressione `Ctrl + C`, execute `pnpm dev` novamente e consulte `GET /tools`. O servidor volta a responder apenas com React e Express. Tanto o array quanto `nextId` foram recriados a partir de `server.js`.
+
+O CRUD funciona, mas seu estado pertence ao processo do Node.js. Quando o processo termina, os dados desaparecem. Para mantê-los entre reinicializações, precisaremos armazená-los fora da memória — problema que abre o caminho para entender SQLite e SQL sem misturar persistência com o contrato HTTP que acabamos de construir.
