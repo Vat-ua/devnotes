@@ -24,7 +24,6 @@ export default function Articles() {
       ? [...primaryTopicOptions, activeTopicOption]
       : primaryTopicOptions;
   const visibleArticles = filterContentByTopic(articles, activeTopic);
-  const resultLabel = visibleArticles.length === 1 ? 'artigo encontrado' : 'artigos encontrados';
 
   return (
     <div className="container page-shell">
@@ -41,11 +40,6 @@ export default function Articles() {
       </header>
       {showTopicFilters && (
         <TopicFilterBar options={topicOptions} activeTopic={activeTopic} total={articles.length} />
-      )}
-      {activeTopic && (
-        <p className="article-result-count" role="status">
-          {visibleArticles.length} {resultLabel} para “{activeTopic}”.
-        </p>
       )}
       {visibleArticles.length > 0 ? (
         <ul className="archive-grid">

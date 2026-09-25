@@ -979,13 +979,6 @@
     text-align: center;
   }
 
-  .article-result-count {
-    margin-bottom: 1.5rem;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    font-weight: 700;
-  }
-
   .article-filter-empty {
     min-height: 18rem;
     display: grid;
