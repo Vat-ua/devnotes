@@ -928,6 +928,94 @@
     font-size: var(--text-lead);
   }
 
+  .article-topic-filter {
+    display: grid;
+    gap: 0.875rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .article-topic-filter-label {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 800;
+  }
+
+  .article-topic-filter ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article-topic-filter-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.8125rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+    font-weight: 800;
+    text-decoration: none;
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .article-topic-filter-link:hover {
+    border-color: color-mix(in srgb, currentColor 36%, var(--color-border));
+  }
+
+  .article-topic-filter-link[aria-current='page'] {
+    border-color: var(--color-text);
+    background: var(--color-text);
+    color: var(--color-canvas);
+  }
+
+  .article-topic-filter-count {
+    min-width: 1.5rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .article-result-count {
+    margin-bottom: 1.5rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .article-filter-empty {
+    min-height: 18rem;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 1rem;
+    padding-block: 2rem;
+  }
+
+  .article-filter-empty h2 {
+    max-width: 40rem;
+    margin: 0;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 0.95;
+  }
+
+  .article-filter-empty p {
+    max-width: 36rem;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+
   .empty-state {
     min-height: 60vh;
     display: grid;

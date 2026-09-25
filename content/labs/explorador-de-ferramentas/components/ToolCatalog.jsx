@@ -1,5 +1,5 @@
-import { useMemo, useSyncExternalStore } from 'react';
-import { useSearchParams } from 'react-router';
+import { useMemo } from 'react';
+import { useHydratedSearchParams } from '../../../../src/utils/useHydratedSearchParams.js';
 import { tools } from '../data.js';
 import FilterBar from './FilterBar.jsx';
 import ToolCard from './ToolCard.jsx';
@@ -22,29 +22,11 @@ function sortTools(first, second, sortBy) {
   return first.name.localeCompare(second.name, 'pt-BR');
 }
 
-function subscribeToHydration() {
-  return () => {};
-}
-
-function getClientSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export default function ToolCatalog() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const isHydrated = useSyncExternalStore(
-    subscribeToHydration,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
-  const activeSearchParams = isHydrated ? searchParams : new URLSearchParams();
-  const query = activeSearchParams.get('q') ?? '';
-  const category = activeSearchParams.get('category') ?? 'Todos';
-  const sortBy = activeSearchParams.get('sort') ?? 'name';
+  const [searchParams, setSearchParams] = useHydratedSearchParams();
+  const query = searchParams.get('q') ?? '';
+  const category = searchParams.get('category') ?? 'Todos';
+  const sortBy = searchParams.get('sort') ?? 'name';
 
   const visibleTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

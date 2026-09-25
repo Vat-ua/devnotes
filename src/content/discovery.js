@@ -42,6 +42,29 @@ export function getContinueReadingArticles(
     .map(({ article }) => article);
 }
 
+export function getTopicOptions(entries, { minCount = 1 } = {}) {
+  const topicCounts = new Map();
+
+  for (const entry of entries) {
+    for (const topic of new Set(entry.topics)) {
+      topicCounts.set(topic, (topicCounts.get(topic) ?? 0) + 1);
+    }
+  }
+
+  return [...topicCounts]
+    .map(([topic, count]) => ({ topic, count }))
+    .filter(({ count }) => count >= minCount)
+    .toSorted(
+      (first, second) =>
+        second.count - first.count || first.topic.localeCompare(second.topic, 'pt-BR'),
+    );
+}
+
+export function filterContentByTopic(entries, topic) {
+  if (!topic) return entries;
+  return entries.filter((entry) => entry.topics.includes(topic));
+}
+
 function countSharedTopics(topics, currentTopics) {
   let count = 0;
 

@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  filterContentByTopic,
   getArticleSeriesNavigation,
   getContinueReadingArticles,
+  getTopicOptions,
 } from '../src/content/discovery.js';
 
 const articles = [
@@ -124,4 +126,31 @@ test('completa com artigos recentes e respeita limite e exclusões', () => {
     candidates.map(({ slug }) => slug),
     originalOrder,
   );
+});
+
+test('contabiliza topics por conteúdo e retorna somente opções recorrentes', () => {
+  const entries = [
+    { slug: 'primeiro', topics: ['React', 'APIs', 'React'] },
+    { slug: 'segundo', topics: ['React', 'Node.js'] },
+    { slug: 'terceiro', topics: ['APIs', 'Node.js'] },
+    { slug: 'quarto', topics: ['React Router'] },
+    { slug: 'quinto', topics: ['React'] },
+  ];
+
+  assert.deepEqual(getTopicOptions(entries, { minCount: 2 }), [
+    { topic: 'React', count: 3 },
+    { topic: 'APIs', count: 2 },
+    { topic: 'Node.js', count: 2 },
+  ]);
+});
+
+test('filtra conteúdo por topic exato e preserva a coleção completa sem filtro', () => {
+  const entries = [
+    { slug: 'react', topics: ['React'] },
+    { slug: 'apis', topics: ['APIs'] },
+  ];
+
+  assert.deepEqual(filterContentByTopic(entries, 'React'), [entries[0]]);
+  assert.deepEqual(filterContentByTopic(entries, 'react'), []);
+  assert.equal(filterContentByTopic(entries), entries);
 });
