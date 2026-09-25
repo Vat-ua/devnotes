@@ -1,4 +1,4 @@
-const commonFields = ['title', 'description', 'publishedAt', 'topics'];
+const commonFields = ['title', 'description', 'publishedAt', 'publicationOrder', 'topics'];
 const fieldsByKind = {
   article: commonFields,
   lab: [...commonFields, 'demoInstruction'],
@@ -12,12 +12,19 @@ export const CONTENT_FILES = {
 export function createContentEntries(metadataModules, kind) {
   assertContentKind(kind);
 
-  return Object.entries(metadataModules)
-    .map(([path, module]) => {
-      const slug = getSlugFromMetadataPath(path);
-      return normalizeContentMetadata({ kind, slug, meta: module.meta, source: path });
-    })
-    .sort(byPublishedAt);
+  const entries = Object.entries(metadataModules).map(([path, module]) => {
+    const slug = getSlugFromMetadataPath(path);
+    return normalizeContentMetadata({ kind, slug, meta: module.meta, source: path });
+  });
+  const issues = getContentCollectionIssues(entries, kind);
+
+  if (issues.length > 0) {
+    throw new Error(
+      `Metadata inválido na coleção de ${kindLabel(kind)}:\n- ${issues.join('\n- ')}`,
+    );
+  }
+
+  return entries.sort(compareContentPublication);
 }
 
 export function normalizeContentMetadata({ kind, slug, meta, source = slug }) {
@@ -85,7 +92,69 @@ export function getContentMetadataIssues({ kind, meta }) {
     issues.push('meta.publishedAt deve ser uma data válida no formato YYYY-MM-DD');
   }
 
+  if (
+    meta.publicationOrder !== undefined &&
+    (!Number.isInteger(meta.publicationOrder) || meta.publicationOrder < 1)
+  ) {
+    issues.push('meta.publicationOrder deve ser um número inteiro positivo');
+  }
+
   return issues;
+}
+
+export function getContentCollectionIssues(entries, kind) {
+  assertContentKind(kind);
+
+  const issues = [];
+  const entriesByDate = groupBy(entries, (entry) => entry.publishedAt);
+
+  for (const [publishedAt, dateEntries] of entriesByDate) {
+    const hasSameDate = dateEntries.length > 1;
+    const hasPublicationOrder = dateEntries.some((entry) => entry.publicationOrder !== undefined);
+
+    if (!hasSameDate && !hasPublicationOrder) continue;
+
+    const entriesWithoutOrder = dateEntries.filter((entry) => entry.publicationOrder === undefined);
+
+    if (entriesWithoutOrder.length > 0) {
+      issues.push(
+        `meta.publicationOrder é obrigatório para todos os conteúdos publicados em ${publishedAt}: ${formatSlugs(entriesWithoutOrder)}`,
+      );
+      continue;
+    }
+
+    const entriesByOrder = groupBy(dateEntries, (entry) => entry.publicationOrder);
+
+    for (const [publicationOrder, orderEntries] of entriesByOrder) {
+      if (orderEntries.length > 1) {
+        issues.push(
+          `meta.publicationOrder ${publicationOrder} está duplicado em ${publishedAt}: ${formatSlugs(orderEntries)}`,
+        );
+      }
+    }
+
+    const actualOrders = [...entriesByOrder.keys()].toSorted((first, second) => first - second);
+    const expectedOrders = Array.from({ length: dateEntries.length }, (_, index) => index + 1);
+
+    if (
+      actualOrders.length !== expectedOrders.length ||
+      actualOrders.some((order, index) => order !== expectedOrders[index])
+    ) {
+      issues.push(
+        `meta.publicationOrder deve formar uma sequência contínua de 1 a ${dateEntries.length} em ${publishedAt}`,
+      );
+    }
+  }
+
+  return issues;
+}
+
+export function compareContentPublication(first, second) {
+  return (
+    second.publishedAt.localeCompare(first.publishedAt) ||
+    (second.publicationOrder ?? 0) - (first.publicationOrder ?? 0) ||
+    first.slug.localeCompare(second.slug, 'pt-BR')
+  );
 }
 
 export function getSlugFromMetadataPath(path) {
@@ -100,6 +169,27 @@ export function isContentSlug(value) {
 
 function assertContentKind(kind) {
   if (!fieldsByKind[kind]) throw new Error(`Tipo de conteúdo desconhecido: "${kind}".`);
+}
+
+function kindLabel(kind) {
+  return kind === 'article' ? 'artigos' : 'Labs';
+}
+
+function formatSlugs(entries) {
+  return entries.map((entry) => entry.slug).join(', ');
+}
+
+function groupBy(values, getKey) {
+  const groups = new Map();
+
+  for (const value of values) {
+    const key = getKey(value);
+    const group = groups.get(key) ?? [];
+    group.push(value);
+    groups.set(key, group);
+  }
+
+  return groups;
 }
 
 function isPlainObject(value) {
@@ -121,12 +211,5 @@ function isIsoDate(value) {
     date.getUTCFullYear() === Number(year) &&
     date.getUTCMonth() + 1 === Number(month) &&
     date.getUTCDate() === Number(day)
-  );
-}
-
-function byPublishedAt(first, second) {
-  return (
-    second.publishedAt.localeCompare(first.publishedAt) ||
-    first.slug.localeCompare(second.slug, 'pt-BR')
   );
 }

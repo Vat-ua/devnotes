@@ -4,4 +4,5 @@ export const meta = {
     'A resposta de uma API é um detalhe externo. Adapte os dados, cancele buscas antigas e trate estados vazios antes de entregá-los à interface.',
   topics: ['React', 'APIs'],
   publishedAt: '2026-09-01',
+  publicationOrder: 1,
 };

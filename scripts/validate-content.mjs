@@ -1,7 +1,12 @@
 import { access, readdir } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { CONTENT_FILES, getContentEntryIssues } from '../src/content/metadata.js';
+import {
+  CONTENT_FILES,
+  getContentCollectionIssues,
+  getContentEntryIssues,
+  normalizeContentMetadata,
+} from '../src/content/metadata.js';
 
 const contentDir = getContentDirectory(process.argv.slice(2));
 const projectDir = resolve(contentDir, '..');
@@ -28,6 +33,7 @@ async function validateContentType({ type, kind }) {
   const typeDir = join(contentDir, type);
   const entries = await getDirectories(typeDir, type);
   const requiredFiles = CONTENT_FILES[kind].required;
+  const validEntries = [];
 
   for (const entry of entries) {
     const entryDir = join(typeDir, entry.name);
@@ -43,10 +49,22 @@ async function validateContentType({ type, kind }) {
     const metadataModule = await loadMetadata(metaPath, type, entryDir);
     if (!metadataModule) continue;
 
-    getContentEntryIssues({ kind, slug: entry.name, meta: metadataModule.meta }).forEach((issue) =>
-      addIssue(type, entryDir, issue),
-    );
+    const entryIssues = getContentEntryIssues({
+      kind,
+      slug: entry.name,
+      meta: metadataModule.meta,
+    });
+
+    entryIssues.forEach((issue) => addIssue(type, entryDir, issue));
+
+    if (entryIssues.length === 0) {
+      validEntries.push(
+        normalizeContentMetadata({ kind, slug: entry.name, meta: metadataModule.meta }),
+      );
+    }
   }
+
+  getContentCollectionIssues(validEntries, kind).forEach((issue) => addIssue(type, typeDir, issue));
 }
 
 async function getDirectories(typeDir, type) {

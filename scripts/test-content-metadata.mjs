@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   createContentEntries,
+  getContentCollectionIssues,
   getContentEntryIssues,
   normalizeContentMetadata,
 } from '../src/content/metadata.js';
@@ -56,11 +57,27 @@ test('rejeita metadata e slugs que causariam registros inconsistentes', () => {
   ]);
 });
 
-test('ordena registros normalizados por data e slug', () => {
+test('rejeita publicationOrder que não seja um inteiro positivo', () => {
+  assert.deepEqual(
+    getContentEntryIssues({
+      kind: 'article',
+      slug: 'um-artigo',
+      meta: { ...articleMeta, publicationOrder: 0 },
+    }),
+    ['meta.publicationOrder deve ser um número inteiro positivo'],
+  );
+});
+
+test('ordena registros por data e pela ordem de publicação dentro do dia', () => {
   const entries = createContentEntries(
     {
-      '/content/articles/segundo/meta.js': { meta: articleMeta },
-      '/content/articles/primeiro/meta.js': {
+      '/content/articles/primeiro-do-dia/meta.js': {
+        meta: { ...articleMeta, publicationOrder: 1 },
+      },
+      '/content/articles/segundo-do-dia/meta.js': {
+        meta: { ...articleMeta, publicationOrder: 2 },
+      },
+      '/content/articles/mais-recente/meta.js': {
         meta: { ...articleMeta, publishedAt: '2026-09-09' },
       },
     },
@@ -69,6 +86,35 @@ test('ordena registros normalizados por data e slug', () => {
 
   assert.deepEqual(
     entries.map(({ slug }) => slug),
-    ['primeiro', 'segundo'],
+    ['mais-recente', 'segundo-do-dia', 'primeiro-do-dia'],
   );
+});
+
+test('exige publicationOrder em todos os conteúdos que compartilham uma data', () => {
+  const issues = getContentCollectionIssues(
+    [
+      { slug: 'primeiro', publishedAt: '2026-09-08', publicationOrder: 1 },
+      { slug: 'segundo', publishedAt: '2026-09-08' },
+    ],
+    'article',
+  );
+
+  assert.deepEqual(issues, [
+    'meta.publicationOrder é obrigatório para todos os conteúdos publicados em 2026-09-08: segundo',
+  ]);
+});
+
+test('rejeita publicationOrder duplicado ou com lacunas na mesma data', () => {
+  const issues = getContentCollectionIssues(
+    [
+      { slug: 'primeiro', publishedAt: '2026-09-08', publicationOrder: 1 },
+      { slug: 'segundo', publishedAt: '2026-09-08', publicationOrder: 1 },
+    ],
+    'article',
+  );
+
+  assert.deepEqual(issues, [
+    'meta.publicationOrder 1 está duplicado em 2026-09-08: primeiro, segundo',
+    'meta.publicationOrder deve formar uma sequência contínua de 1 a 2 em 2026-09-08',
+  ]);
 });
