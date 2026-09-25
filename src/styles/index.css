@@ -1498,14 +1498,6 @@
     color: var(--color-text-muted);
   }
 
-  .content-error {
-    margin: 2rem 0;
-    padding: 1rem 1.25rem;
-    border-left: 3px solid var(--color-accent-warm);
-    background: var(--color-surface-subtle);
-    color: var(--color-text);
-  }
-
   .code-block {
     position: relative;
     margin: 2rem 0;
