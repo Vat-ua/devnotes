@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 export default function TopicFilterBar({ options, activeTopic, total }) {
   return (
     <nav className="article-topic-filter" aria-label="Filtrar artigos por assunto">
-      <span className="article-topic-filter-label">Filtrar por assunto</span>
       <ul>
         <li>
           <TopicLink count={total} current={!activeTopic} label="Todos" />

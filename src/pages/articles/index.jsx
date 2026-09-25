@@ -1,24 +1,28 @@
 import { Link } from 'react-router';
 
 import ArticleCard from '../../components/content/ArticleCard.jsx';
+import { articleFilterTopics } from '../../content/articleFilterTopics.js';
 import { filterContentByTopic, getTopicOptions } from '../../content/discovery.js';
 import { useHydratedSearchParams } from '../../utils/useHydratedSearchParams.js';
 import { articles } from '@content/registry';
 import TopicFilterBar from './TopicFilterBar.jsx';
 
 const allTopicOptions = getTopicOptions(articles);
-const recurringTopicMinimum = 2;
-const recurringTopicOptions = getTopicOptions(articles, { minCount: recurringTopicMinimum });
-const showTopicFilters = recurringTopicOptions.length >= 2;
+const topicOptionsByName = new Map(allTopicOptions.map((option) => [option.topic, option]));
+const primaryTopicOptions = articleFilterTopics.flatMap((topic) => {
+  const option = topicOptionsByName.get(topic);
+  return option ? [option] : [];
+});
+const showTopicFilters = primaryTopicOptions.length > 0;
 
 export default function Articles() {
   const [searchParams] = useHydratedSearchParams();
   const activeTopic = searchParams.get('topic')?.trim() || undefined;
   const activeTopicOption = allTopicOptions.find(({ topic }) => topic === activeTopic);
   const topicOptions =
-    activeTopicOption && activeTopicOption.count < recurringTopicMinimum
-      ? [...recurringTopicOptions, activeTopicOption]
-      : recurringTopicOptions;
+    activeTopicOption && !articleFilterTopics.includes(activeTopicOption.topic)
+      ? [...primaryTopicOptions, activeTopicOption]
+      : primaryTopicOptions;
   const visibleArticles = filterContentByTopic(articles, activeTopic);
   const resultLabel = visibleArticles.length === 1 ? 'artigo encontrado' : 'artigos encontrados';
 
@@ -38,11 +42,11 @@ export default function Articles() {
       {showTopicFilters && (
         <TopicFilterBar options={topicOptions} activeTopic={activeTopic} total={articles.length} />
       )}
-      <p className="article-result-count" role="status">
-        {activeTopic
-          ? `${visibleArticles.length} ${resultLabel} para “${activeTopic}”.`
-          : `${visibleArticles.length} artigos publicados.`}
-      </p>
+      {activeTopic && (
+        <p className="article-result-count" role="status">
+          {visibleArticles.length} {resultLabel} para “{activeTopic}”.
+        </p>
+      )}
       {visibleArticles.length > 0 ? (
         <ul className="archive-grid">
           {visibleArticles.map((article, index) => (
