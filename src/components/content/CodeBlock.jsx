@@ -24,19 +24,29 @@ export default function CodeBlock({ children, className = '', copy = true, sourc
 
   const hasCopyButton = copy !== false && copy !== 'false' && copySource.trim().length > 0;
   const copied = copyState === 'success';
-  const label = copied ? 'Copiado' : copyState === 'error' ? 'Tente novamente' : 'Copiar';
+  const hasCopyError = copyState === 'error';
+  const tooltipLabel = hasCopyError ? 'Não foi possível copiar' : 'Copiar';
+  const statusMessage = copied ? 'Código copiado' : 'Não foi possível copiar';
 
   return (
     <div className={`code-block${className ? ` ${className}` : ''}`}>
       {hasCopyButton && (
         <button
-          className={`code-copy-button${copied ? ' is-copied' : ''}`}
+          className={`code-copy-button${copied ? ' is-copied' : ''}${hasCopyError ? ' has-copy-error' : ''}`}
           type="button"
+          aria-label="Copiar código"
           onClick={copyCode}
         >
-          {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
-          <span aria-live="polite">{label}</span>
+          {copied ? <Check aria-hidden="true" size={19} /> : <Copy aria-hidden="true" size={19} />}
+          <span className="code-copy-tooltip" aria-hidden="true">
+            {tooltipLabel}
+          </span>
         </button>
+      )}
+      {copyState !== 'idle' && (
+        <span className="sr-only" role="status" aria-live="polite">
+          {statusMessage}
+        </span>
       )}
       {children}
     </div>

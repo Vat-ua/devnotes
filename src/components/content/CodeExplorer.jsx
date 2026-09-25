@@ -79,7 +79,7 @@ export default function CodeExplorer({ files }) {
         <div className="code-file-tabs" role="tablist" aria-label="Arquivos do exemplo">
           {files.map((item, index) => (
             <button
-              className={item.name === activeFile ? 'active' : ''}
+              className="content-tab-button"
               type="button"
               role="tab"
               id={tabId(item.name)}

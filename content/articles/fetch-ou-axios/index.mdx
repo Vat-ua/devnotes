@@ -1,0 +1,273 @@
+import ContentDisclosure from '../../../src/components/content/ContentDisclosure.jsx';
+import ContentTabs, { ContentTab } from '../../../src/components/content/ContentTabs.jsx';
+
+O JavaScript já oferece o `fetch()` para fazer requisições HTTP. Com ele podemos buscar dados, enviar informações para uma API e trabalhar com diferentes métodos como GET, POST, PATCH e DELETE.
+
+Então, por que instalar outra biblioteca para fazer a mesma coisa?
+
+O **Axios** não substitui as capacidades do `fetch()`. Ele oferece uma interface diferente e algumas conveniências que podem reduzir código repetitivo, principalmente quando uma aplicação faz muitas requisições.
+
+Vamos comparar as duas abordagens usando a mesma API e as mesmas operações.
+
+## O que é Axios?
+
+Axios é uma biblioteca JavaScript para fazer requisições HTTP. Assim como `fetch()`, trabalha com Promises e pode ser utilizada com `async/await`. A diferença inicial é simples: `fetch()` já faz parte da plataforma Web, enquanto o Axios precisa ser instalado no projeto.
+
+Em um projeto configurado para usar pacotes, instale a dependência com:
+
+```bash
+pnpm add axios
+```
+
+Depois, importe a biblioteca e use seus métodos para cada operação. Os exemplos deste artigo consideram que o código está dentro de uma função `async` ou de um módulo JavaScript, por isso podemos usar `await` diretamente.
+
+```js
+import axios from 'axios';
+
+// GET: busca dados
+const getResponse = await axios.get(url);
+
+// POST: envia dados
+const postResponse = await axios.post(url, data);
+```
+
+A diferença entre as abordagens fica mais clara quando colocamos o código lado a lado.
+
+## GET: buscando dados
+
+Vamos buscar um produto enviando uma requisição `GET` para `https://dummyjson.com/products/1`.
+
+<ContentTabs ariaLabel="Comparação da requisição GET com fetch e Axios">
+  <ContentTab label="fetch()">
+
+```js
+const response = await fetch('https://dummyjson.com/products/1');
+
+// fetch não rejeita a Promise apenas por causa do status HTTP
+if (!response.ok) {
+  throw new Error(`Erro HTTP: ${response.status}`);
+}
+
+// O corpo da resposta ainda precisa ser lido como JSON
+const product = await response.json();
+
+console.log(product.title);
+```
+
+  </ContentTab>
+  <ContentTab label="Axios">
+
+```js
+const response = await axios.get('https://dummyjson.com/products/1');
+
+// O corpo já está disponível em data
+const product = response.data;
+
+console.log(product.title);
+```
+
+  </ContentTab>
+</ContentTabs>
+
+<Callout title="Por que dois awaits?">
+
+O primeiro `await` entrega o objeto `Response` quando os cabeçalhos da resposta estão disponíveis. O corpo ainda precisa ser lido; `response.json()` faz essa leitura e também retorna uma Promise.
+
+Por isso, sem o segundo `await`, teríamos uma Promise em vez dos dados esperados. O Axios faz essa etapa automaticamente e disponibiliza o corpo em `response.data`.
+
+</Callout>
+
+Outras informações do Axios, como `response.status` e `response.headers`, continuam disponíveis no objeto `response`.
+
+Para uma requisição simples, a diferença é pequena. O Axios apenas elimina algumas etapas que normalmente escreveríamos com `fetch()`.
+
+## POST: enviando dados
+
+Agora vamos enviar um novo produto.
+
+Os dados serão os mesmos nos dois exemplos:
+
+```js
+const newProduct = {
+  title: 'Caderno',
+  price: 25,
+};
+```
+
+<ContentTabs ariaLabel="Comparação da requisição POST com fetch e Axios">
+  <ContentTab label="fetch()">
+
+```js
+const response = await fetch('https://dummyjson.com/products/add', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(newProduct),
+});
+
+if (!response.ok) {
+  throw new Error(`Erro HTTP: ${response.status}`);
+}
+
+const product = await response.json();
+
+console.log(product);
+```
+
+  </ContentTab>
+  <ContentTab label="Axios">
+
+```js
+// Axios serializa o objeto e configura o JSON automaticamente
+const response = await axios.post('https://dummyjson.com/products/add', newProduct);
+
+console.log(response.data);
+```
+
+  </ContentTab>
+</ContentTabs>
+
+Com `fetch()`, precisamos indicar o método, configurar o `Content-Type` e transformar o objeto JavaScript em JSON com `JSON.stringify()`. No Axios, podemos passar o objeto diretamente para `axios.post()`; a biblioteca faz a serialização e configura o cabeçalho correspondente automaticamente.
+
+> **Nota:** o DummyJSON apenas simula a criação do produto. A resposta inclui um novo `id`, mas o produto não é realmente salvo no servidor.
+
+Até aqui, Axios significa principalmente **menos configuração explícita**. Existe, porém, outra diferença importante: o tratamento de respostas HTTP com erro.
+
+## O que acontece quando a API retorna um erro?
+
+Considere uma requisição `GET` para um produto inexistente em `https://dummyjson.com/products/999999`.
+
+A API pode responder, por exemplo, com `404 Not Found`.
+
+<ContentTabs ariaLabel="Comparação do tratamento de erros com fetch e Axios">
+  <ContentTab label="fetch()">
+
+```js
+try {
+  const response = await fetch('https://dummyjson.com/products/999999');
+
+  // Uma resposta 404 não entra automaticamente no catch
+  if (!response.ok) {
+    throw new Error(`Erro HTTP: ${response.status}`);
+  }
+
+  const product = await response.json();
+
+  console.log(product);
+} catch (error) {
+  console.error(error.message);
+}
+```
+
+  </ContentTab>
+  <ContentTab label="Axios">
+
+```js
+try {
+  const response = await axios.get('https://dummyjson.com/products/999999');
+
+  console.log(response.data);
+} catch (error) {
+  if (error.response) {
+    console.error('Erro HTTP:', error.response.status);
+  } else if (error.request) {
+    console.error('A API não respondeu');
+  } else {
+    console.error('Erro ao configurar a requisição:', error.message);
+  }
+}
+```
+
+  </ContentTab>
+</ContentTabs>
+
+Aqui existe uma diferença de comportamento importante. O `fetch()` não rejeita sua Promise apenas porque o servidor respondeu com `404`, `400` ou `500`: como a resposta HTTP chegou, precisamos verificar `response.ok`. O Axios, por padrão, rejeita a Promise quando recebe uma resposta fora da faixa `2xx`, por isso um `404` já direciona a execução para o `catch`.
+
+Também é importante distinguir **erro HTTP** de **falha de rede**. Um erro HTTP significa que o servidor respondeu, mas informou que algo deu errado, como `404 Not Found` ou `500 Internal Server Error`. Em uma falha de rede, a aplicação não consegue obter uma resposta HTTP utilizável por problemas de conexão, timeout ou outras falhas durante a requisição.
+
+No Axios, `error.response` indica que o servidor respondeu com erro, enquanto `error.request` indica que a requisição foi enviada, mas nenhuma resposta foi recebida. Nos dois casos precisamos tratar o problema; a diferença é que Axios já considera respostas HTTP malsucedidas como erros por padrão.
+
+## Reutilizando configurações com `axios.create()`
+
+As diferenças anteriores economizam algumas linhas, mas existe outra conveniência que começa a fazer mais sentido quando uma aplicação possui várias requisições. Em vez de repetir a mesma URL base e outras opções em cada chamada, podemos criar uma instância configurada do Axios:
+
+```js
+const api = axios.create({
+  baseURL: 'https://dummyjson.com',
+  timeout: 5000, // Interrompe a espera após 5 segundos
+});
+
+// Todas as chamadas feitas com api reutilizam a configuração
+const productResponse = await api.get('/products/1');
+const userResponse = await api.get('/users/1');
+```
+
+Agora `baseURL` e `timeout` ficam definidos em um único lugar. Se a URL da API mudar, não precisamos procurar cada requisição espalhada pelo projeto.
+
+O `fetch()` também pode centralizar essas decisões em uma função auxiliar e usar `AbortSignal.timeout()` para limitar o tempo de espera:
+
+<ContentDisclosure label="Para comparar" title="Como ficaria com fetch()?">
+
+```js
+async function apiFetch(path, options = {}) {
+  const response = await fetch(`https://dummyjson.com${path}`, {
+    ...options,
+    signal: AbortSignal.timeout(5000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+const product = await apiFetch('/products/1');
+```
+
+</ContentDisclosure>
+
+Nos dois casos, a URL base, o timeout e a regra para erros ficam concentrados em um lugar. A diferença é que Axios já oferece uma estrutura para isso; com `fetch()`, nós a construímos.
+
+<ContentDisclosure label="Conteúdo opcional" title="E os interceptors?">
+
+Em aplicações maiores, algumas operações precisam acontecer em muitas requisições. Pode ser necessário, por exemplo, adicionar automaticamente um cabeçalho de autenticação ou executar uma ação comum quando uma resposta apresenta determinado erro.
+
+Axios permite centralizar esse comportamento por meio de **interceptors**, funções executadas durante o fluxo de uma requisição ou resposta. Eles podem ser úteis em projetos com muitas chamadas HTTP, mas não são necessários para começar a trabalhar com Axios.
+
+```js
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+```
+
+Neste exemplo, `getAccessToken()` representa uma função da própria aplicação responsável por fornecer o token atual.
+
+</ContentDisclosure>
+
+## Quando usar fetch ou Axios?
+
+Esta é uma comparação rápida entre as duas abordagens:
+
+| Critério                   | `fetch()`                              | Axios                                      |
+| -------------------------- | -------------------------------------- | ------------------------------------------ |
+| Instalação                 | Já faz parte da plataforma Web         | É uma dependência externa                  |
+| Corpo JSON                 | Exige `response.json()`                | Fica disponível em `response.data`         |
+| Erros HTTP                 | Exigem a verificação de `response.ok`  | Rejeitam a Promise fora da faixa `2xx`     |
+| Configuração compartilhada | Pode ser criada com funções auxiliares | Pode ser centralizada com `axios.create()` |
+| Timeout                    | Pode usar `AbortSignal.timeout()`      | Pode ser definido na configuração          |
+| Comportamentos comuns      | Podem ser centralizados em uma função  | Podem usar interceptors                    |
+
+Para poucas requisições simples, `fetch()` costuma ser suficiente: ele não adiciona uma dependência e permite realizar as mesmas operações HTTP básicas. Axios começa a ser conveniente quando várias chamadas repetem padrões como trabalhar com JSON, compartilhar uma URL base, configurar timeouts ou aplicar comportamentos comuns.
+
+Não existe uma regra que reserve `fetch()` para projetos pequenos e Axios para projetos grandes. Uma aplicação pequena pode aproveitar as conveniências do Axios, enquanto uma aplicação maior pode funcionar muito bem com abstrações próprias sobre `fetch()`.
+
+Escolha a opção que torna as requisições mais claras e consistentes no contexto do projeto. **`fetch()` oferece a base nativa; Axios oferece conveniências prontas para organizar esse trabalho.**
