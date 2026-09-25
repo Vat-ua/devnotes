@@ -19,27 +19,27 @@ export function getArticleSeriesNavigation(articles, currentArticle) {
   };
 }
 
-export function getContinueReadingArticles(
-  articles,
-  currentArticle,
+export function getContentRecommendations(
+  entries,
+  currentEntry,
   { limit = 3, excludeSlugs = [] } = {},
 ) {
-  const currentTopics = new Set(currentArticle.topics);
-  const excludedSlugs = new Set([currentArticle.slug, ...excludeSlugs]);
+  const currentTopics = new Set(currentEntry.topics);
+  const excludedSlugs = new Set([currentEntry.slug, ...excludeSlugs]);
 
-  return articles
-    .filter((article) => !excludedSlugs.has(article.slug))
-    .map((article) => ({
-      article,
-      sharedTopicCount: countSharedTopics(article.topics, currentTopics),
+  return entries
+    .filter((entry) => !excludedSlugs.has(entry.slug))
+    .map((entry) => ({
+      entry,
+      sharedTopicCount: countSharedTopics(entry.topics, currentTopics),
     }))
     .toSorted(
       (first, second) =>
         second.sharedTopicCount - first.sharedTopicCount ||
-        compareContentPublication(first.article, second.article),
+        compareContentPublication(first.entry, second.entry),
     )
     .slice(0, limit)
-    .map(({ article }) => article);
+    .map(({ entry }) => entry);
 }
 
 export function getTopicOptions(entries, { minCount = 1 } = {}) {

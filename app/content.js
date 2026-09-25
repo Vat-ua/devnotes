@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 import {
   getArticleSeriesNavigation as createArticleSeriesNavigation,
-  getContinueReadingArticles as selectContinueReadingArticles,
+  getContentRecommendations,
 } from '../src/content/discovery.js';
 import { createContentEntries } from '../src/content/metadata.js';
 
@@ -40,7 +40,11 @@ export function getArticleSeriesNavigation(article) {
 }
 
 export function getContinueReadingArticles(article, options) {
-  return selectContinueReadingArticles(articles, article, options);
+  return getContentRecommendations(articles, article, options);
+}
+
+export function getContinueExploringLabs(lab, options) {
+  return getContentRecommendations(labs, lab, options);
 }
 
 export function getLazyLabDemo(slug) {

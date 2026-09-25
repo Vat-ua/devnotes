@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  getContentRecommendations,
   filterContentByTopic,
   getArticleSeriesNavigation,
-  getContinueReadingArticles,
   getTopicOptions,
 } from '../src/content/discovery.js';
 
@@ -81,7 +81,7 @@ test('prioriza topics compartilhados e usa a publicação como desempate', () =>
   ];
 
   assert.deepEqual(
-    getContinueReadingArticles([currentArticle, ...candidates], currentArticle).map(
+    getContentRecommendations([currentArticle, ...candidates], currentArticle).map(
       ({ slug }) => slug,
     ),
     ['dois-topics', 'um-topic-recente', 'um-topic-antigo'],
@@ -112,7 +112,7 @@ test('completa com artigos recentes e respeita limite e exclusões', () => {
     },
   ];
   const originalOrder = candidates.map(({ slug }) => slug);
-  const recommendations = getContinueReadingArticles(
+  const recommendations = getContentRecommendations(
     [...candidates, currentArticle],
     currentArticle,
     { limit: 2, excludeSlugs: ['excluido'] },

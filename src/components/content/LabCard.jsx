@@ -3,13 +3,21 @@ import { ArrowUpRight } from 'lucide-react';
 import { formatCardDate } from '@content/registry';
 import { getContentVisualPair } from '../../utils/contentVisuals.js';
 
-export default function LabCard({ lab, featured = false, headingLevel = 3 }) {
+export default function LabCard({ lab, featured = false, headingLevel = 3, variant = 'default' }) {
   const [primaryColor, secondaryColor] = getContentVisualPair(lab.slug);
   const Title = headingLevel === 2 ? 'h2' : 'h3';
+  const className = [
+    'content-card',
+    'lab-card',
+    featured && 'is-featured',
+    variant === 'compact' && 'is-compact',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <Link
-      className={`content-card lab-card ${featured ? 'is-featured' : ''}`}
+      className={className}
       style={{
         '--lab-orb-primary': `var(--${primaryColor})`,
         '--lab-orb-secondary': `var(--${secondaryColor})`,

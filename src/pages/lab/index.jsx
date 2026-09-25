@@ -5,8 +5,9 @@ import { MdxCodeBlock } from '../../components/content/CodeBlock.jsx';
 import ContentBody from '../../components/content/ContentBody.jsx';
 import ContentHeader from '../../components/content/ContentHeader.jsx';
 import ContentTable from '../../components/content/ContentTable.jsx';
+import ContinueExploring from '../../components/content/ContinueExploring.jsx';
 
-export default function Lab({ lab, Demo, Content, LabCodeExplorer }) {
+export default function Lab({ lab, Demo, Content, LabCodeExplorer, continueExploringLabs }) {
   return (
     <div className="container page-shell">
       <article className="content-page lab-page">
@@ -37,6 +38,7 @@ export default function Lab({ lab, Demo, Content, LabCodeExplorer }) {
           </Suspense>
         </ContentBody>
       </article>
+      <ContinueExploring labs={continueExploringLabs} />
     </div>
   );
 }
